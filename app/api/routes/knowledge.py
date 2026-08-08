@@ -9,6 +9,6 @@ router = APIRouter()
 def list_knowledge(current_user=Depends(get_current_user)) -> dict[str, object]:
     return {
         "items": [],
-        "message": "Knowledge APIs are scaffolded for later phases.",
+        "message": "will be added ",
         "requested_by": current_user.email,
     }

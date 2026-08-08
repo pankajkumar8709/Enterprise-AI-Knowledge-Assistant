@@ -15,11 +15,33 @@ def signup(payload: UserCreate, db: Session = Depends(get_db)) -> UserRead:
     return register_user(db, payload)
 
 
+# @router.post("/login", response_model=TokenResponse)
+# def login(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse:
+#     user = authenticate_user(db, payload.email, payload.password)
+#     if not user:
+#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+#     return create_access_token_for_user(user)
+
+from fastapi.security import OAuth2PasswordRequestForm
+
 @router.post("/login", response_model=TokenResponse)
-def login(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse:
-    user = authenticate_user(db, payload.email, payload.password)
+def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
+    # Username field will contain the email
+    user = authenticate_user(
+        db,
+        form_data.username,
+        form_data.password
+    )
+
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials"
+        )
+
     return create_access_token_for_user(user)
 
 

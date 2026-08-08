@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60
     database_url: str = Field(alias="DATABASE_URL")
     log_level: str = "INFO"
+    document_upload_dir: str = "storage/documents"
+    max_document_size_bytes: int = 10 * 1024 * 1024
 
     model_config = SettingsConfigDict(
         env_file=".env",

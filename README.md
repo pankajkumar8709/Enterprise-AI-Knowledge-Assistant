@@ -35,3 +35,4 @@ Swagger UI will be available at `http://127.0.0.1:8000/docs`.
 ```powershell
 pytest
 ```
+# Enterprise-AI-Knowledge-Assistant
