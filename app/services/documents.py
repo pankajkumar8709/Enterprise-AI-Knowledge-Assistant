@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.models.document import Document, DocumentStatus
 from app.schemas.document import DocumentUpdate
+from app.services.extraction import delete_extraction_files, extract_document_text
 
 ALLOWED_DOCUMENT_TYPES = {
     ".pdf": "application/pdf",
@@ -94,7 +95,7 @@ def create_document(db: Session, title: str, file: UploadFile) -> Document:
     db.add(document)
     db.commit()
     db.refresh(document)
-    return document
+    return extract_document_text(db, document)
 
 
 def update_document(
@@ -128,11 +129,14 @@ def update_document(
     db.add(document)
     db.commit()
     db.refresh(document)
+    if file is not None:
+        return extract_document_text(db, document)
     return document
 
 
 def delete_document(db: Session, document: Document) -> None:
     storage_path = document.storage_path
+    delete_extraction_files(document)
     db.delete(document)
     db.commit()
     _delete_stored_file(storage_path)

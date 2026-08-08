@@ -1,0 +1,618 @@
+Enterprise AI Knowledge Assistant
+Hybrid OKF + RAG Development Plan
+Project Vision
+Build an enterprise AI knowledge assistant that uses:
+OKF (Open Knowledge Format)  for structured enterprise knowledge
+RAG (Retrieval-Augmented Generation)  for unstructured documents
+Hybrid Retrieval  to decide whether to use OKF, RAG, or both
+Citations and sources  in every answer
+Final System Flow
+Admin uploads a document or structured record.
+System extracts text and metadata.
+System converts suitable facts into OKF objects.
+System chunks documents for RAG.
+System stores chunks in a vector database.
+User asks a question.
+Query classifier decides:
+OKF only
+RAG only
+OKF + RAG together
+Retrieved context is passed to the LLM.
+LLM generates grounded answer with citations.
+Phase 0 — Planning and Architecture
+Goal
+Finalize the product idea, scope, and architecture before writing code.
+Exact Things to Do
+Write the project problem statement.•
+•
+•
+•
+1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+10.
+11.
+12.
+1.
+1
+
+Define the target users:
+Admin
+Employee/User
+List supported knowledge types:
+Policies
+FAQs
+Documents
+Departments
+Employees
+Products
+Rules
+Decide what goes to OKF and what goes to RAG.
+Draw the high-level architecture diagram.
+Define the data flow from upload to answer .
+Finalize the technology stack.
+Create the folder structure for backend and frontend.
+Write the minimum viable product scope.
+Prepare the phase-wise learning plan for the team.
+Deliverables
+Project synopsis
+HLD diagram
+System flow diagram
+Folder structure
+Tech stack list
+MVP scope document
+Phase 1 — Backend Foundation
+Goal
+Set up the backend, database, and basic APIs.
+Exact Things to Do
+Create the FastAPI project.
+Set up virtual environment and dependencies.
+Create configuration files for environment variables.2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+10.
+11.
+12.
+13.
+14.
+15.
+16.
+17.
+18.
+19.
+•
+•
+•
+•
+•
+•
+1.
+2.
+3.
+2
+
+Connect PostgreSQL to the backend.
+Create SQLAlchemy models.
+Set up Alembic migrations.
+Create authentication APIs:
+Signup
+Login
+Token generation
+Token verification
+Create user roles:
+Admin
+Employee
+Create base API structure:
+users
+auth
+documents
+knowledge
+chat
+Add error handling and logging.
+Create health check endpoint.
+Test all APIs with Swagger/Postman.
+Deliverables
+Working FastAPI backend
+PostgreSQL connection
+JWT-based login system
+Role-based access foundation
+API documentation
+Phase 2 — Document Management
+Goal
+Allow admins to upload, store, view, update, and delete documents.4.
+5.
+6.
+7.
+8.
+9.
+10.
+11.
+12.
+13.
+14.
+15.
+16.
+17.
+18.
+19.
+20.
+21.
+22.
+23.
+•
+•
+•
+•
+•
+3
+
+Create document upload API.
+Allow file types:
+PDF
+DOCX
+PPTX
+TXT
+Markdown
+Store uploaded files in local storage or cloud storage.
+Save document metadata in database.
+Create document listing API.
+Create document delete API.
+Create document update API.
+Create document status field:
+Uploaded
+Processing
+Ready
+Failed
+Add file validation:
+Size limit
+Type check
+Create a document history/version field.
+Deliverables
+Document upload module
+Document CRUD APIs
+Document metadata table
+Upload status tracking
+Phase 3 — Text Extraction and Cleaning
+Goal
+Extract clean text from uploaded documents.1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+10.
+11.
+12.
+13.
+14.
+15.
+16.
+17.
+18.
+19.
+20.
+21.
+•
+•
+•
+•
+4
+
+Build PDF text extraction.
+Build DOCX text extraction.
+Build PPTX text extraction.
+Build TXT and Markdown reading.
+Add OCR support for scanned PDFs.
+Remove headers, footers, and extra spaces.
+Normalize line breaks.
+Remove unwanted symbols and noise.
+Detect empty or broken documents.
+Save extracted raw text in database or file storage.
+Show extraction status in the admin dashboard.
+Deliverables
+Text extraction pipeline
+OCR support
+Clean text output
+Extraction status API
+Phase 4 — Chunking and Metadata Preparation
+Goal
+Break documents into meaningful chunks for retrieval.
+Exact Things to Do
+Split extracted text into chunks.
+Decide chunk size and overlap.
+Try multiple chunking strategies:
+Fixed-size chunking
+Sentence-based chunking
+Section-based chunking
+Attach metadata to each chunk:
+document_id
+page number1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+10.
+11.
+•
+•
+•
+•
+1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+5
+
+section title
+upload date
+source file name
+Store chunks in the database.
+Create chunk preview API.
+Add chunk status tracking.
+Deliverables
+Chunking service
+Chunk metadata table
+Chunk preview endpoint
+Chunk storage logic
+Phase 5 — OKF Knowledge Extraction
+Goal
+Convert important structured facts from documents into OKF objects.
+Exact Things to Do
+Define the OKF schema for the project.
+Decide the object types:
+Policy
+Employee
+Department
+Product
+FAQ
+Business rule
+Asset
+Create a structured JSON format for knowledge objects.
+Build entity extraction logic.
+Build relation extraction logic.
+Extract important facts from documents.
+Validate extracted facts against schema.
+Save knowledge objects in the database.
+Link each OKF object back to its source document.
+Create CRUD APIs for OKF objects.
+Add search API for structured knowledge.
+Add update and versioning support.10.
+11.
+12.
+13.
+14.
+15.
+•
+•
+•
+•
+1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+10.
+11.
+12.
+13.
+14.
+15.
+16.
+17.
+18.
+19.
+6
+
+OKF schema design
+Structured knowledge table
+Knowledge extraction pipeline
+Knowledge CRUD APIs
+Source traceability for every object
+Phase 6 — Vector Embeddings and Semantic
+Search
+Goal
+Enable semantic retrieval from unstructured document chunks.
+Exact Things to Do
+Choose an embedding model.
+Generate embeddings for every chunk.
+Store embeddings in a vector database.
+Save chunk ID with each vector .
+Add metadata filtering.
+Build semantic search API.
+Return top-k relevant chunks for a query.
+Add similarity score to results.
+Test retrieval for different user queries.
+Deliverables
+Embedding generation service
+Vector database integration
+Semantic search API
+Top-k retrieval results
+Phase 7 — Query Classification and Hybrid
+Retrieval
+Goal
+Decide whether to use OKF, RAG, or both for a query.•
+•
+•
+•
+•
+1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+•
+•
+•
+•
+7
+
+Build query intent classifier .
+Classify questions into:
+Structured query
+Document query
+Mixed query
+Use OKF retrieval for facts, rules, and entities.
+Use RAG retrieval for long-form document context.
+Use both when the question needs both types.
+Merge results from OKF and RAG.
+Remove duplicate or low-quality context.
+Rank retrieved information by relevance.
+Pass final context to prompt builder .
+Example Rules
+"Who is the HR manager?" → OKF
+"Summarize the leave policy" → RAG
+"Explain the leave policy and tell me the carry-forward limit" → OKF + RAG
+Deliverables
+Query classifier
+Hybrid retriever
+Context merger
+Retrieval ranking logic
+Phase 8 — LLM Answer Generation
+Goal
+Generate grounded answers from retrieved knowledge.
+Exact Things to Do
+Build prompt template.
+Add system instructions for grounded answers.
+Insert retrieved OKF and RAG context into the prompt.
+Ask the LLM to answer only from provided context.
+Add citation format in the response.1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+10.
+11.
+12.
+•
+•
+•
+•
+•
+•
+•
+1.
+2.
+3.
+4.
+5.
+8
+
+Add fallback response when context is insufficient.
+Add structured output if needed.
+Return answer with source references.
+Add confidence or relevance score.
+Deliverables
+Prompt builder
+Answer generation service
+Citation support
+Fallback response logic
+Phase 9 — Frontend Development
+Goal
+Create the user interface for admin and employee users.
+Exact Things to Do
+Create login and signup pages.
+Create admin dashboard.
+Create document upload screen.
+Create document list and processing status view.
+Create OKF knowledge management page.
+Create chat interface for employees.
+Show retrieved sources in chat.
+Show related documents and structured facts.
+Add loading and error states.
+Make the UI responsive.
+Deliverables
+Admin portal
+Employee portal
+Chat interface
+Source display panel6.
+7.
+8.
+9.
+•
+•
+•
+•
+1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+10.
+•
+•
+•
+•
+9
+
+Phase 10 — Security and Access Control
+Goal
+Protect enterprise knowledge with proper permissions.
+Exact Things to Do
+Implement JWT authentication.
+Implement OAuth2 if needed.
+Add role-based access control.
+Restrict document access by role or department.
+Restrict OKF objects by permission.
+Add audit logs for uploads, edits, and queries.
+Secure all APIs.
+Validate user permissions before retrieval.
+Hide unauthorized sources from results.
+Deliverables
+Secure login system
+RBAC rules
+Permission checks
+Audit logs
+Phase 11 — Production Features
+Goal
+Make the system faster , smarter , and more stable.
+Exact Things to Do
+Add Redis caching.
+Add background indexing jobs.
+Add automatic re-indexing when documents change.
+Add hybrid search improvements.
+Add reranking for better results.
+Add feedback collection.
+Add query history.
+Add usage analytics.
+Add monitoring and structured logging.
+Add performance testing.1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+•
+•
+•
+•
+1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+10.
+10
+
+Cached retrieval
+Background jobs
+Search analytics
+Performance monitoring
+Phase 12 — Deployment and DevOps
+Goal
+Deploy the system like a real enterprise product.
+Exact Things to Do
+Dockerize backend.
+Dockerize frontend.
+Create Docker Compose file.
+Configure environment variables.
+Set up NGINX if needed.
+Create GitHub Actions pipeline.
+Add production build steps.
+Add health checks.
+Add backup strategy.
+Deploy to cloud server .
+Deliverables
+Docker setup
+CI/CD pipeline
+Deployment guide
+Production-ready release
+Final MVP Checklist
+The first working version should do all of the following: 1. Admin uploads a PDF. 2. System extracts text. 3.
+System chunks the text. 4. System generates embeddings. 5. System stores chunks in vector DB. 6. System
+extracts structured OKF objects. 7. User asks a question. 8. Query classifier selects OKF, RAG, or both. 9.
+System retrieves relevant knowledge. 10. LLM generates grounded answer . 11. Answer shows source
+citations.•
+•
+•
+•
+1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+10.
+•
+•
+•
+•
+11
+
+Recommended Order of Work
+Planning and architecture
+Backend foundation
+Document upload
+Text extraction
+Chunking
+OKF extraction
+Embeddings and vector search
+Hybrid retrieval
+LLM answer generation
+Frontend
+Security
+Production features
+Deployment
+Team Rule
+Do not move to the next phase until the current phase is stable, tested, and documented.1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+10.
+11.
+12.
+13.
+12

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
@@ -22,19 +22,25 @@ def signup(payload: UserCreate, db: Session = Depends(get_db)) -> UserRead:
 #         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 #     return create_access_token_for_user(user)
 
-from fastapi.security import OAuth2PasswordRequestForm
-
 @router.post("/login", response_model=TokenResponse)
-def login(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db)
-):
-    # Username field will contain the email
-    user = authenticate_user(
-        db,
-        form_data.username,
-        form_data.password
-    )
+async def login(request: Request, db: Session = Depends(get_db)) -> TokenResponse:
+    content_type = request.headers.get("content-type", "")
+
+    if "application/json" in content_type:
+        payload = LoginRequest.model_validate(await request.json())
+        email = payload.email
+        password = payload.password
+    else:
+        form = await request.form()
+        email = form.get("username") or form.get("email")
+        password = form.get("password")
+        if not email or not password:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Email/username and password are required",
+            )
+
+    user = authenticate_user(db, str(email), str(password))
 
     if not user:
         raise HTTPException(

@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     database_url: str = Field(alias="DATABASE_URL")
     log_level: str = "INFO"
     document_upload_dir: str = "storage/documents"
+    document_extraction_dir: str = "storage/extractions"
     max_document_size_bytes: int = 10 * 1024 * 1024
 
     model_config = SettingsConfigDict(

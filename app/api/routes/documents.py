@@ -5,7 +5,13 @@ from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_active_admin
 from app.db.session import get_db
-from app.schemas.document import DocumentListResponse, DocumentRead, DocumentUpdate
+from app.schemas.document import (
+    DocumentExtractedTextRead,
+    DocumentExtractionStatusRead,
+    DocumentListResponse,
+    DocumentRead,
+    DocumentUpdate,
+)
 from app.services.documents import (
     create_document,
     delete_document,
@@ -13,6 +19,7 @@ from app.services.documents import (
     list_documents,
     update_document,
 )
+from app.services.extraction import extract_document_text, get_extracted_text
 
 router = APIRouter()
 
@@ -43,6 +50,70 @@ def read_document(
     current_user=Depends(get_current_active_admin),
 ) -> DocumentRead:
     return get_document_or_404(db, document_id)
+
+
+@router.get(
+    "/{document_id}/extraction-status",
+    response_model=DocumentExtractionStatusRead,
+    status_code=status.HTTP_200_OK,
+)
+def read_document_extraction_status(
+    document_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_active_admin),
+) -> DocumentExtractionStatusRead:
+    document = get_document_or_404(db, document_id)
+    return DocumentExtractionStatusRead(
+        document_id=document.id,
+        status=document.extraction_status,
+        raw_text_path=document.extraction_raw_text_path,
+        clean_text_path=document.extraction_clean_text_path,
+        error=document.extraction_error,
+        ocr_used=document.extraction_ocr_used,
+        extracted_char_count=document.extracted_char_count,
+        started_at=document.extraction_started_at,
+        completed_at=document.extraction_completed_at,
+    )
+
+
+@router.get(
+    "/{document_id}/extracted-text",
+    response_model=DocumentExtractedTextRead,
+    status_code=status.HTTP_200_OK,
+)
+def read_document_extracted_text(
+    document_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_active_admin),
+) -> DocumentExtractedTextRead:
+    document = get_document_or_404(db, document_id)
+    raw_text, clean_text = get_extracted_text(document)
+    return DocumentExtractedTextRead(document_id=document.id, raw_text=raw_text, clean_text=clean_text)
+
+
+@router.post(
+    "/{document_id}/extract",
+    response_model=DocumentExtractionStatusRead,
+    status_code=status.HTTP_200_OK,
+)
+def trigger_document_extraction(
+    document_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_active_admin),
+) -> DocumentExtractionStatusRead:
+    document = get_document_or_404(db, document_id)
+    document = extract_document_text(db, document)
+    return DocumentExtractionStatusRead(
+        document_id=document.id,
+        status=document.extraction_status,
+        raw_text_path=document.extraction_raw_text_path,
+        clean_text_path=document.extraction_clean_text_path,
+        error=document.extraction_error,
+        ocr_used=document.extraction_ocr_used,
+        extracted_char_count=document.extracted_char_count,
+        started_at=document.extraction_started_at,
+        completed_at=document.extraction_completed_at,
+    )
 
 
 @router.put("/{document_id}", response_model=DocumentRead, status_code=status.HTTP_200_OK)
