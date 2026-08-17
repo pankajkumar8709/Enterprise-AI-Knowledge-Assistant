@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.models.document import Document, ExtractionStatus
+from app.services.chunking import chunk_document, reset_document_chunks
 
 WORD_NAMESPACE = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
 PPT_NAMESPACES = {
@@ -64,6 +65,7 @@ def delete_extraction_files(document: Document) -> None:
 
 def extract_document_text(db: Session, document: Document) -> Document:
     delete_extraction_files(document)
+    reset_document_chunks(db, document, commit=False)
     document.extraction_status = ExtractionStatus.PROCESSING
     document.extraction_error = None
     document.extraction_ocr_used = False
@@ -98,6 +100,8 @@ def extract_document_text(db: Session, document: Document) -> Document:
     db.add(document)
     db.commit()
     db.refresh(document)
+    if document.extraction_status == ExtractionStatus.READY:
+        return chunk_document(db, document)
     return document
 
 

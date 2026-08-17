@@ -1,9 +1,13 @@
 import os
 from pathlib import Path
+import shutil
+import tempfile
 
 os.environ["DATABASE_URL"] = "sqlite:///./test_phase1.db"
 os.environ["SECRET_KEY"] = "test-secret"
-os.environ["DOCUMENT_UPLOAD_DIR"] = str((Path.cwd() / "test_uploads").resolve())
+TEST_STORAGE_ROOT = Path(tempfile.mkdtemp(prefix="phase_backend_tests_"))
+os.environ["DOCUMENT_UPLOAD_DIR"] = str((TEST_STORAGE_ROOT / "uploads").resolve())
+os.environ["DOCUMENT_EXTRACTION_DIR"] = str((TEST_STORAGE_ROOT / "extractions").resolve())
 os.environ["MAX_DOCUMENT_SIZE_BYTES"] = "1024"
 
 from fastapi.testclient import TestClient
@@ -20,9 +24,12 @@ Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)
 upload_dir = Path(os.environ["DOCUMENT_UPLOAD_DIR"])
 upload_dir.mkdir(parents=True, exist_ok=True)
-for existing_file in upload_dir.iterdir():
-    if existing_file.is_file():
-        existing_file.unlink()
+shutil.rmtree(upload_dir, ignore_errors=True)
+upload_dir.mkdir(parents=True, exist_ok=True)
+
+extraction_dir = Path(os.environ["DOCUMENT_EXTRACTION_DIR"])
+shutil.rmtree(extraction_dir, ignore_errors=True)
+extraction_dir.mkdir(parents=True, exist_ok=True)
 
 
 def override_get_db():

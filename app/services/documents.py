@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.models.document import Document, DocumentStatus
 from app.schemas.document import DocumentUpdate
+from app.services.chunking import reset_document_chunks
 from app.services.extraction import delete_extraction_files, extract_document_text
 
 ALLOWED_DOCUMENT_TYPES = {
@@ -137,6 +138,7 @@ def update_document(
 def delete_document(db: Session, document: Document) -> None:
     storage_path = document.storage_path
     delete_extraction_files(document)
+    reset_document_chunks(db, document, commit=False)
     db.delete(document)
     db.commit()
     _delete_stored_file(storage_path)

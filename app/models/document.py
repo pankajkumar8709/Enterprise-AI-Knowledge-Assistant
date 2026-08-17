@@ -2,7 +2,7 @@ import enum
 from datetime import datetime
 
 from sqlalchemy import Boolean, DateTime, Enum, Integer, String, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin
 
@@ -15,6 +15,13 @@ class DocumentStatus(str, enum.Enum):
 
 
 class ExtractionStatus(str, enum.Enum):
+    PENDING = "pending"
+    PROCESSING = "processing"
+    READY = "ready"
+    FAILED = "failed"
+
+
+class ChunkingStatus(str, enum.Enum):
     PENDING = "pending"
     PROCESSING = "processing"
     READY = "ready"
@@ -49,3 +56,14 @@ class Document(TimestampMixin, Base):
     extracted_char_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     extraction_started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     extraction_completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    chunking_status: Mapped[ChunkingStatus] = mapped_column(
+        Enum(ChunkingStatus, name="chunking_status", values_callable=lambda x: [e.value for e in x]),
+        default=ChunkingStatus.PENDING,
+        nullable=False,
+    )
+    chunking_error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    chunk_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    chunking_started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    chunking_completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    chunks = relationship("Chunk", back_populates="document", cascade="all, delete-orphan")

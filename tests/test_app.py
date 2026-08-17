@@ -132,6 +132,8 @@ def test_admin_can_manage_documents() -> None:
     assert created_document["version"] == 1
     assert created_document["extraction_status"] == "ready"
     assert created_document["extracted_char_count"] == len("phase 2 upload content")
+    assert created_document["chunking_status"] == "ready"
+    assert created_document["chunk_count"] == 3
     assert Path(created_document["storage_path"]).exists()
     assert Path(created_document["extraction_raw_text_path"]).exists()
     assert Path(created_document["extraction_clean_text_path"]).exists()
@@ -156,6 +158,7 @@ def test_admin_can_manage_documents() -> None:
     assert updated_document["version"] == 2
     assert updated_document["source_name"] == "handbook.md"
     assert updated_document["extraction_status"] == "ready"
+    assert updated_document["chunking_status"] == "ready"
 
     extraction_status_response = client.get(
         f"/api/v1/documents/{created_document['id']}/extraction-status",
@@ -163,6 +166,25 @@ def test_admin_can_manage_documents() -> None:
     )
     assert extraction_status_response.status_code == 200
     assert extraction_status_response.json()["status"] == "ready"
+
+    chunk_status_response = client.get(
+        f"/api/v1/documents/{created_document['id']}/chunk-status",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert chunk_status_response.status_code == 200
+    assert chunk_status_response.json()["status"] == "ready"
+    assert chunk_status_response.json()["chunk_count"] == 3
+
+    chunk_preview_response = client.get(
+        f"/api/v1/documents/{created_document['id']}/chunks/preview",
+        headers={"Authorization": f"Bearer {token}"},
+        params={"strategy": "fixed_size"},
+    )
+    assert chunk_preview_response.status_code == 200
+    assert chunk_preview_response.json()["strategy"] == "fixed_size"
+    assert chunk_preview_response.json()["total"] == 1
+    assert chunk_preview_response.json()["items"][0]["page_number"] == 1
+    assert chunk_preview_response.json()["items"][0]["source_file_name"] == "handbook.md"
 
     extracted_text_response = client.get(
         f"/api/v1/documents/{created_document['id']}/extracted-text",
@@ -334,3 +356,59 @@ def test_empty_text_document_is_detected_as_broken() -> None:
     payload = upload_response.json()
     assert payload["extraction_status"] == "failed"
     assert payload["extraction_error"] == "Document is empty or unreadable after cleaning"
+    assert payload["chunking_status"] == "pending"
+    assert payload["chunk_count"] == 0
+
+
+def test_document_chunk_preview_and_manual_regeneration_support_multiple_strategies() -> None:
+    login_response = client.post(
+        "/api/v1/auth/login",
+        json={"email": "admin@example.com", "password": "StrongPass123"},
+    )
+    token = login_response.json()["access_token"]
+
+    text = (
+        "# Overview\n"
+        "This is the first sentence. This is the second sentence. This is the third sentence.\n\n"
+        "## Details\n"
+        "Here is a longer section with more context. It should be split into more than one chunk when "
+        "we reduce the chunk size. The last sentence closes the paragraph."
+    )
+    upload_response = client.post(
+        "/api/v1/documents",
+        headers={"Authorization": f"Bearer {token}"},
+        data={"title": "Chunk Strategy Sample"},
+        files={"file": ("chunk-sample.md", text.encode("utf-8"), "text/markdown")},
+    )
+    assert upload_response.status_code == 201
+    payload = upload_response.json()
+    assert payload["chunking_status"] == "ready"
+
+    regenerate_response = client.post(
+        f"/api/v1/documents/{payload['id']}/chunk",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"chunk_size": 120, "overlap": 20, "strategies": ["sentence_based", "section_based"]},
+    )
+    assert regenerate_response.status_code == 200
+    assert regenerate_response.json()["status"] == "ready"
+    assert regenerate_response.json()["chunk_count"] >= 3
+
+    sentence_preview_response = client.get(
+        f"/api/v1/documents/{payload['id']}/chunks/preview",
+        headers={"Authorization": f"Bearer {token}"},
+        params={"strategy": "sentence_based", "limit": 10},
+    )
+    assert sentence_preview_response.status_code == 200
+    sentence_payload = sentence_preview_response.json()
+    assert sentence_payload["total"] >= 2
+    assert all(item["strategy"] == "sentence_based" for item in sentence_payload["items"])
+
+    section_preview_response = client.get(
+        f"/api/v1/documents/{payload['id']}/chunks/preview",
+        headers={"Authorization": f"Bearer {token}"},
+        params={"strategy": "section_based", "limit": 10},
+    )
+    assert section_preview_response.status_code == 200
+    section_payload = section_preview_response.json()
+    assert section_payload["total"] >= 1
+    assert any(item["section_title"] == "Overview" for item in section_payload["items"])
