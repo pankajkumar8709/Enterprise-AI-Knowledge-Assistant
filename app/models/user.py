@@ -19,5 +19,7 @@ class User(TimestampMixin, Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     role: Mapped[UserRole] = mapped_column(
-        Enum(UserRole, name="user_role"), default=UserRole.EMPLOYEE, nullable=False
+        Enum(UserRole, name="user_role", values_callable=lambda values: [value.value for value in values]),
+        default=UserRole.EMPLOYEE,
+        nullable=False,
     )

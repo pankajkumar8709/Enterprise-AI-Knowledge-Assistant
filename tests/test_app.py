@@ -5,6 +5,7 @@ import zipfile
 from pypdf import PdfWriter
 
 from app.core.config import settings
+from app.models.user import User
 from app.models.user import UserRole
 
 from tests.conftest import client
@@ -69,6 +70,10 @@ def test_health_check() -> None:
     response = client.get("/api/v1/health")
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
+
+
+def test_user_role_enum_uses_database_values() -> None:
+    assert User.__table__.c.role.type.enums == [UserRole.ADMIN.value, UserRole.EMPLOYEE.value]
 
 
 def test_signup_login_and_verify_token() -> None:
@@ -412,3 +417,166 @@ def test_document_chunk_preview_and_manual_regeneration_support_multiple_strateg
     section_payload = section_preview_response.json()
     assert section_payload["total"] >= 1
     assert any(item["section_title"] == "Overview" for item in section_payload["items"])
+
+
+def test_phase5_okf_knowledge_extraction_search_and_versioning() -> None:
+    login_response = client.post(
+        "/api/v1/auth/login",
+        json={"email": "admin@example.com", "password": "StrongPass123"},
+    )
+    token = login_response.json()["access_token"]
+
+    document_text = (
+        "# Leave Policy\n"
+        "Department: Human Resources\n"
+        "Employee: Jane Doe\n"
+        "Title: HR Manager\n"
+        "Department: Human Resources\n"
+        "Manager: John Smith\n"
+        "Product: Knowledge Portal\n"
+        "Asset: Employee Handbook\n"
+        "Q: What is the carry-forward limit?\n"
+        "A: Employees may carry forward up to 5 leave days.\n"
+        "Employees must submit leave requests 3 days in advance.\n"
+        "Only HR should approve emergency leave exceptions.\n"
+    )
+
+    upload_response = client.post(
+        "/api/v1/documents",
+        headers={"Authorization": f"Bearer {token}"},
+        data={"title": "Leave Policy Source"},
+        files={"file": ("leave-policy.md", document_text.encode("utf-8"), "text/markdown")},
+    )
+    assert upload_response.status_code == 201
+    document_payload = upload_response.json()
+
+    extract_response = client.post(
+        f"/api/v1/knowledge/extract/{document_payload['id']}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert extract_response.status_code == 200
+    extracted_payload = extract_response.json()
+    assert extracted_payload["document_id"] == document_payload["id"]
+    assert extracted_payload["created"] >= 6
+    assert any(item["object_type"] == "policy" for item in extracted_payload["items"])
+    assert any(item["object_type"] == "department" for item in extracted_payload["items"])
+    assert any(item["object_type"] == "employee" for item in extracted_payload["items"])
+    assert any(item["object_type"] == "faq" for item in extracted_payload["items"])
+    assert any(item["object_type"] == "business_rule" for item in extracted_payload["items"])
+
+    list_response = client.get(
+        "/api/v1/knowledge",
+        headers={"Authorization": f"Bearer {token}"},
+        params={"document_id": document_payload["id"]},
+    )
+    assert list_response.status_code == 200
+    listed_payload = list_response.json()
+    assert listed_payload["total"] >= 6
+
+    search_response = client.get(
+        "/api/v1/knowledge/search",
+        headers={"Authorization": f"Bearer {token}"},
+        params={"q": "carry-forward", "document_id": document_payload["id"]},
+    )
+    assert search_response.status_code == 200
+    search_payload = search_response.json()
+    assert search_payload["total"] >= 1
+    faq_item = next(item for item in search_payload["items"] if item["object_type"] == "faq")
+    assert faq_item["payload"]["answer"] == "Employees may carry forward up to 5 leave days."
+    assert faq_item["source_document_id"] == document_payload["id"]
+
+    read_response = client.get(
+        f"/api/v1/knowledge/{faq_item['id']}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert read_response.status_code == 200
+    assert read_response.json()["name"] == "What is the carry-forward limit?"
+
+    update_response = client.put(
+        f"/api/v1/knowledge/{faq_item['id']}",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "payload": {
+                "question": "What is the carry-forward limit?",
+                "answer": "Employees may carry forward up to 7 leave days.",
+            },
+            "summary": "Carry-forward allowance updated",
+        },
+    )
+    assert update_response.status_code == 200
+    updated_payload = update_response.json()
+    assert updated_payload["object_version"] == 2
+    assert updated_payload["is_current"] is True
+    assert updated_payload["payload"]["answer"] == "Employees may carry forward up to 7 leave days."
+
+    versions_response = client.get(
+        f"/api/v1/knowledge/{faq_item['id']}/versions",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert versions_response.status_code == 200
+    versions_payload = versions_response.json()
+    assert versions_payload["total"] == 2
+    assert versions_payload["items"][0]["object_version"] == 2
+    assert versions_payload["items"][0]["payload"]["answer"] == "Employees may carry forward up to 7 leave days."
+    assert versions_payload["items"][1]["object_version"] == 1
+    assert versions_payload["items"][1]["is_current"] is False
+
+
+def test_knowledge_write_requires_admin_and_read_allows_authenticated_user() -> None:
+    employee_login = client.post(
+        "/api/v1/auth/login",
+        json={"email": "employee@example.com", "password": "StrongPass123"},
+    )
+    employee_token = employee_login.json()["access_token"]
+
+    read_response = client.get(
+        "/api/v1/knowledge",
+        headers={"Authorization": f"Bearer {employee_token}"},
+    )
+    assert read_response.status_code == 200
+
+    create_response = client.post(
+        "/api/v1/knowledge",
+        headers={"Authorization": f"Bearer {employee_token}"},
+        json={
+            "object_type": "department",
+            "name": "Finance",
+            "payload": {"name": "Finance"},
+        },
+    )
+    assert create_response.status_code == 403
+
+
+def test_document_delete_removes_phase5_knowledge_objects() -> None:
+    login_response = client.post(
+        "/api/v1/auth/login",
+        json={"email": "admin@example.com", "password": "StrongPass123"},
+    )
+    token = login_response.json()["access_token"]
+
+    document_text = (
+        "# Security Policy\n"
+        "Department: Compliance\n"
+        "Employees must follow the approved workflow.\n"
+    )
+    upload_response = client.post(
+        "/api/v1/documents",
+        headers={"Authorization": f"Bearer {token}"},
+        data={"title": "Security Policy"},
+        files={"file": ("security-policy.md", document_text.encode("utf-8"), "text/markdown")},
+    )
+    assert upload_response.status_code == 201
+    document_id = upload_response.json()["id"]
+
+    extract_response = client.post(
+        f"/api/v1/knowledge/extract/{document_id}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert extract_response.status_code == 200
+    assert extract_response.json()["created"] >= 1
+
+    delete_response = client.delete(
+        f"/api/v1/documents/{document_id}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert delete_response.status_code == 204
