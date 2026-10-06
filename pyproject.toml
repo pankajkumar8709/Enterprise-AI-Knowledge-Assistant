@@ -1,0 +1,27 @@
+# Tooling configuration (audit F-028).
+# The backend ships as a plain requirements.txt app; this file only configures
+# local dev tools and does not affect runtime or packaging.
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.lint]
+# Keep ruff's default rule set and explicitly permit FastAPI's dependency
+# injection pattern (Depends/Query/... in argument defaults).
+extend-ignore = ["E501"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Body",
+    "fastapi.Header",
+    "fastapi.Cookie",
+    "fastapi.Form",
+    "fastapi.File",
+]
+
+[tool.ruff.format]
+quote-style = "double"

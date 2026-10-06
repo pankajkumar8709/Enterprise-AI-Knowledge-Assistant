@@ -1,21 +1,43 @@
 from __future__ import annotations
 
-import json
 import re
 from collections.abc import Iterable
+from datetime import UTC, datetime
 
 from fastapi import HTTPException, status
-from sqlalchemy import or_
+from sqlalchemy import String, and_, cast, false, func, or_, true
 from sqlalchemy.orm import Session
 
-from app.models.document import Document, ExtractionStatus
-from app.models.knowledge import KnowledgeObject, KnowledgeObjectType
-from app.schemas.knowledge import KnowledgeObjectCreate, KnowledgeObjectRead, KnowledgeObjectUpdate, KnowledgeRelation
+from app.models.document import Document, ExtractionStatus, Visibility
+from app.models.knowledge import (
+    KnowledgeObject,
+    KnowledgeObjectStatus,
+    KnowledgeObjectType,
+)
+from app.models.knowledge_version import KnowledgeObjectVersion
+from app.models.user import User, UserRole
+from app.schemas.knowledge import (
+    KnowledgeObjectCreate,
+    KnowledgeObjectRead,
+    KnowledgeObjectUpdate,
+    KnowledgeRelation,
+)
 from app.services.documents import get_document_or_404
 from app.services.extraction import get_extracted_text
 
 SCHEMA_VERSION = 1
 RULE_PATTERN = re.compile(r"\b(must|should|shall|required|not allowed|prohibited|only)\b", flags=re.IGNORECASE)
+
+# Spec §6.2 required attributes per type (audit F-022): ★ fields must be present.
+REQUIRED_ATTRIBUTES: dict[KnowledgeObjectType, set[str]] = {
+    KnowledgeObjectType.POLICY: {"title", "summary"},
+    KnowledgeObjectType.EMPLOYEE: {"full_name", "job_title"},
+    KnowledgeObjectType.DEPARTMENT: {"name"},
+    KnowledgeObjectType.PRODUCT: {"name"},
+    KnowledgeObjectType.FAQ: {"question", "answer"},
+    KnowledgeObjectType.BUSINESS_RULE: {"statement", "subject"},
+    KnowledgeObjectType.ASSET: {"name"},
+}
 
 
 def _slugify(value: str) -> str:
@@ -23,21 +45,29 @@ def _slugify(value: str) -> str:
     return normalized or "knowledge-object"
 
 
-def _serialize_payload(payload: dict[str, object]) -> str:
-    return json.dumps(payload, ensure_ascii=True, sort_keys=True)
+def _build_search_text(name: str, payload: dict[str, object]) -> str:
+    """Search text = name + flattened attributes (spec §5 search_text)."""
+
+    parts: list[str] = [name]
+    for key, value in payload.items():
+        parts.append(str(key))
+        if isinstance(value, dict):
+            parts.extend(f"{sub_key} {sub_value}" for sub_key, sub_value in value.items())
+        elif isinstance(value, list):
+            parts.extend(str(item) for item in value)
+        else:
+            parts.append(str(value))
+    return " ".join(parts)
 
 
-def _serialize_relations(relations: Iterable[KnowledgeRelation]) -> str:
-    return json.dumps([relation.model_dump() for relation in relations], ensure_ascii=True, sort_keys=True)
-
-
-def _deserialize_payload(payload: str) -> dict[str, object]:
-    return json.loads(payload)
-
-
-def _deserialize_relations(relations: str) -> list[KnowledgeRelation]:
-    raw_items = json.loads(relations or "[]")
-    return [KnowledgeRelation.model_validate(item) for item in raw_items]
+def _deserialize_relations(relations: Iterable) -> list[dict]:
+    items: list[dict] = []
+    for relation in relations or []:
+        if isinstance(relation, KnowledgeRelation):
+            items.append(relation.model_dump())
+        elif isinstance(relation, dict):
+            items.append(relation)
+    return items
 
 
 def _as_read_model(obj: KnowledgeObject) -> KnowledgeObjectRead:
@@ -47,8 +77,8 @@ def _as_read_model(obj: KnowledgeObject) -> KnowledgeObjectRead:
             "object_type": obj.object_type,
             "object_key": obj.object_key,
             "name": obj.name,
-            "payload": _deserialize_payload(obj.payload),
-            "relations": _deserialize_relations(obj.relations),
+            "payload": obj.payload,
+            "relations": obj.relations,
             "summary": obj.summary,
             "source_excerpt": obj.source_excerpt,
             "schema_version": obj.schema_version,
@@ -56,6 +86,14 @@ def _as_read_model(obj: KnowledgeObject) -> KnowledgeObjectRead:
             "is_current": obj.is_current,
             "extraction_method": obj.extraction_method,
             "source_document_id": obj.source_document_id,
+            "status": obj.status,
+            "visibility": obj.visibility,
+            "department_ids": obj.department_ids or [],
+            "confidence": obj.confidence,
+            "created_by_id": obj.created_by_id,
+            "reviewed_by_id": obj.reviewed_by_id,
+            "reviewed_at": obj.reviewed_at,
+            "review_note": obj.review_note,
             "created_at": obj.created_at,
             "updated_at": obj.updated_at,
         }
@@ -66,31 +104,54 @@ def _require_fields(payload: dict[str, object], required_fields: set[str], objec
     missing = [field for field in sorted(required_fields) if not payload.get(field)]
     if missing:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=f"Missing required fields for {object_type.value}: {', '.join(missing)}",
         )
 
 
 def validate_knowledge_payload(object_type: KnowledgeObjectType, payload: dict[str, object]) -> None:
-    match object_type:
-        case KnowledgeObjectType.POLICY:
-            _require_fields(payload, {"title"}, object_type)
-        case KnowledgeObjectType.EMPLOYEE:
-            _require_fields(payload, {"full_name"}, object_type)
-        case KnowledgeObjectType.DEPARTMENT:
-            _require_fields(payload, {"name"}, object_type)
-        case KnowledgeObjectType.PRODUCT:
-            _require_fields(payload, {"name"}, object_type)
-        case KnowledgeObjectType.FAQ:
-            _require_fields(payload, {"question", "answer"}, object_type)
-        case KnowledgeObjectType.BUSINESS_RULE:
-            _require_fields(payload, {"rule"}, object_type)
-        case KnowledgeObjectType.ASSET:
-            _require_fields(payload, {"name"}, object_type)
+    _require_fields(payload, REQUIRED_ATTRIBUTES[object_type], object_type)
+    if object_type == KnowledgeObjectType.POLICY and len(str(payload.get("summary", ""))) > 500:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="policy summary must be 500 characters or fewer",
+        )
 
 
 def _build_object_key(object_type: KnowledgeObjectType, name: str) -> str:
     return f"{object_type.value}:{_slugify(name)}"
+
+
+def _department_clause(column, department_id: int | None):
+    """SQL match of a JSON int-list column against one department id (portable)."""
+
+    if department_id is None:
+        return false()
+    text = cast(column, String)
+    marker = str(department_id)
+    return or_(
+        text == f"[{marker}]",
+        text.like(f"[{marker}, %"),
+        text.like(f"%, {marker}, %"),
+        text.like(f"%, {marker}]"),
+    )
+
+
+def _visibility_clause(user: User, object_type=None):
+    """ACL for reads (spec §9.1/§11): employees only see approved, non-admin-only
+    objects they are allowed to see; admins see everything."""
+
+    if user.role == UserRole.ADMIN:
+        return true()
+    dept_clause = _department_clause(KnowledgeObject.department_ids, user.department_id)
+    return and_(
+        KnowledgeObject.status == KnowledgeObjectStatus.APPROVED,
+        KnowledgeObject.visibility != Visibility.ADMIN_ONLY,
+        or_(
+            KnowledgeObject.visibility == Visibility.ALL,
+            and_(KnowledgeObject.visibility == Visibility.DEPARTMENT, dept_clause),
+        ),
+    )
 
 
 def _new_object(
@@ -197,7 +258,7 @@ def _extract_employee_objects(document: Document, text: str) -> list[KnowledgeOb
         if department:
             relations.append(
                 KnowledgeRelation(
-                    relation_type="member_of",
+                    relation_type="belongs_to",
                     target_type=KnowledgeObjectType.DEPARTMENT,
                     target_name=department,
                     evidence=f"Department: {department}",
@@ -218,9 +279,9 @@ def _extract_employee_objects(document: Document, text: str) -> list[KnowledgeOb
                 name=name,
                 payload={
                     "full_name": name,
-                    "title": title or None,
-                    "department": department or None,
-                    "manager": manager or None,
+                    "job_title": title,
+                    "department": department,
+                    "reports_to": manager,
                 },
                 relations=relations,
                 summary=f"{name}{f' - {title}' if title else ''}".strip(),
@@ -259,13 +320,14 @@ def _extract_named_line_objects(
 
 def _extract_business_rules(document: Document, lines: list[str], policy_title: str) -> list[KnowledgeObjectCreate]:
     items: list[KnowledgeObjectCreate] = []
+    policy_key = _build_object_key(KnowledgeObjectType.POLICY, policy_title)
     for line in lines:
         if len(line) < 12 or not RULE_PATTERN.search(line):
             continue
         rule_name = line[:80]
         relations = [
             KnowledgeRelation(
-                relation_type="derived_from",
+                relation_type="governed_by",
                 target_type=KnowledgeObjectType.POLICY,
                 target_name=policy_title,
                 evidence=policy_title,
@@ -275,7 +337,7 @@ def _extract_business_rules(document: Document, lines: list[str], policy_title: 
             _new_object(
                 object_type=KnowledgeObjectType.BUSINESS_RULE,
                 name=rule_name,
-                payload={"rule": line, "policy": policy_title},
+                payload={"statement": line, "subject": policy_title, "policy": policy_key},
                 relations=relations,
                 summary=line[:240],
                 source_excerpt=line,
@@ -290,17 +352,32 @@ def _extract_policy_object(document: Document, text: str, lines: list[str]) -> K
     statements = [line for line in lines if RULE_PATTERN.search(line)]
     if "policy" not in title.lower() and not statements:
         return None
+    summary = " ".join(statements[:3])[:500] if statements else title
     return _new_object(
         object_type=KnowledgeObjectType.POLICY,
         name=title,
-        payload={"title": title, "statements": statements[:10], "document_title": document.title},
+        payload={
+            "title": title,
+            "summary": summary,
+            "statements": statements[:10],
+            "document_title": document.title,
+        },
         summary=f"Policy extracted from {document.title}",
         source_excerpt="\n".join(statements[:5]) if statements else title,
         source_document_id=document.id,
     )
 
 
-def extract_knowledge_candidates(document: Document) -> list[KnowledgeObjectCreate]:
+def extract_knowledge_candidates(
+    document: Document,
+) -> tuple[list[KnowledgeObjectCreate], int]:
+    """Run the rule-based extractors.
+
+    Returns candidates plus the number of items dropped because they failed
+    schema validation (spec §7.4.3: invalid items are dropped and counted —
+    they must never crash the pipeline).
+    """
+
     _, clean_text = get_extracted_text(document)
     if not clean_text:
         raise HTTPException(
@@ -310,23 +387,31 @@ def extract_knowledge_candidates(document: Document) -> list[KnowledgeObjectCrea
 
     lines = [line.strip() for line in clean_text.splitlines() if line.strip()]
     policy_title = _extract_title(clean_text, document.title)
-    candidates: list[KnowledgeObjectCreate] = []
+    raw_candidates: list[KnowledgeObjectCreate] = []
+    dropped_invalid = 0
 
     policy = _extract_policy_object(document, clean_text, lines)
     if policy is not None:
-        candidates.append(policy)
+        raw_candidates.append(policy)
 
-    candidates.extend(_extract_department_objects(document, lines))
-    candidates.extend(_extract_employee_objects(document, clean_text))
-    candidates.extend(_extract_named_line_objects(document, lines, "Product", KnowledgeObjectType.PRODUCT))
-    candidates.extend(_extract_named_line_objects(document, lines, "Asset", KnowledgeObjectType.ASSET))
-    candidates.extend(_extract_faq_objects(document, lines))
-    candidates.extend(_extract_business_rules(document, lines, policy_title))
+    extractors = (
+        lambda: _extract_department_objects(document, lines),
+        lambda: _extract_employee_objects(document, clean_text),
+        lambda: _extract_named_line_objects(document, lines, "Product", KnowledgeObjectType.PRODUCT),
+        lambda: _extract_named_line_objects(document, lines, "Asset", KnowledgeObjectType.ASSET),
+        lambda: _extract_faq_objects(document, lines),
+        lambda: _extract_business_rules(document, lines, policy_title),
+    )
+    for run in extractors:
+        try:
+            raw_candidates.extend(run())
+        except HTTPException:
+            dropped_invalid += 1
 
     deduped: dict[str, KnowledgeObjectCreate] = {}
-    for candidate in candidates:
+    for candidate in raw_candidates:
         deduped[_build_object_key(candidate.object_type, candidate.name)] = candidate
-    return list(deduped.values())
+    return list(deduped.values()), dropped_invalid
 
 
 def _persist_versioned_object(
@@ -335,47 +420,65 @@ def _persist_versioned_object(
     object_type: KnowledgeObjectType,
     name: str,
     payload: dict[str, object],
-    relations: list[KnowledgeRelation],
+    relations: list[KnowledgeRelation] | list[dict],
     summary: str | None,
     source_excerpt: str | None,
     source_document_id: int | None,
     extraction_method: str,
+    object_status: KnowledgeObjectStatus,
+    visibility: Visibility = Visibility.ALL,
+    department_ids: list[int] | None = None,
+    created_by_id: int | None = None,
+    review_note: str | None = None,
+    reviewed_by_id: int | None = None,
 ) -> tuple[KnowledgeObject, bool]:
     validate_knowledge_payload(object_type, payload)
     object_key = _build_object_key(object_type, name)
-    serialized_payload = _serialize_payload(payload)
-    serialized_relations = _serialize_relations(relations)
-    query = db.query(KnowledgeObject).filter(
-        KnowledgeObject.object_key == object_key,
-        KnowledgeObject.is_current.is_(True),
+    relation_dicts = _deserialize_relations(relations)
+    # Live = status in (pending_review, approved); exactly one such row per key
+    # (spec §5 partial unique index). Superseded rows are archived history.
+    live_statuses = (
+        KnowledgeObjectStatus.PENDING_REVIEW,
+        KnowledgeObjectStatus.APPROVED,
     )
-    if source_document_id is None:
-        query = query.filter(KnowledgeObject.source_document_id.is_(None))
-    else:
-        query = query.filter(KnowledgeObject.source_document_id == source_document_id)
-    existing = query.first()
-    if existing and (
-        existing.payload == serialized_payload
-        and existing.relations == serialized_relations
+    existing = (
+        db.query(KnowledgeObject)
+        .filter(
+            KnowledgeObject.object_key == object_key,
+            KnowledgeObject.status.in_(live_statuses),
+        )
+        .first()
+    )
+    if existing is not None and (
+        existing.payload == payload
+        and existing.relations == relation_dicts
         and existing.summary == summary
         and existing.source_excerpt == source_excerpt
-        and existing.source_document_id == source_document_id
         and existing.name == name
     ):
+        # Spec §6.3: identical facts never fork a new version; the single live
+        # object per key is kept (the schema holds one source link per row).
         return existing, False
 
-    next_version = 1
-    if existing:
+    max_version = (
+        db.query(func.max(KnowledgeObject.object_version)).filter(KnowledgeObject.object_key == object_key).scalar()
+        or 0
+    )
+    next_version = int(max_version) + 1
+    if existing is not None:
+        # Move the superseded row out of the live set *before* inserting the
+        # replacement so the partial unique index is never transiently violated.
         existing.is_current = False
+        existing.status = KnowledgeObjectStatus.ARCHIVED
         db.add(existing)
-        next_version = existing.object_version + 1
+        db.flush()
 
     knowledge_object = KnowledgeObject(
         object_type=object_type,
         object_key=object_key,
         name=name,
-        payload=serialized_payload,
-        relations=serialized_relations,
+        payload=payload,
+        relations=relation_dicts,
         summary=summary,
         source_excerpt=source_excerpt,
         schema_version=SCHEMA_VERSION,
@@ -383,10 +486,50 @@ def _persist_versioned_object(
         is_current=True,
         extraction_method=extraction_method,
         source_document_id=source_document_id,
+        status=object_status,
+        visibility=visibility,
+        department_ids=department_ids or [],
+        created_by_id=created_by_id,
+        reviewed_by_id=reviewed_by_id,
+        reviewed_at=datetime.now(UTC) if reviewed_by_id else None,
+        review_note=review_note,
+        search_text=_build_search_text(name, payload),
     )
     db.add(knowledge_object)
     db.flush()
+    _write_version_snapshot(db, knowledge_object, changed_by_id=reviewed_by_id, change_note=review_note)
     return knowledge_object, existing is not None
+
+
+def _write_version_snapshot(
+    db: Session, obj: KnowledgeObject, *, changed_by_id: int | None, change_note: str | None
+) -> None:
+    """Snapshot every new version into okf_object_versions (spec §5/§6.3)."""
+
+    db.add(
+        KnowledgeObjectVersion(
+            okf_object_id=obj.id,
+            version=obj.object_version,
+            snapshot={
+                "type": obj.object_type.value,
+                "canonical_key": obj.object_key,
+                "name": obj.name,
+                "attributes": obj.payload,
+                "relations": obj.relations,
+                "summary": obj.summary,
+                "status": obj.status.value,
+                "visibility": obj.visibility.value,
+                "department_ids": obj.department_ids or [],
+                "version": obj.object_version,
+                "schema_version": obj.schema_version,
+                "confidence": obj.confidence,
+                "source_document_id": obj.source_document_id,
+            },
+            changed_by_id=changed_by_id,
+            change_note=change_note,
+            changed_at=datetime.now(UTC),
+        )
+    )
 
 
 def extract_knowledge_from_document(db: Session, document_id: int):
@@ -399,7 +542,7 @@ def extract_knowledge_from_document(db: Session, document_id: int):
             detail="Document extraction must be ready before Phase 5 knowledge extraction",
         )
 
-    candidates = extract_knowledge_candidates(document)
+    candidates, dropped_invalid = extract_knowledge_candidates(document)
     existing_current = {
         item.object_key: item
         for item in db.query(KnowledgeObject)
@@ -426,6 +569,11 @@ def extract_knowledge_from_document(db: Session, document_id: int):
             source_excerpt=candidate.source_excerpt,
             source_document_id=document.id,
             extraction_method="document_extraction",
+            # Spec §7.4.6: extracted facts always wait for admin review
+            # (OKF_AUTO_APPROVE_THRESHOLD=1.01 -> never auto-approve).
+            object_status=KnowledgeObjectStatus.PENDING_REVIEW,
+            visibility=document.visibility,
+            department_ids=list(document.department_ids or []),
         )
         candidate_keys.add(knowledge_object.object_key)
         items.append(knowledge_object)
@@ -438,7 +586,10 @@ def extract_knowledge_from_document(db: Session, document_id: int):
     for object_key, existing in existing_current.items():
         if object_key in candidate_keys:
             continue
+        # Facts removed from the document are superseded, not left live: the
+        # partial unique index admits only one live row per key (spec §5).
         existing.is_current = False
+        existing.status = KnowledgeObjectStatus.ARCHIVED
         db.add(existing)
         archived += 1
 
@@ -450,11 +601,12 @@ def extract_knowledge_from_document(db: Session, document_id: int):
         created=created,
         updated=updated,
         archived=archived,
+        dropped_invalid=dropped_invalid,
         items=[_as_read_model(item) for item in items],
     )
 
 
-def create_knowledge_object(db: Session, payload: KnowledgeObjectCreate):
+def create_knowledge_object(db: Session, payload: KnowledgeObjectCreate, user: User):
     knowledge_object, _ = _persist_versioned_object(
         db,
         object_type=payload.object_type,
@@ -465,6 +617,12 @@ def create_knowledge_object(db: Session, payload: KnowledgeObjectCreate):
         source_excerpt=payload.source_excerpt,
         source_document_id=payload.source_document_id,
         extraction_method="manual",
+        # Spec §8: manually created objects are admin-approved immediately.
+        object_status=KnowledgeObjectStatus.APPROVED,
+        visibility=payload.visibility,
+        department_ids=payload.department_ids,
+        created_by_id=user.id,
+        reviewed_by_id=user.id,
     )
     db.commit()
     db.refresh(knowledge_object)
@@ -478,13 +636,17 @@ def get_knowledge_object_or_404(db: Session, knowledge_id: int) -> KnowledgeObje
     return knowledge_object
 
 
-def read_knowledge_object(db: Session, knowledge_id: int) -> KnowledgeObjectRead:
-    return _as_read_model(get_knowledge_object_or_404(db, knowledge_id))
+def read_knowledge_object(db: Session, knowledge_id: int, user: User) -> KnowledgeObjectRead:
+    knowledge_object = get_knowledge_object_or_404(db, knowledge_id)
+    if not db.query(KnowledgeObject).filter(KnowledgeObject.id == knowledge_id, _visibility_clause(user)).count():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Knowledge object not found")
+    return _as_read_model(knowledge_object)
 
 
 def list_knowledge_objects(
     db: Session,
     *,
+    user: User,
     object_type: KnowledgeObjectType | None = None,
     document_id: int | None = None,
     include_history: bool = False,
@@ -496,12 +658,14 @@ def list_knowledge_objects(
         query = query.filter(KnowledgeObject.object_type == object_type)
     if document_id is not None:
         query = query.filter(KnowledgeObject.source_document_id == document_id)
+    query = query.filter(_visibility_clause(user))
     return [_as_read_model(item) for item in query.order_by(KnowledgeObject.created_at.desc()).all()]
 
 
 def search_knowledge_objects(
     db: Session,
     *,
+    user: User,
     query_text: str,
     object_type: KnowledgeObjectType | None = None,
     document_id: int | None = None,
@@ -511,11 +675,12 @@ def search_knowledge_objects(
         query = query.filter(KnowledgeObject.object_type == object_type)
     if document_id is not None:
         query = query.filter(KnowledgeObject.source_document_id == document_id)
+    query = query.filter(_visibility_clause(user))
     like_value = f"%{query_text.strip()}%"
     query = query.filter(
         or_(
             KnowledgeObject.name.ilike(like_value),
-            KnowledgeObject.payload.ilike(like_value),
+            cast(KnowledgeObject.payload, String).ilike(like_value),
             KnowledgeObject.summary.ilike(like_value),
             KnowledgeObject.source_excerpt.ilike(like_value),
         )
@@ -523,25 +688,26 @@ def search_knowledge_objects(
     return [_as_read_model(item) for item in query.order_by(KnowledgeObject.updated_at.desc()).all()]
 
 
-def list_knowledge_versions(db: Session, knowledge_id: int):
+def list_knowledge_versions(db: Session, knowledge_id: int, user: User):
     knowledge_object = get_knowledge_object_or_404(db, knowledge_id)
     query = (
         db.query(KnowledgeObject)
         .filter(KnowledgeObject.object_key == knowledge_object.object_key)
+        .filter(_visibility_clause(user))
         .order_by(KnowledgeObject.object_version.desc())
     )
     return [_as_read_model(item) for item in query.all()]
 
 
-def update_knowledge_object(db: Session, knowledge_id: int, payload: KnowledgeObjectUpdate):
+def update_knowledge_object(db: Session, knowledge_id: int, payload: KnowledgeObjectUpdate, user: User):
     existing = get_knowledge_object_or_404(db, knowledge_id)
     merged_name = payload.name if payload.name is not None else existing.name
-    merged_payload = _deserialize_payload(existing.payload)
+    merged_payload = dict(existing.payload)
     if payload.payload is not None:
         merged_payload = payload.payload
-    merged_relations = _deserialize_relations(existing.relations)
+    merged_relations = list(existing.relations or [])
     if payload.relations is not None:
-        merged_relations = payload.relations
+        merged_relations = [relation.model_dump() for relation in payload.relations]
     merged_summary = payload.summary if payload.summary is not None else existing.summary
     merged_excerpt = payload.source_excerpt if payload.source_excerpt is not None else existing.source_excerpt
 
@@ -555,6 +721,16 @@ def update_knowledge_object(db: Session, knowledge_id: int, payload: KnowledgeOb
         source_excerpt=merged_excerpt,
         source_document_id=existing.source_document_id,
         extraction_method=existing.extraction_method,
+        # Admin edits keep the object's current review state; the mandatory
+        # change_note is stored on the new version row (spec §8, audit F-038).
+        object_status=existing.status,
+        visibility=payload.visibility if payload.visibility is not None else existing.visibility,
+        department_ids=(
+            payload.department_ids if payload.department_ids is not None else (existing.department_ids or [])
+        ),
+        created_by_id=existing.created_by_id,
+        review_note=payload.change_note,
+        reviewed_by_id=user.id,
     )
     db.commit()
     db.refresh(knowledge_object)
@@ -562,8 +738,46 @@ def update_knowledge_object(db: Session, knowledge_id: int, payload: KnowledgeOb
 
 
 def delete_knowledge_object(db: Session, knowledge_id: int) -> None:
+    """Spec §8 DELETE /knowledge/{id} archives instead of deleting (audit F-011)."""
     knowledge_object = get_knowledge_object_or_404(db, knowledge_id)
-    siblings = db.query(KnowledgeObject).filter(KnowledgeObject.object_key == knowledge_object.object_key).all()
-    for sibling in siblings:
-        db.delete(sibling)
+    knowledge_object.status = KnowledgeObjectStatus.ARCHIVED
+    knowledge_object.is_current = False
+    db.add(knowledge_object)
     db.commit()
+
+
+def _review_knowledge_object(
+    db: Session, knowledge_id: int, user: User, new_status: KnowledgeObjectStatus, note: str | None
+) -> KnowledgeObjectRead:
+    knowledge_object = get_knowledge_object_or_404(db, knowledge_id)
+    if not knowledge_object.is_current:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Cannot review a superseded knowledge version",
+        )
+    knowledge_object.status = new_status
+    knowledge_object.reviewed_by_id = user.id
+    knowledge_object.reviewed_at = datetime.now(UTC)
+    knowledge_object.review_note = note
+    db.add(knowledge_object)
+    db.commit()
+    db.refresh(knowledge_object)
+    return _as_read_model(knowledge_object)
+
+
+def approve_knowledge_object(db: Session, knowledge_id: int, user: User, note: str | None = None):
+    return _review_knowledge_object(db, knowledge_id, user, KnowledgeObjectStatus.APPROVED, note)
+
+
+def reject_knowledge_object(db: Session, knowledge_id: int, user: User, note: str | None = None):
+    return _review_knowledge_object(db, knowledge_id, user, KnowledgeObjectStatus.REJECTED, note)
+
+
+def bulk_review_knowledge_objects(
+    db: Session, ids: list[int], action: str, user: User, note: str | None = None
+) -> tuple[int, list[KnowledgeObjectRead]]:
+    new_status = KnowledgeObjectStatus.APPROVED if action == "approve" else KnowledgeObjectStatus.REJECTED
+    reviewed: list[KnowledgeObjectRead] = []
+    for knowledge_id in ids:
+        reviewed.append(_review_knowledge_object(db, knowledge_id, user, new_status, note))
+    return len(reviewed), reviewed

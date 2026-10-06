@@ -10,6 +10,12 @@ __pycache__/
 venv/
 env/
 
+
+.frebuff
+.build_temp
+.mypy_cache
+.pytest_cache
+.ruff_cache
 # Environment Variables
 .env
 
