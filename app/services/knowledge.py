@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import re
 from collections.abc import Iterable
 from datetime import UTC, datetime
@@ -17,6 +18,7 @@ from app.models.knowledge import (
 from app.models.knowledge_version import KnowledgeObjectVersion
 from app.models.user import User, UserRole
 from app.schemas.knowledge import (
+    RELATION_PREDICATES,
     KnowledgeObjectCreate,
     KnowledgeObjectRead,
     KnowledgeObjectUpdate,
@@ -24,6 +26,8 @@ from app.schemas.knowledge import (
 )
 from app.services.documents import get_document_or_404
 from app.services.extraction import get_extracted_text
+
+logger = logging.getLogger(__name__)
 
 SCHEMA_VERSION = 1
 RULE_PATTERN = re.compile(r"\b(must|should|shall|required|not allowed|prohibited|only)\b", flags=re.IGNORECASE)
@@ -70,6 +74,23 @@ def _deserialize_relations(relations: Iterable) -> list[dict]:
     return items
 
 
+def _safe_relations(relations: Iterable) -> list[dict]:
+    """Drop stored relations whose predicate is outside the closed list (spec §6.2).
+
+    Rows written before the predicate validator existed can hold predicates the read
+    schema rejects; a stored value must never make the read endpoints return 500.
+    """
+
+    kept: list[dict] = []
+    for relation in _deserialize_relations(relations):
+        predicate = relation.get("relation_type") or relation.get("predicate")
+        if predicate in RELATION_PREDICATES:
+            kept.append(relation)
+        else:
+            logger.warning("Dropping relation with unknown predicate %r", predicate)
+    return kept
+
+
 def _as_read_model(obj: KnowledgeObject) -> KnowledgeObjectRead:
     return KnowledgeObjectRead.model_validate(
         {
@@ -78,7 +99,7 @@ def _as_read_model(obj: KnowledgeObject) -> KnowledgeObjectRead:
             "object_key": obj.object_key,
             "name": obj.name,
             "payload": obj.payload,
-            "relations": obj.relations,
+            "relations": _safe_relations(obj.relations),
             "summary": obj.summary,
             "source_excerpt": obj.source_excerpt,
             "schema_version": obj.schema_version,
@@ -104,7 +125,7 @@ def _require_fields(payload: dict[str, object], required_fields: set[str], objec
     missing = [field for field in sorted(required_fields) if not payload.get(field)]
     if missing:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=f"Missing required fields for {object_type.value}: {', '.join(missing)}",
         )
 
@@ -113,7 +134,7 @@ def validate_knowledge_payload(object_type: KnowledgeObjectType, payload: dict[s
     _require_fields(payload, REQUIRED_ATTRIBUTES[object_type], object_type)
     if object_type == KnowledgeObjectType.POLICY and len(str(payload.get("summary", ""))) > 500:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="policy summary must be 500 characters or fewer",
         )
 

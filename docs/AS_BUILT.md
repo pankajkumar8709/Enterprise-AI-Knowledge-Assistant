@@ -190,3 +190,31 @@ All six enabling items from `build_plan.md` §Phase 5.5 are in place:
 | 6 | pgvector + pg_trgm + vector/FTS schema | **pgvector 0.8.6 installed into PostgreSQL 18** (DLL + extension scripts from `.build_tmp/pgvector`); `pg_trgm`/`pgcrypto` enabled; `document_chunks.embedding vector(384)`, `tsv`, `knowledge_objects.search_text`/`search_tsv` with HNSW (`m=16, ef_construction=64`), GIN tsv, GIN trgm, GIN jsonb indexes — declared in the models so autogenerate is stable. |
 
 Verification evidence: migrations `0007 → head` apply to a **copy of the live data** (`enterprise_ai_ka_55check`, dropped after verification) with up/down/up all clean and zero data loss; `alembic check` reports "No new upgrade operations detected"; `ruff check`, `ruff format --check` and `mypy app --ignore-missing-imports` are clean; the 44-test suite passes; the app boots against the dev DB with `/health/ready` → `database: connected`. Dev DB migrated to head **`20261005_0009`**. Also fixed en route: migration `0008` downgrade now drops `documents.uploaded_by_id` (re-upgrade previously failed), and the broken `.env` `DATABASE_URL` role (`user` → `postgres`).
+
+---
+
+## 9. Phase 9 frontend (2026-10-06)
+
+`frontend/` — React 18.3, TypeScript 5.7 (strict; zero `any`), Vite 6, Tailwind 3.4,
+TanStack Query 5, Zustand 5, react-hook-form + zod, react-markdown + remark-gfm,
+class-variance-authority, lucide-react, `@fontsource` fonts. Commands: `npm ci`,
+`npm run dev` (proxies `/api` → `http://localhost:8000`), `npm run typecheck`, `npm run lint`,
+`npm run build` (→ `dist/`), `npm run preview`.
+
+Structure follows §13.2 (`lib/`, `types/`, `store/`, `hooks/`, `components/{ui,layout,documents,knowledge,chat}/`,
+`pages/{admin,app}/`) plus `pages/DevUi.tsx` mounted at `/dev/ui`. Routes and guards follow
+§13.3: `/` redirects by role, and employees hitting `/admin/*` get a 403 page instead of a
+redirect.
+
+**Deviations from the §13.4 type sketch** (full table in `frontend/README.md`): the shipped API
+uses integer ids and different field names (`source_name`, `content_type`, `version`,
+`object_type`, `object_key`, `payload`, `object_version`, `source_excerpt`,
+`source_document_id`); `GET /documents` accepts only `page`/`page_size`, so the documents page
+filters and paginates the newest 100 rows client-side; `GET /knowledge/schema` was never
+implemented, so the manual object form is driven by a local `OKF_FIELD_SPECS` table (§6.2);
+`GET /chat/conversations` returns a bare array; and `GET /chat/conversations/{id}` returns
+messages without sources, so replayed history renders without citation chips. The error
+envelope `{"error":{"code","message","details"}}` matches §8 exactly (verified live).
+
+**Known gaps**: the main bundle is 761 kB (not code-split), and the two backend defects listed
+in the changelog were only surfaced by this work.

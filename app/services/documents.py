@@ -101,7 +101,7 @@ def _save_upload(file: UploadFile, stored_name: str) -> tuple[Path, int, str]:
                 buffer.close()
                 destination.unlink(missing_ok=True)
                 raise HTTPException(
-                    status_code=status.HTTP_413_CONTENT_TOO_LARGE,
+                    status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                     detail="File exceeds size limit",
                 )
             digest.update(chunk)
@@ -110,7 +110,7 @@ def _save_upload(file: UploadFile, stored_name: str) -> tuple[Path, int, str]:
     if size == 0:
         destination.unlink(missing_ok=True)
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Empty file",
         )
     return destination, size, digest.hexdigest()

@@ -17,3 +17,7 @@ pytesseract==0.3.13
 Pillow==12.3.0
 # Starlette ships transitively via FastAPI; pin the patched line explicitly.
 starlette==1.7.0
+# Phase 6 — embeddings & retrieval.
+sentence-transformers==3.4.1
+tiktoken==0.9.0
+pgvector==0.3.6

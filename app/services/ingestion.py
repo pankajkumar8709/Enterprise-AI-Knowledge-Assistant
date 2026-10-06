@@ -135,7 +135,11 @@ def _run_pipeline(db: Session, document: Document) -> None:
     reset_document_chunks(db, document, commit=False)
     document = chunk_document(db, document, ChunkingOptions())
 
-    # Stage: embedding (Phase 6) — chunks stay without embeddings until then.
+    # Stage: embedding (spec §7.2).
+    from app.services.embeddings import embed_document_chunks  # noqa: PLC0415
+
+    embed_document_chunks(db, document.id, document.version)
+
     # Stage: okf_extracting (Phase 8) — skipped while LLM_EXTERNAL_ALLOWED=false.
 
     # Stage: indexing.

@@ -1,5 +1,6 @@
 from app.models.audit import AuditLog
 from app.models.chunk import Chunk, ChunkStatus, ChunkStrategy
+from app.models.conversation import ChatRoute, Conversation, Message, MessageRole, MessageSource
 from app.models.department import Department
 from app.models.document import (
     ChunkingStatus,
@@ -19,10 +20,12 @@ from app.models.user import User, UserRole
 
 __all__ = [
     "AuditLog",
+    "ChatRoute",
     "Chunk",
     "ChunkStatus",
     "ChunkStrategy",
     "ChunkingStatus",
+    "Conversation",
     "Department",
     "Document",
     "DocumentStatus",
@@ -36,6 +39,9 @@ __all__ = [
     "KnowledgeObjectStatus",
     "KnowledgeObjectType",
     "KnowledgeObjectVersion",
+    "Message",
+    "MessageRole",
+    "MessageSource",
     "RefreshToken",
     "User",
     "UserRole",
