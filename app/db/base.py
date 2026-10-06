@@ -1,16 +1,43 @@
+from app.models.audit import AuditLog
 from app.models.chunk import Chunk, ChunkStatus, ChunkStrategy
-from app.models.document import ChunkingStatus, Document, ExtractionStatus
-from app.models.knowledge import KnowledgeObject, KnowledgeObjectType
-from app.models.user import User
+from app.models.department import Department
+from app.models.document import (
+    ChunkingStatus,
+    Document,
+    DocumentStatus,
+    ExtractionStatus,
+    Visibility,
+)
+from app.models.document_version import DocumentVersion
+from app.models.ingestion_job import IngestionJob, JobStatus
+from app.models.knowledge import KnowledgeObject, KnowledgeObjectStatus, KnowledgeObjectType
+from app.models.knowledge_edge import KnowledgeObjectRelation
+from app.models.knowledge_source import KnowledgeObjectSource
+from app.models.knowledge_version import KnowledgeObjectVersion
+from app.models.refresh_token import RefreshToken
+from app.models.user import User, UserRole
 
 __all__ = [
-    "User",
-    "Document",
-    "ExtractionStatus",
-    "ChunkingStatus",
+    "AuditLog",
     "Chunk",
     "ChunkStatus",
     "ChunkStrategy",
+    "ChunkingStatus",
+    "Department",
+    "Document",
+    "DocumentStatus",
+    "DocumentVersion",
+    "ExtractionStatus",
+    "IngestionJob",
+    "JobStatus",
     "KnowledgeObject",
+    "KnowledgeObjectRelation",
+    "KnowledgeObjectSource",
+    "KnowledgeObjectStatus",
     "KnowledgeObjectType",
+    "KnowledgeObjectVersion",
+    "RefreshToken",
+    "User",
+    "UserRole",
+    "Visibility",
 ]

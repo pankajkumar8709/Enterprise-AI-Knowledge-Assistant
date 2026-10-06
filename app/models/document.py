@@ -1,10 +1,14 @@
 import enum
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Enum, Integer, String, Text
+from sqlalchemy import JSON, Boolean, DateTime, Enum, ForeignKey, Integer, String, Text
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin
+
+# jsonb on PostgreSQL, portable JSON elsewhere (SQLite tests).
+JSON_TYPE = JSON().with_variant(postgresql.JSONB(), "postgresql")
 
 
 class DocumentStatus(str, enum.Enum):
@@ -12,6 +16,12 @@ class DocumentStatus(str, enum.Enum):
     PROCESSING = "processing"
     READY = "ready"
     FAILED = "failed"
+
+
+class Visibility(str, enum.Enum):
+    ALL = "all"
+    DEPARTMENT = "department"
+    ADMIN_ONLY = "admin_only"
 
 
 class ExtractionStatus(str, enum.Enum):
@@ -38,6 +48,18 @@ class Document(TimestampMixin, Base):
     content_type: Mapped[str] = mapped_column(String(255), nullable=False)
     size_bytes: Mapped[int] = mapped_column(Integer, nullable=False)
     storage_path: Mapped[str] = mapped_column(String(500), nullable=False)
+    sha256: Mapped[str | None] = mapped_column(String(64), index=True, nullable=True)
+    uploaded_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    visibility: Mapped[Visibility] = mapped_column(
+        Enum(
+            Visibility,
+            name="visibility",
+            values_callable=lambda values: [value.value for value in values],
+        ),
+        default=Visibility.ALL,
+        nullable=False,
+    )
+    department_ids: Mapped[list] = mapped_column(JSON_TYPE, default=list, nullable=False)
     status: Mapped[DocumentStatus] = mapped_column(
         Enum(DocumentStatus, name="document_status", values_callable=lambda x: [e.value for e in x]),
         default=DocumentStatus.UPLOADED,
@@ -67,3 +89,21 @@ class Document(TimestampMixin, Base):
     chunking_completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     chunks = relationship("Chunk", back_populates="document", cascade="all, delete-orphan")
+
+
+def refresh_document_status(document: Document) -> None:
+    """Derive documents.status from the pipeline stages (audit F-006).
+
+    The status field must never be client-writable: it follows extraction and
+    chunking so a document can no longer sit on `uploaded` forever, and any
+    stage failure surfaces as `failed`.
+    """
+
+    if document.extraction_status == ExtractionStatus.FAILED or document.chunking_status == ChunkingStatus.FAILED:
+        document.status = DocumentStatus.FAILED
+    elif document.extraction_status == ExtractionStatus.READY and document.chunking_status == ChunkingStatus.READY:
+        document.status = DocumentStatus.READY
+    elif document.extraction_status == ExtractionStatus.PENDING and document.chunking_status == ChunkingStatus.PENDING:
+        document.status = DocumentStatus.UPLOADED
+    else:
+        document.status = DocumentStatus.PROCESSING

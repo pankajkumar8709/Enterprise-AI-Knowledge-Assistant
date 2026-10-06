@@ -56,29 +56,36 @@ Security and authorization will be applied throughout this pipeline so that user
 
 # 📌 Current Status
 
-## Phase 1 — Backend Foundation
+## Phases 0–5 — Foundation, Ingestion & Knowledge (OKF)
 
-The current repository implements the **Phase 1 foundation from the project plan**.
+The repository now implements **Phases 0–5 of the build plan** (see
+[build_plan.md](build_plan.md) and the audit in [docs/AUDIT_0-5.md](docs/AUDIT_0-5.md)).
 
 ### Implemented
 
 * ✅ FastAPI project scaffold
 * ✅ PostgreSQL-ready SQLAlchemy setup
 * ✅ Alembic migration support
-* ✅ JWT authentication APIs
-* ✅ Role-based access foundation
+* ✅ JWT authentication APIs (HS256, role re-read per request, active-user revocation)
+* ✅ Role-based access + ACL: document **visibility** (`all` / `department`) and per-chunk / per-fact ACL denormalization
 * ✅ Base route groups for:
 
   * Users
   * Authentication
   * Documents
   * Knowledge
+  * Departments
   * Chat
-* ✅ Application logging
-* ✅ Centralized error handling
-* ✅ Health checks
-* ✅ Swagger / OpenAPI documentation
-* ✅ Automated tests
+* ✅ Document ingestion: upload, magic-byte validation, SHA-256 (duplicate 409 + `?force`), `413`/`415`/`422`, async-style lifecycle (`uploaded → processing → ready/failed`) with a status endpoint
+* ✅ Text extraction for **PDF, DOCX, PPTX, TXT, MD** (unicode-safe cleaner, DOCX headings/lists/tables, PPTX numeric slide order + speaker notes, header/footer removal at the >40% threshold)
+* ✅ Token-aware chunking (section-based default, contiguous indices, `token_count`, ACL copied onto chunks)
+* ✅ OKF knowledge objects: typed schema with required attributes, closed relation predicates, versioning, admin **review workflow** (`pending_review → approved/rejected`), bulk review, archive-on-delete
+* ✅ Audit log (`audit_logs`) for auth, document and knowledge events
+* ✅ Liveness `/health` and readiness `/health/ready` (503 when the DB is down)
+* ✅ CORS, `X-Request-ID` request tracing, structured logging
+* ✅ Application logging, centralized error handling
+* ✅ Swagger / OpenAPI documentation (`docs/openapi.json`)
+* ✅ Automated tests (44 passing incl. one regression test per P0/P1 audit fix)
 
 The current phase focuses on creating a clean and scalable backend architecture that can support the future AI/RAG components.
 
@@ -553,15 +560,15 @@ This can later be extended to monitor:
 
 ## Phase 2 — Document Intelligence
 
-* [ ] Document upload
-* [ ] File validation
-* [ ] PDF processing
-* [ ] DOCX processing
-* [ ] PPTX processing
+* [x] Document upload
+* [x] File validation
+* [x] PDF processing
+* [x] DOCX processing
+* [x] PPTX processing
 * [ ] XLSX processing
-* [ ] Text extraction
-* [ ] Document chunking
-* [ ] Metadata extraction
+* [x] Text extraction
+* [x] Document chunking
+* [x] Metadata extraction
 * [ ] Document versioning
 
 ---
@@ -594,10 +601,10 @@ This can later be extended to monitor:
 
 ## Phase 5 — Enterprise Security
 
-* [ ] Fine-grained RBAC
-* [ ] Document-level permissions
-* [ ] Department-level access
-* [ ] Audit logs
+* [x] Fine-grained RBAC (admin/employee + per-object review workflow)
+* [x] Document-level permissions (`visibility`: `all` / `department`)
+* [x] Department-level access (department ACL on documents, chunks and knowledge objects)
+* [x] Audit logs
 * [ ] PII detection
 * [ ] Prompt-injection protection
 * [ ] Rate limiting

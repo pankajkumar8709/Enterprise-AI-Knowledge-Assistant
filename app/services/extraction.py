@@ -8,21 +8,33 @@ import zipfile
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Iterable
 from xml.etree import ElementTree
 
 from pypdf import PdfReader
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.models.document import Document, ExtractionStatus
+from app.models.document import (
+    Document,
+    DocumentStatus,
+    ExtractionStatus,
+    refresh_document_status,
+)
 from app.services.chunking import chunk_document, reset_document_chunks
 
 WORD_NAMESPACE = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
 PPT_NAMESPACES = {
     "a": "http://schemas.openxmlformats.org/drawingml/2006/main",
 }
-REPEATED_HEADER_MIN_OCCURRENCES = 2
+# Spec §7.2: a line counts as header/footer only when repeated on > 40% of pages
+# and is <= 100 chars. A fixed count would delete legitimate lines on long documents.
+REPEATED_HEADER_MAX_RATIO = 0.4
+REPEATED_HEADER_MAX_CHARS = 100
+# Control characters, zero-width/bidi marks and BOM are removed; every other
+# character (currency signs, dashes, quotes, emoji, non-Latin scripts) is kept.
+CONTROL_CHARS_PATTERN = re.compile(
+    "[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f\u200b-\u200f\u2028\u2029\u202a-\u202e\u2060-\u206f\ufeff]"
+)
 
 
 class ExtractionError(Exception):
@@ -67,6 +79,7 @@ def extract_document_text(db: Session, document: Document) -> Document:
     delete_extraction_files(document)
     reset_document_chunks(db, document, commit=False)
     document.extraction_status = ExtractionStatus.PROCESSING
+    document.status = DocumentStatus.PROCESSING
     document.extraction_error = None
     document.extraction_ocr_used = False
     document.extracted_char_count = None
@@ -96,12 +109,24 @@ def extract_document_text(db: Session, document: Document) -> Document:
         document.extraction_status = ExtractionStatus.FAILED
         document.extraction_error = str(exc)
         document.extraction_completed_at = datetime.now(UTC)
+    except Exception as exc:  # noqa: BLE001 - corrupt/encrypted files raise parser-specific
+        # errors (pypdf EmptyFileError/PdfReadError/FileNotDecryptedError, zip/XML
+        # errors, ...). They must surface as a failed document, never as an
+        # unhandled 500 that leaves the row stuck in `processing` (audit F-002).
+        document.extraction_status = ExtractionStatus.FAILED
+        document.extraction_error = f"Unreadable or corrupt document ({type(exc).__name__}): {exc}"
+        document.extraction_completed_at = datetime.now(UTC)
 
     db.add(document)
     db.commit()
     db.refresh(document)
     if document.extraction_status == ExtractionStatus.READY:
-        return chunk_document(db, document)
+        document = chunk_document(db, document)
+    else:
+        refresh_document_status(document)
+        db.add(document)
+        db.commit()
+        db.refresh(document)
     return document
 
 
@@ -159,29 +184,81 @@ def _extract_docx_text(path: Path) -> str:
         raise ExtractionError("Broken DOCX file") from exc
 
     try:
-        root = ElementTree.fromstring(xml_bytes)
+        # Parsed from a server-extracted DOCX part, not raw client XML; stdlib
+        # ElementTree does not resolve external entities.
+        root = ElementTree.fromstring(xml_bytes)  # nosec B314
     except ElementTree.ParseError as exc:
         raise ExtractionError("Broken DOCX XML content") from exc
 
-    paragraphs: list[str] = []
-    for paragraph in root.findall(".//w:p", WORD_NAMESPACE):
-        texts = [node.text or "" for node in paragraph.findall(".//w:t", WORD_NAMESPACE)]
-        if texts:
-            paragraphs.append("".join(texts))
-    return "\n".join(paragraphs)
+    body = root.find("w:body", WORD_NAMESPACE)
+    if body is None:
+        return ""
+
+    lines: list[str] = []
+    word_tag = WORD_NAMESPACE["w"]
+    for child in body:
+        tag = child.tag.rsplit("}", 1)[-1]
+        if tag == "p":
+            texts = [node.text or "" for node in child.findall(".//w:t", WORD_NAMESPACE)]
+            text = "".join(texts).strip()
+            if not text:
+                continue
+            style = child.find("w:pPr/w:pStyle", WORD_NAMESPACE)
+            heading_level = 0
+            if style is not None:
+                style_value = style.get(f"{{{word_tag}}}val", "") or ""
+                heading_match = re.match(r"(?i)heading\s*(\d)", style_value)
+                if heading_match:
+                    heading_level = min(int(heading_match.group(1)), 6)
+                elif style_value.lower() == "title":
+                    heading_level = 1
+            if heading_level:
+                # Mark headings so the chunker can use them as section titles.
+                text = f"{'#' * heading_level} {text}"
+            elif child.find("w:pPr/w:numPr", WORD_NAMESPACE) is not None:
+                text = f"- {text}"
+            lines.append(text)
+        elif tag == "tbl":
+            for row in child.findall("w:tr", WORD_NAMESPACE):
+                cells: list[str] = []
+                for cell in row.findall("w:tc", WORD_NAMESPACE):
+                    cell_texts = [node.text or "" for node in cell.findall(".//w:t", WORD_NAMESPACE)]
+                    cells.append("".join(cell_texts).strip())
+                lines.append(" | ".join(cells))
+    return "\n".join(lines)
+
+
+def _pptx_name_sort_key(name: str) -> int:
+    match = re.search(r"slide(\d+)", name)
+    return int(match.group(1)) if match else 0
 
 
 def _extract_pptx_text(path: Path) -> str:
     try:
         with zipfile.ZipFile(path) as archive:
+            names = archive.namelist()
             slide_names = sorted(
-                name for name in archive.namelist() if name.startswith("ppt/slides/slide") and name.endswith(".xml")
+                (name for name in names if name.startswith("ppt/slides/slide") and name.endswith(".xml")),
+                key=_pptx_name_sort_key,
             )
             slide_texts = []
             for slide_name in slide_names:
-                root = ElementTree.fromstring(archive.read(slide_name))
+                # Server-side PPTX part; external entities are not resolved.
+                root = ElementTree.fromstring(archive.read(slide_name))  # nosec B314
                 texts = [node.text or "" for node in root.findall(".//a:t", PPT_NAMESPACES)]
-                slide_texts.append("\n".join(part for part in texts if part.strip()))
+                slide_text = "\n".join(part for part in texts if part.strip())
+                # Speaker notes for the same slide (audit F-016).
+                slide_number = _pptx_name_sort_key(slide_name)
+                notes_name = f"ppt/notesSlides/notesSlide{slide_number}.xml"
+                if notes_name in names:
+                    # Server-side PPTX notes part; external entities are not resolved.
+                    notes_root = ElementTree.fromstring(archive.read(notes_name))  # nosec B314
+                    notes_parts = [node.text or "" for node in notes_root.findall(".//a:t", PPT_NAMESPACES)]
+                    notes_text = " ".join(part.strip() for part in notes_parts if part.strip())
+                    if notes_text:
+                        prefix = f"{slide_text}\n" if slide_text else ""
+                        slide_text = f"{prefix}[speaker notes] {notes_text}"
+                slide_texts.append(slide_text)
     except zipfile.BadZipFile as exc:
         raise ExtractionError("Broken PPTX file") from exc
     except ElementTree.ParseError as exc:
@@ -200,9 +277,10 @@ def _read_text_file(path: Path) -> str:
 
 
 def _remove_repeated_page_lines(page_texts: list[str]) -> list[str]:
-    if len(page_texts) < REPEATED_HEADER_MIN_OCCURRENCES:
+    if len(page_texts) < 2:
         return page_texts
 
+    page_count = len(page_texts)
     header_counts: dict[str, int] = {}
     footer_counts: dict[str, int] = {}
     page_lines: list[list[str]] = []
@@ -213,8 +291,19 @@ def _remove_repeated_page_lines(page_texts: list[str]) -> list[str]:
             header_counts[lines[0]] = header_counts.get(lines[0], 0) + 1
             footer_counts[lines[-1]] = footer_counts.get(lines[-1], 0) + 1
 
-    repeated_headers = {line for line, count in header_counts.items() if count >= REPEATED_HEADER_MIN_OCCURRENCES}
-    repeated_footers = {line for line, count in footer_counts.items() if count >= REPEATED_HEADER_MIN_OCCURRENCES}
+    def _is_repeated_boilerplate(count: int) -> bool:
+        return count > REPEATED_HEADER_MAX_RATIO * page_count
+
+    repeated_headers = {
+        line
+        for line, count in header_counts.items()
+        if len(line) <= REPEATED_HEADER_MAX_CHARS and _is_repeated_boilerplate(count)
+    }
+    repeated_footers = {
+        line
+        for line, count in footer_counts.items()
+        if len(line) <= REPEATED_HEADER_MAX_CHARS and _is_repeated_boilerplate(count)
+    }
 
     cleaned_pages: list[str] = []
     for lines in page_lines:
@@ -228,9 +317,13 @@ def _remove_repeated_page_lines(page_texts: list[str]) -> list[str]:
 
 def _clean_text(text: str) -> str:
     text = text.replace("\r\n", "\n").replace("\r", "\n").replace("\x0c", "\n")
-    text = re.sub(r"[\u200b\u200c\u200d\ufeff]", "", text)
+    # Remove control and zero-width characters only; never strip currency signs,
+    # dashes, quotes, emoji or non-Latin scripts (audit F-003 / spec §7.2).
+    text = CONTROL_CHARS_PATTERN.sub("", text)
+    # Rejoin hyphenated line wraps: "carry-\nforward" -> "carryforward";
+    # real hyphens without a line break ("full-time") are untouched.
+    text = re.sub(r"(?<=\w)-\n(?=[a-z])", "", text)
     text = re.sub(r"[^\S\n]+", " ", text)
-    text = re.sub(r"[^\x09\x0A\x20-\x7E\u00A0-\u024F]", "", text)
     lines = [_clean_line(line) for line in text.split("\n")]
     text = "\n".join(line for line in lines if line is not None)
     text = re.sub(r"\n{3,}", "\n\n", text)
@@ -250,8 +343,8 @@ def _clean_line(line: str) -> str | None:
 
 def _extract_pdf_text_with_ocr(path: Path) -> str:
     try:
-        from PIL import Image
         import pytesseract
+        from PIL import Image
     except ImportError as exc:
         raise ExtractionError("OCR dependencies are not installed for scanned PDF support") from exc
 

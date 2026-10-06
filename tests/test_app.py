@@ -1,14 +1,31 @@
 import io
-from pathlib import Path
+import time
 import zipfile
 
+from fastapi.testclient import TestClient
 from pypdf import PdfWriter
 
 from app.core.config import settings
-from app.models.user import User
-from app.models.user import UserRole
-
+from app.models.user import User, UserRole
 from tests.conftest import client
+
+
+def _wait_document_ready(test_client: TestClient, token: str, document_id: int, *, timeout_s: float = 10.0) -> dict:
+    """Poll the §8 status endpoint until the background ingestion finishes."""
+
+    deadline = time.monotonic() + timeout_s
+    last: dict = {}
+    while time.monotonic() < deadline:
+        status_response = test_client.get(
+            f"/api/v1/documents/{document_id}/status",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert status_response.status_code == 200
+        last = status_response.json()
+        if last["status"] in {"ready", "failed"}:
+            return last
+        time.sleep(0.05)
+    return last
 
 
 def _build_docx_bytes(paragraphs: list[str]) -> bytes:
@@ -22,9 +39,7 @@ def _build_docx_bytes(paragraphs: list[str]) -> bytes:
             "_rels/.rels",
             '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>',
         )
-        paragraph_xml = "".join(
-            f"<w:p><w:r><w:t>{paragraph}</w:t></w:r></w:p>" for paragraph in paragraphs
-        )
+        paragraph_xml = "".join(f"<w:p><w:r><w:t>{paragraph}</w:t></w:r></w:p>" for paragraph in paragraphs)
         archive.writestr(
             "word/document.xml",
             f'<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>{paragraph_xml}</w:body></w:document>',
@@ -48,9 +63,7 @@ def _build_pptx_bytes(slides: list[list[str]]) -> bytes:
             '<?xml version="1.0" encoding="UTF-8"?><p:presentation xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"/>',
         )
         for index, slide_lines in enumerate(slides, start=1):
-            text_nodes = "".join(
-                f"<a:t>{line}</a:t>" for line in slide_lines
-            )
+            text_nodes = "".join(f"<a:t>{line}</a:t>" for line in slide_lines)
             archive.writestr(
                 f"ppt/slides/slide{index}.xml",
                 f'<?xml version="1.0" encoding="UTF-8"?><p:sld xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><p:cSld><p:spTree><p:sp><p:txBody>{text_nodes}</p:txBody></p:sp></p:spTree></p:cSld></p:sld>',
@@ -80,17 +93,18 @@ def test_signup_login_and_verify_token() -> None:
     signup_response = client.post(
         "/api/v1/auth/signup",
         json={
-            "full_name": "Admin User",
-            "email": "admin@example.com",
+            "full_name": "New Employee",
+            "email": "new.employee@example.com",
             "password": "StrongPass123",
             "role": UserRole.ADMIN.value,
         },
     )
     assert signup_response.status_code == 201
+    assert signup_response.json()["role"] == UserRole.EMPLOYEE.value
 
     login_response = client.post(
         "/api/v1/auth/login",
-        json={"email": "admin@example.com", "password": "StrongPass123"},
+        json={"email": "new.employee@example.com", "password": "StrongPass123"},
     )
     assert login_response.status_code == 200
     token = login_response.json()["access_token"]
@@ -100,7 +114,7 @@ def test_signup_login_and_verify_token() -> None:
         headers={"Authorization": f"Bearer {token}"},
     )
     assert verify_response.status_code == 200
-    assert verify_response.json()["email"] == "admin@example.com"
+    assert verify_response.json()["email"] == "new.employee@example.com"
 
 
 def test_admin_can_list_users() -> None:
@@ -131,17 +145,18 @@ def test_admin_can_manage_documents() -> None:
         data={"title": "Employee Handbook"},
         files={"file": ("handbook.txt", b"phase 2 upload content", "text/plain")},
     )
-    assert upload_response.status_code == 201
+    # Phase 5.5: spec §7.1.5 — upload returns 202 Accepted (async ingestion).
+    assert upload_response.status_code == 202
     created_document = upload_response.json()
-    assert created_document["status"] == "uploaded"
+    # Status follows the pipeline (audit F-006): ingestion now runs as a
+    # background task, so the response is `processing` and clients poll §8 status.
+    final_status = _wait_document_ready(client, token, created_document["id"])
+    assert final_status["status"] == "ready", final_status
     assert created_document["version"] == 1
-    assert created_document["extraction_status"] == "ready"
-    assert created_document["extracted_char_count"] == len("phase 2 upload content")
-    assert created_document["chunking_status"] == "ready"
-    assert created_document["chunk_count"] == 3
-    assert Path(created_document["storage_path"]).exists()
-    assert Path(created_document["extraction_raw_text_path"]).exists()
-    assert Path(created_document["extraction_clean_text_path"]).exists()
+    assert created_document["sha256"]
+    # Internal storage paths must not leak to API clients (audit F-034).
+    assert "storage_path" not in created_document
+    assert "extraction_raw_text_path" not in created_document
 
     list_response = client.get(
         "/api/v1/documents",
@@ -153,17 +168,30 @@ def test_admin_can_manage_documents() -> None:
     update_response = client.put(
         f"/api/v1/documents/{created_document['id']}",
         headers={"Authorization": f"Bearer {token}"},
-        data={"title": "Updated Handbook", "status": "ready"},
+        data={"title": "Updated Handbook"},
         files={"file": ("handbook.md", b"# updated phase 2 content", "text/markdown")},
     )
     assert update_response.status_code == 200
     updated_document = update_response.json()
     assert updated_document["title"] == "Updated Handbook"
-    assert updated_document["status"] == "uploaded"
     assert updated_document["version"] == 2
     assert updated_document["source_name"] == "handbook.md"
-    assert updated_document["extraction_status"] == "ready"
-    assert updated_document["chunking_status"] == "ready"
+    # Phase 5.5: re-ingestion of the new version runs in the background (§7.1.5);
+    # the PUT response shows the pipeline state at accept time, so poll §8 status.
+    v2_status = _wait_document_ready(client, token, created_document["id"])
+    assert v2_status["status"] == "ready", v2_status
+
+    # Pipeline states are visible after ingestion completes (§8 status contract).
+    refreshed = client.get(
+        f"/api/v1/documents/{created_document['id']}",
+        headers={"Authorization": f"Bearer {token}"},
+    ).json()
+    assert refreshed["extraction_status"] == "ready"
+    # Version 2 replaced the file, so pipeline stats now reflect its content.
+    assert refreshed["extracted_char_count"] == len("# updated phase 2 content")
+    assert refreshed["chunking_status"] == "ready"
+    # Single production chunking strategy (audit F-019): one chunk, not three.
+    assert refreshed["chunk_count"] == 1
 
     extraction_status_response = client.get(
         f"/api/v1/documents/{created_document['id']}/extraction-status",
@@ -178,18 +206,28 @@ def test_admin_can_manage_documents() -> None:
     )
     assert chunk_status_response.status_code == 200
     assert chunk_status_response.json()["status"] == "ready"
-    assert chunk_status_response.json()["chunk_count"] == 3
+    assert chunk_status_response.json()["chunk_count"] == 1
+
+    # Combined status endpoint (spec §8)
+    status_response = client.get(
+        f"/api/v1/documents/{created_document['id']}/status",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert status_response.status_code == 200
+    assert status_response.json()["status"] == "ready"
+    assert status_response.json()["progress_pct"] == 100
 
     chunk_preview_response = client.get(
         f"/api/v1/documents/{created_document['id']}/chunks/preview",
         headers={"Authorization": f"Bearer {token}"},
-        params={"strategy": "fixed_size"},
+        params={"strategy": "section_based"},
     )
     assert chunk_preview_response.status_code == 200
-    assert chunk_preview_response.json()["strategy"] == "fixed_size"
+    assert chunk_preview_response.json()["strategy"] == "section_based"
     assert chunk_preview_response.json()["total"] == 1
     assert chunk_preview_response.json()["items"][0]["page_number"] == 1
     assert chunk_preview_response.json()["items"][0]["source_file_name"] == "handbook.md"
+    assert chunk_preview_response.json()["items"][0]["token_count"] >= 1
 
     extracted_text_response = client.get(
         f"/api/v1/documents/{created_document['id']}/extracted-text",
@@ -244,8 +282,10 @@ def test_document_upload_rejects_invalid_type_and_non_admin() -> None:
         data={"title": "Unsupported"},
         files={"file": ("script.exe", b"binary", "application/octet-stream")},
     )
-    assert invalid_type_response.status_code == 400
-    assert invalid_type_response.json()["detail"] == "Unsupported file type"
+    # Spec §8: unsupported file type is 415, not 400 (audit F-007).
+    assert invalid_type_response.status_code == 415
+    # Spec §8 error contract (R0 #17): {"error": {code, message, details}}.
+    assert invalid_type_response.json()["error"]["code"] == "UNSUPPORTED_FILE_TYPE"
 
 
 def test_document_upload_rejects_file_over_size_limit() -> None:
@@ -261,8 +301,10 @@ def test_document_upload_rejects_file_over_size_limit() -> None:
         data={"title": "Oversized"},
         files={"file": ("large.txt", b"a" * 2048, "text/plain")},
     )
-    assert oversized_response.status_code == 400
-    assert oversized_response.json()["detail"] == "File exceeds size limit"
+    # Spec §8: FILE_TOO_LARGE is 413 (audit F-007).
+    assert oversized_response.status_code == 413
+    # Spec §8 error contract (R0 #17): {"error": {code, message, details}}.
+    assert oversized_response.json()["error"]["code"] == "FILE_TOO_LARGE"
 
 
 def test_docx_and_pptx_extraction_work() -> None:
@@ -288,8 +330,13 @@ def test_docx_and_pptx_extraction_work() -> None:
                 )
             },
         )
-        assert docx_response.status_code == 201
+        # Phase 5.5: ingestion is asynchronous (§7.1.5); poll until it settles.
+        assert docx_response.status_code == 202
         docx_payload = docx_response.json()
+        assert _wait_document_ready(client, token, docx_payload["id"])["status"] == "ready"
+        docx_payload = client.get(
+            f"/api/v1/documents/{docx_payload['id']}", headers={"Authorization": f"Bearer {token}"}
+        ).json()
         assert docx_payload["extraction_status"] == "ready"
 
         docx_text_response = client.get(
@@ -311,8 +358,13 @@ def test_docx_and_pptx_extraction_work() -> None:
                 )
             },
         )
-        assert pptx_response.status_code == 201
+        # Phase 5.5: ingestion is asynchronous (§7.1.5); poll until it settles.
+        assert pptx_response.status_code == 202
         pptx_payload = pptx_response.json()
+        assert _wait_document_ready(client, token, pptx_payload["id"])["status"] == "ready"
+        pptx_payload = client.get(
+            f"/api/v1/documents/{pptx_payload['id']}", headers={"Authorization": f"Bearer {token}"}
+        ).json()
         assert pptx_payload["extraction_status"] == "ready"
 
         pptx_text_response = client.get(
@@ -338,10 +390,12 @@ def test_scanned_pdf_without_ocr_dependencies_marks_extraction_failed() -> None:
         data={"title": "Scanned PDF"},
         files={"file": ("scan.pdf", _build_blank_pdf_bytes(), "application/pdf")},
     )
-    assert upload_response.status_code == 201
-    payload = upload_response.json()
-    assert payload["extraction_status"] == "failed"
-    assert "OCR" in payload["extraction_error"]
+    # Phase 5.5: spec §7.1.5 — upload returns 202 Accepted (async ingestion);
+    # the OCR failure surfaces through the §8 status endpoint once the task runs.
+    assert upload_response.status_code == 202
+    final_status = _wait_document_ready(client, token, upload_response.json()["id"])
+    assert final_status["status"] == "failed", final_status
+    assert "OCR" in (final_status["error_message"] or "")
 
 
 def test_empty_text_document_is_detected_as_broken() -> None:
@@ -357,8 +411,15 @@ def test_empty_text_document_is_detected_as_broken() -> None:
         data={"title": "Empty Notes"},
         files={"file": ("empty.txt", b"   \n\n\t", "text/plain")},
     )
-    assert upload_response.status_code == 201
-    payload = upload_response.json()
+    # Phase 5.5: spec §7.1.5 — upload returns 202 Accepted (async ingestion);
+    # the deterministic extraction failure marks the document failed.
+    assert upload_response.status_code == 202
+    final_status = _wait_document_ready(client, token, upload_response.json()["id"])
+    assert final_status["status"] == "failed", final_status
+    payload = client.get(
+        f"/api/v1/documents/{upload_response.json()['id']}",
+        headers={"Authorization": f"Bearer {token}"},
+    ).json()
     assert payload["extraction_status"] == "failed"
     assert payload["extraction_error"] == "Document is empty or unreadable after cleaning"
     assert payload["chunking_status"] == "pending"
@@ -372,12 +433,15 @@ def test_document_chunk_preview_and_manual_regeneration_support_multiple_strateg
     )
     token = login_response.json()["access_token"]
 
+    # Each sentence is long enough to clear the token floor that
+    # _apply_token_limits enforces (audit F-018), so multi-chunk splits survive.
     text = (
         "# Overview\n"
-        "This is the first sentence. This is the second sentence. This is the third sentence.\n\n"
+        "The employee handbook defines the leave policy for every department in the company and explains "
+        "how requests are submitted, approved, and recorded throughout the year.\n\n"
         "## Details\n"
-        "Here is a longer section with more context. It should be split into more than one chunk when "
-        "we reduce the chunk size. The last sentence closes the paragraph."
+        "Carry-forward requests must be reviewed by the HR manager before the end of the annual cycle, and "
+        "any exception requires written approval from the department head as well."
     )
     upload_response = client.post(
         "/api/v1/documents",
@@ -385,23 +449,28 @@ def test_document_chunk_preview_and_manual_regeneration_support_multiple_strateg
         data={"title": "Chunk Strategy Sample"},
         files={"file": ("chunk-sample.md", text.encode("utf-8"), "text/markdown")},
     )
-    assert upload_response.status_code == 201
+    # Phase 5.5: spec §7.1.5 — upload returns 202 Accepted (async ingestion).
+    assert upload_response.status_code == 202
     payload = upload_response.json()
+    assert _wait_document_ready(client, token, payload["id"])["status"] == "ready"
+    payload = client.get(f"/api/v1/documents/{payload['id']}", headers={"Authorization": f"Bearer {token}"}).json()
     assert payload["chunking_status"] == "ready"
 
     regenerate_response = client.post(
         f"/api/v1/documents/{payload['id']}/chunk",
         headers={"Authorization": f"Bearer {token}"},
-        json={"chunk_size": 120, "overlap": 20, "strategies": ["sentence_based", "section_based"]},
+        json={"chunk_size": 100, "overlap": 20, "strategies": ["sentence_based", "section_based"]},
     )
     assert regenerate_response.status_code == 200
     assert regenerate_response.json()["status"] == "ready"
-    assert regenerate_response.json()["chunk_count"] >= 3
+    # Explicit multi-strategy runs still work for the Phase 4 comparison;
+    # indices stay contiguous across strategies (audit F-019).
+    assert regenerate_response.json()["chunk_count"] >= 2
 
     sentence_preview_response = client.get(
         f"/api/v1/documents/{payload['id']}/chunks/preview",
         headers={"Authorization": f"Bearer {token}"},
-        params={"strategy": "sentence_based", "limit": 10},
+        params={"strategy": "sentence_based", "page_size": 10},
     )
     assert sentence_preview_response.status_code == 200
     sentence_payload = sentence_preview_response.json()
@@ -411,7 +480,7 @@ def test_document_chunk_preview_and_manual_regeneration_support_multiple_strateg
     section_preview_response = client.get(
         f"/api/v1/documents/{payload['id']}/chunks/preview",
         headers={"Authorization": f"Bearer {token}"},
-        params={"strategy": "section_based", "limit": 10},
+        params={"strategy": "section_based", "page_size": 10},
     )
     assert section_preview_response.status_code == 200
     section_payload = section_preview_response.json()
@@ -447,7 +516,8 @@ def test_phase5_okf_knowledge_extraction_search_and_versioning() -> None:
         data={"title": "Leave Policy Source"},
         files={"file": ("leave-policy.md", document_text.encode("utf-8"), "text/markdown")},
     )
-    assert upload_response.status_code == 201
+    # Phase 5.5: spec §7.1.5 — upload returns 202 Accepted (async ingestion).
+    assert upload_response.status_code == 202
     document_payload = upload_response.json()
 
     extract_response = client.post(
@@ -501,6 +571,8 @@ def test_phase5_okf_knowledge_extraction_search_and_versioning() -> None:
                 "answer": "Employees may carry forward up to 7 leave days.",
             },
             "summary": "Carry-forward allowance updated",
+            # Spec §8: edits require a change note (audit F-038).
+            "change_note": "Answer corrected after policy review",
         },
     )
     assert update_response.status_code == 200
@@ -554,18 +626,15 @@ def test_document_delete_removes_phase5_knowledge_objects() -> None:
     )
     token = login_response.json()["access_token"]
 
-    document_text = (
-        "# Security Policy\n"
-        "Department: Compliance\n"
-        "Employees must follow the approved workflow.\n"
-    )
+    document_text = "# Security Policy\nDepartment: Compliance\nEmployees must follow the approved workflow.\n"
     upload_response = client.post(
         "/api/v1/documents",
         headers={"Authorization": f"Bearer {token}"},
         data={"title": "Security Policy"},
         files={"file": ("security-policy.md", document_text.encode("utf-8"), "text/markdown")},
     )
-    assert upload_response.status_code == 201
+    # Phase 5.5: spec §7.1.5 — upload returns 202 Accepted (async ingestion).
+    assert upload_response.status_code == 202
     document_id = upload_response.json()["id"]
 
     extract_response = client.post(

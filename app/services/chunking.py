@@ -1,20 +1,56 @@
 from __future__ import annotations
 
+import math
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Iterable, Sequence
 
 from pypdf import PdfReader
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.models.chunk import Chunk, ChunkStatus, ChunkStrategy
-from app.models.document import ChunkingStatus, Document, ExtractionStatus
+from app.models.document import (
+    ChunkingStatus,
+    Document,
+    DocumentStatus,
+    ExtractionStatus,
+    refresh_document_status,
+)
 
-DEFAULT_CHUNK_SIZE = 800
-DEFAULT_CHUNK_OVERLAP = 120
+# Sizes are configured in tokens (spec §4 CHUNK_*); we pack with an average
+# of 4 characters per token and enforce the exact token limits afterwards.
+CHARS_PER_TOKEN = 4
+DEFAULT_CHUNK_SIZE = settings.chunk_target_tokens * CHARS_PER_TOKEN
+DEFAULT_CHUNK_OVERLAP = settings.chunk_overlap_tokens * CHARS_PER_TOKEN
 MAX_CHUNK_PREVIEW_LIMIT = 100
+
+_encoder_cache: object | None = None
+
+
+def _get_encoder():
+    """Load tiktoken's cl100k_base once; return None when unavailable."""
+
+    global _encoder_cache
+    if _encoder_cache is None:
+        try:
+            import tiktoken
+
+            _encoder_cache = tiktoken.get_encoding("cl100k_base")
+        except Exception:  # noqa: BLE001 - offline or dependency missing -> approximation
+            _encoder_cache = False
+    return _encoder_cache if _encoder_cache is not False else None
+
+
+def count_tokens(text: str) -> int:
+    """Token count via tiktoken (spec §2: approximation only), fallback len/4."""
+
+    encoder = _get_encoder()
+    if encoder is None:
+        return max(1, math.ceil(len(text) / CHARS_PER_TOKEN))
+    return max(1, len(encoder.encode(text, disallowed_special=())))
 
 
 class ChunkingError(Exception):
@@ -25,11 +61,10 @@ class ChunkingError(Exception):
 class ChunkingOptions:
     chunk_size: int = DEFAULT_CHUNK_SIZE
     overlap: int = DEFAULT_CHUNK_OVERLAP
-    strategies: tuple[ChunkStrategy, ...] = (
-        ChunkStrategy.FIXED_SIZE,
-        ChunkStrategy.SENTENCE_BASED,
-        ChunkStrategy.SECTION_BASED,
-    )
+    # Production default is the section-based strategy with sentence fallback
+    # (spec §7.3); the other strategies stay selectable for the eval comparison
+    # but must not run together by default (audit F-019/F-042).
+    strategies: tuple[ChunkStrategy, ...] = (ChunkStrategy.SECTION_BASED,)
 
 
 @dataclass(slots=True)
@@ -81,6 +116,7 @@ def chunk_document(
 
     reset_document_chunks(db, document, commit=False)
     document.chunking_status = ChunkingStatus.PROCESSING
+    document.status = DocumentStatus.PROCESSING
     document.chunking_started_at = datetime.now(UTC)
     db.add(document)
     db.commit()
@@ -104,7 +140,14 @@ def chunk_document(
         document.chunking_error = str(exc)
         document.chunk_count = 0
         document.chunking_completed_at = datetime.now(UTC)
+    except Exception as exc:  # noqa: BLE001 - parser failures (e.g. corrupt PDF re-read
+        # for page spans) must not crash the request or leave the row stuck.
+        document.chunking_status = ChunkingStatus.FAILED
+        document.chunking_error = f"Chunking failed ({type(exc).__name__}): {exc}"
+        document.chunk_count = 0
+        document.chunking_completed_at = datetime.now(UTC)
 
+    refresh_document_status(document)
     db.add(document)
     db.commit()
     db.refresh(document)
@@ -117,12 +160,14 @@ def list_document_chunks(
     *,
     strategy: ChunkStrategy | None = None,
     limit: int = 20,
+    offset: int = 0,
 ) -> list[Chunk]:
     limit = min(max(limit, 1), MAX_CHUNK_PREVIEW_LIMIT)
+    offset = max(offset, 0)
     query = db.query(Chunk).filter(Chunk.document_id == document_id, Chunk.status == ChunkStatus.READY)
     if strategy is not None:
         query = query.filter(Chunk.strategy == strategy)
-    return query.order_by(Chunk.strategy.asc(), Chunk.chunk_index.asc()).limit(limit).all()
+    return query.order_by(Chunk.chunk_index.asc()).offset(offset).limit(limit).all()
 
 
 def count_document_chunks(
@@ -173,9 +218,17 @@ def _build_chunk_records(
     options: ChunkingOptions,
 ) -> list[Chunk]:
     chunk_records: list[Chunk] = []
+    chunk_index = 0  # contiguous from 0 over the whole document (spec §5/P4-08)
     for strategy in options.strategies:
         drafts = _generate_chunks_for_strategy(strategy, clean_text, sections, options.chunk_size, options.overlap)
-        for index, draft in enumerate(drafts, start=1):
+        # Never merge below a size the caller explicitly requested: the token
+        # floor is capped by what this chunk_size actually produces (measured
+        # with the real tokenizer — the chars/4 heuristic underestimates token
+        # counts for prose and would collapse explicit small sizes to one chunk).
+        largest_draft_tokens = max((count_tokens(draft.text) for draft in drafts), default=0)
+        effective_min = min(settings.chunk_min_tokens, max(1, largest_draft_tokens))
+        drafts = _apply_token_limits(drafts, effective_min)
+        for draft in drafts:
             start_offset, end_offset = _resolve_offsets(clean_text, draft.text, draft.start_offset)
             section_title = draft.section_title or _section_title_for_offset(sections, start_offset)
             page_number = _page_number_for_offset(page_spans, start_offset)
@@ -184,9 +237,10 @@ def _build_chunk_records(
                     document_id=document.id,
                     strategy=strategy,
                     status=ChunkStatus.READY,
-                    chunk_index=index,
+                    chunk_index=chunk_index,
                     text=draft.text,
                     text_length=len(draft.text),
+                    token_count=count_tokens(draft.text),
                     start_offset=start_offset,
                     end_offset=end_offset,
                     overlap_size=draft.overlap_size,
@@ -194,9 +248,58 @@ def _build_chunk_records(
                     section_title=section_title,
                     source_file_name=document.source_name,
                     upload_date=document.created_at,
+                    visibility=document.visibility,
+                    department_ids=list(document.department_ids or []),
                 )
             )
+            chunk_index += 1
     return chunk_records
+
+
+def _apply_token_limits(drafts: list[ChunkDraft], min_tokens: int) -> list[ChunkDraft]:
+    """Enforce CHUNK_MAX_TOKENS / CHUNK_MIN_TOKENS (audit F-018, spec §7.3)."""
+
+    max_tokens = settings.chunk_max_tokens
+
+    # 1) Split oversized chunks on sentence boundaries, then hard-split.
+    limited: list[ChunkDraft] = []
+    for draft in drafts:
+        if count_tokens(draft.text) <= max_tokens:
+            limited.append(draft)
+            continue
+        sentences = [part.strip() for part in re.split(r"(?<=[.!?])\s+", draft.text) if part.strip()]
+        buffer: list[str] = []
+        buffer_tokens = 0
+        for sentence in sentences:
+            sentence_tokens = count_tokens(sentence)
+            if buffer and buffer_tokens + sentence_tokens > max_tokens:
+                limited.append(ChunkDraft(text=" ".join(buffer), overlap_size=0, section_title=draft.section_title))
+                buffer = [sentence]
+                buffer_tokens = sentence_tokens
+            else:
+                buffer.append(sentence)
+                buffer_tokens += sentence_tokens
+        if buffer:
+            limited.append(ChunkDraft(text=" ".join(buffer), overlap_size=0, section_title=draft.section_title))
+
+    # 2) Merge undersized chunks into the previous neighbour (same run),
+    #    unless that would push the neighbour over CHUNK_MAX_TOKENS.
+    merged: list[ChunkDraft] = []
+    for draft in limited:
+        if merged and count_tokens(draft.text) < min_tokens:
+            previous = merged[-1]
+            combined = f"{previous.text} {draft.text}".strip()
+            if count_tokens(combined) <= max_tokens:
+                merged[-1] = ChunkDraft(
+                    text=combined,
+                    overlap_size=previous.overlap_size,
+                    section_title=previous.section_title or draft.section_title,
+                    start_offset=previous.start_offset,
+                    end_offset=None,
+                )
+                continue
+        merged.append(draft)
+    return merged
 
 
 def _generate_chunks_for_strategy(
