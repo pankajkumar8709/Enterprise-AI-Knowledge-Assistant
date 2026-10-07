@@ -72,6 +72,7 @@ export function DocumentDetailPage() {
   const [aclTitle, setAclTitle] = useState('');
   const [aclVisibility, setAclVisibility] = useState<Visibility>('all');
   const [aclDepartments, setAclDepartments] = useState<number[]>([]);
+  const [aclTrusted, setAclTrusted] = useState(false);
   const [textMode, setTextMode] = useState<'clean' | 'raw'>('clean');
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -199,6 +200,7 @@ export function DocumentDetailPage() {
                   setAclTitle(doc.title);
                   setAclVisibility(doc.visibility);
                   setAclDepartments(doc.department_ids);
+                  setAclTrusted(doc.auto_approve_knowledge);
                   setAclOpen(true);
                 }}
               >
@@ -210,6 +212,7 @@ export function DocumentDetailPage() {
                 <Badge color={doc.visibility === 'admin_only' ? 'amber' : 'slate'}>
                   {VISIBILITY_LABEL[doc.visibility]}
                 </Badge>
+                {doc.auto_approve_knowledge ? <Badge color="emerald">Trusted source</Badge> : null}
                 {doc.department_ids.length
                   ? doc.department_ids.map((departmentId) => {
                       const department = departments.data?.find((item) => item.id === departmentId);
@@ -412,6 +415,7 @@ export function DocumentDetailPage() {
                     title: aclTitle.trim() || doc.title,
                     visibility: aclVisibility,
                     department_ids: aclVisibility === 'department' ? aclDepartments : [],
+                    auto_approve_knowledge: aclTrusted,
                   },
                   { onSuccess: () => setAclOpen(false) },
                 )
@@ -436,6 +440,22 @@ export function DocumentDetailPage() {
               <option value="department">{VISIBILITY_LABEL.department}</option>
               <option value="admin_only">{VISIBILITY_LABEL.admin_only}</option>
             </Select>
+          </FormField>
+          <FormField label="Trusted source" htmlFor="acl-trusted">
+            <label className="flex items-start gap-2 rounded-xl border border-slate-200 p-3 text-sm text-slate-700">
+              <input
+                id="acl-trusted"
+                type="checkbox"
+                className="mt-0.5 h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                checked={aclTrusted}
+                onChange={(event) => setAclTrusted(event.target.checked)}
+              />
+              <span>
+                <span className="font-medium">Auto-approve knowledge from this document.</span> Facts extracted now and
+                after every reprocess are approved immediately instead of waiting for review, and its pending facts are
+                approved as soon as you save.
+              </span>
+            </label>
           </FormField>
           {aclVisibility === 'department' ? (
             <div className="grid max-h-36 gap-1 overflow-y-auto rounded-xl border border-slate-200 p-2 sm:grid-cols-2">

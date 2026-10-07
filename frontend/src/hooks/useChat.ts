@@ -93,6 +93,8 @@ export interface ChatSession {
   historyError: unknown;
   send: (content: string) => Promise<void>;
   retry: (assistantMessage: ChatMessage) => Promise<void>;
+  /** Clear any un-sent draft thread; the next message starts a new conversation. */
+  resetDraft: () => void;
 }
 
 /**
@@ -115,8 +117,35 @@ export function useChatSession(urlConversationId: number | null): ChatSession {
     () => (detail.data?.messages ?? []).map(toChatMessage),
     [detail.data],
   );
-  const sessionMessages = useMemo(() => sessions[key] ?? [], [sessions, key]);
-  const messages = useMemo(() => [...history, ...sessionMessages], [history, sessionMessages]);
+  /**
+   * Merge confirmed server history with the optimistic session buffer.
+   * After a send settles, the refetched history already contains the pair that
+   * is still in the session buffer — without reconciliation every answered
+   * turn rendered twice. Rules:
+   *  - a session message whose (role, content) already exists in history is
+   *    dropped, except an enriched assistant answer (carrying `answer` with
+   *    sources), which replaces its history twin so citations stay visible;
+   *  - anything not yet in history (pending pair, error card) is kept.
+   */
+  const messages = useMemo(() => {
+    const session = sessions[key] ?? [];
+    if (history.length === 0) return session;
+    const out: ChatMessage[] = [];
+    const seen = new Set<string>();
+    for (const item of history) {
+      const identity = `${item.role}:${item.content}`;
+      seen.add(identity);
+      const enriched = session.find(
+        (candidate) =>
+          candidate.role === item.role && candidate.content === item.content && candidate.answer,
+      );
+      out.push(enriched ?? item);
+    }
+    for (const item of session) {
+      if (!seen.has(`${item.role}:${item.content}`)) out.push(item);
+    }
+    return out;
+  }, [history, sessions, key]);
 
   const setSession = useCallback((target: number, updater: (items: ChatMessage[]) => ChatMessage[]) => {
     setSessions((prev) => ({ ...prev, [target]: updater(prev[target] ?? []) }));
@@ -223,6 +252,19 @@ export function useChatSession(urlConversationId: number | null): ChatSession {
     [activeId, append, key, queryClient, replace, requestAnswer],
   );
 
+  /** Start a blank thread: drop the current draft buffer (key 0) so the
+   *  next message opens a brand-new conversation instead of reusing the
+   *  abandoned draft. */
+  const resetDraft = useCallback(() => {
+    setSessions((prev) => {
+      if (!prev[0]?.length) return prev;
+      const rest = { ...prev };
+      delete rest[0];
+      return rest;
+    });
+    setCreatedId(null);
+  }, []);
+
   const retry = useCallback(
     async (assistantMessage: ChatMessage) => {
       if (sendingRef.current) return;
@@ -265,5 +307,6 @@ export function useChatSession(urlConversationId: number | null): ChatSession {
     historyError: detail.error,
     send,
     retry,
+    resetDraft,
   };
 }

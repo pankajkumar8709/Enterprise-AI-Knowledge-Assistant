@@ -1,0 +1,192 @@
+APEXNOVA TECHNOLOGIES
+Enterprise Operations, Technology & Governance Manual
+Version 4.0 | Effective 07 October 2026
+Document owner: Enterprise Architecture Office. Review cycle: quarterly. Classification: Internal Use Only.
+# Purpose
+This controlled manual defines operating standards for ApexNova Technologies, a fictional enterprise operating the NovaCore multi-tenant SaaS platform. It is designed as a realistic enterprise knowledge source for RAG retrieval and OKF structured-fact extraction.
+# Enterprise facts
+Item | Value
+Primary product | NovaCore SaaS Platform
+Identity platform | Orion Identity
+Analytics platform | Atlas Data Lake
+Support platform | PulseDesk
+Finance platform | LedgerOne
+Primary regions | United States and European Union
+Availability target | 99.95% monthly
+Security executive | Marcus Chen, CISO
+Engineering executive | Elena Rao, VP Engineering
+Data executive | Priya Nair, Director of Data
+# Testing intent
+The document contains explicit entities, owners, dependencies, thresholds, approval rules, dates, service targets, and exception procedures. RAG should retrieve precise passages; OKF should extract relationships such as System–Owner, Policy–Requirement, Role–Approval, Service–SLA, Data Type–Retention, and Incident–Response.
+# 1. Enterprise Architecture
+# 1.1 Platform landscape
+NovaCore is the customer-facing application. Its API gateway routes requests to application services. Orion Identity provides authentication and authorization. Atlas Data Lake receives approved analytical events. PulseDesk manages customer cases and operational incidents. LedgerOne manages invoices, payments, purchase approvals, and financial records.
+System | Owner | Purpose | Criticality
+NovaCore | Engineering | Customer SaaS platform | Critical
+Orion Identity | Information Security | Identity and access | Critical
+Atlas Data Lake | Data Platform | Analytics and governed data | High
+PulseDesk | Customer Operations | Support and incidents | High
+LedgerOne | Finance | Billing and financial controls | High
+VaultKey | Security Engineering | Secrets management | Critical
+DeployHub | Platform Reliability | CI/CD deployment control | Critical
+# 1.2 Dependencies
+NovaCore depends on Orion Identity for employee administrative authentication.
+NovaCore production deployments depend on DeployHub and VaultKey.
+Atlas Data Lake receives approved events from NovaCore through the analytics ingestion service.
+PulseDesk is the system of record for customer support tickets and incident coordination.
+LedgerOne receives billing events from NovaCore through the Finance Integration Service.
+# 1.3 Architecture ownership
+The Enterprise Architecture Office maintains the authoritative system catalog. Every critical system must have a business owner, technical owner, recovery target, data classification, and documented dependency list. A system cannot enter production without these fields.
+# 2. Identity, Access, and Privileged Operations
+# 2.1 Access lifecycle
+Employees request access through the AccessHub workflow. The employee's manager approves business need, the system owner confirms technical suitability, and Information Security reviews privileged or Restricted-data access. Orion Identity provisions approved access.
+Access Type | Approval | Review Frequency
+Standard application | Manager | Every 90 days
+Production read-only | Manager + System Owner | Every 60 days
+Production write | Manager + System Owner + Security | Every 30 days
+Privileged administrator | System Owner + Security | Every 30 days
+Finance administrator | Finance Owner + Security | Every 30 days
+# 2.2 Joiner, mover, leaver rules
+New employees must receive a unique corporate identity before access is granted.
+Role changes require removal of obsolete privileges before new privileged access is activated.
+Involuntary termination access must be disabled within 15 minutes of confirmation.
+Voluntary termination access is disabled at the end of the employee's final working period unless Security approves earlier termination.
+Contractor accounts must have an expiration date and cannot be indefinite.
+# 2.3 Privileged access
+Privileged sessions must use MFA, named accounts, and centralized audit logging. Password sharing is prohibited. Break-glass credentials are stored in VaultKey and may be used only during approved emergencies. Break-glass use automatically creates a security review task.
+# 3. Data Management and Privacy Operations
+# 3.1 Classification
+Class | Examples | Handling
+Public | Published documentation | Integrity and change control
+Internal | Internal procedures | Corporate authentication
+Confidential | Contracts, employee records | Encryption + need-to-know
+Restricted | Payment data, credentials, security secrets | Encryption + MFA + strict logging
+# 3.2 Authoritative datasets
+Dataset | System | Business Owner | Retention
+Customer tickets | PulseDesk | Customer Operations | 24 months after closure
+Analytics events | Atlas Data Lake | Data Platform | 13 months
+Billing records | LedgerOne | Finance | 7 years
+Security logs | Atlas Data Lake | Information Security | 180 days
+Employee records | People systems | People Operations | 7 years after employment ends
+# 3.3 Data movement
+Confidential and Restricted data may move only through approved encrypted channels. Production data must not be copied into unmanaged development environments. Developers must use synthetic or masked datasets for local development unless a documented exception is approved by the Data Owner and Information Security.
+# 3.4 Deletion workflow
+Deletion requests are recorded in the Data Governance queue. The Data Owner identifies primary storage, replicas, backups, exports, and downstream datasets. The technical custodian executes deletion according to the approved retention schedule and records evidence. Legal holds override ordinary deletion until released.
+# 4. Secure Software Development
+# 4.1 Development lifecycle
+Engineering teams use Git-based source control, mandatory pull requests, automated testing, dependency scanning, secret scanning, and controlled deployment through DeployHub. Direct production code modification is prohibited except through the emergency procedure.
+# 4.2 Required controls
+Every production change must reference a ticket or approved change record.
+At least one qualified reviewer must approve application-code changes.
+Critical security findings must be resolved or formally excepted before release.
+Secrets must be stored in VaultKey and must never be committed to source control.
+Production configuration changes require peer review and an auditable change record.
+# 4.3 Vulnerability targets
+Severity | Remediation Target | Exception Authority
+Critical | 7 calendar days | CISO
+High | 14 calendar days | Security Engineering Lead
+Medium | 30 calendar days | System Owner
+Low | 90 calendar days | System Owner
+# 4.4 Dependency management
+Engineering maintains a software bill of materials for NovaCore production releases. Unsupported libraries require an architecture review. A dependency with a known critical vulnerability may not be introduced into production without a CISO-approved exception.
+# 5. Change, Release, and Incident Management
+# 5.1 Change categories
+Category | Approval | Notice
+Standard | Pre-approved service owner | No additional notice
+Normal | Service owner + reviewer | 4 business hours
+High Risk | Engineering owner + Security | 24 hours
+Emergency | Incident Commander | Immediate; review next business day
+# 5.2 Release procedure
+A release candidate must pass automated tests, dependency scanning, configuration validation, and deployment readiness checks. The release owner verifies the rollback plan before production deployment. Platform Reliability monitors the service for at least 30 minutes after a high-risk release.
+# 5.3 Incident severity
+Severity | Example | Initial Response
+S1 | Multi-customer production outage | 15 minutes
+S2 | Major feature unavailable | 2 business hours
+S3 | Normal defect or degradation | 1 business day
+S4 | Question or minor issue | 2 business days
+# 5.4 Incident command
+For S1 incidents, the Incident Commander owns coordination, the Communications Lead manages stakeholder updates, and the Technical Lead coordinates diagnosis and recovery. Executive notification is required within 30 minutes of confirming an S1 incident. Status updates occur at least every 30 minutes until stabilization.
+# 6. Business Continuity and Disaster Recovery
+# 6.1 Recovery objectives
+Service | RPO | RTO | Owner
+NovaCore | 24 hours | 4 hours | Platform Reliability
+Orion Identity | 1 hour | 2 hours | Information Security
+Atlas Data Lake | 24 hours | 8 hours | Data Platform
+PulseDesk | 24 hours | 8 hours | Customer Operations
+LedgerOne | 24 hours | 8 hours | Finance
+# 6.2 Backup policy
+Critical production databases receive encrypted daily backups. NovaCore backups are retained for 35 days. Backup restoration is tested quarterly using a representative workload. Restoration evidence must identify the date, dataset, operator, result, and recovery duration.
+# 6.3 Disaster recovery exercise
+Platform Reliability schedules the quarterly exercise.
+System owners validate application dependencies and recovery steps.
+Information Security verifies access controls during recovery.
+Data Platform validates data integrity after restoration.
+Outstanding recovery gaps receive an owner and target date within five business days.
+# 6.4 Business continuity
+If PulseDesk becomes unavailable, the approved temporary incident channel is the emergency operations mailbox. If Orion Identity becomes unavailable, privileged emergency access may use VaultKey break-glass credentials subject to post-event review.
+# 7. Vendor, Procurement, and Third-Party Risk
+# 7.1 Vendor onboarding
+A business sponsor must create a vendor record before procurement. The record includes vendor name, service, data categories, processing location, business owner, contract status, security assessment status, and renewal date.
+Vendor Risk | Required Review | Approval
+Low | Procurement review | Business Owner
+Medium | Procurement + Security questionnaire | Business Owner + Procurement
+High | Security assessment + Legal review | Business Owner + CISO + Legal
+Critical | Full risk review + executive acceptance | CISO + General Counsel + Executive Sponsor
+# 7.2 Customer-data processors
+A processor handling customer Confidential or Restricted information must have an approved contract and security assessment before production access. Production credentials are issued only after the vendor record is marked approved.
+# 7.3 Procurement thresholds
+Purchases up to INR 100,000 require business-owner approval.
+Purchases above INR 100,000 and up to INR 500,000 require Procurement review.
+Purchases above INR 500,000 require Finance approval.
+Any purchase involving Restricted customer data requires Information Security review regardless of price.
+# 8. Customer Operations and Service Management
+# 8.1 Support operating model
+PulseDesk is the authoritative system for customer cases. Support agents must classify each case, assign a severity, record customer impact, and link related incidents where applicable.
+Service Metric | Target | Owner
+S1 acknowledgement | 15 minutes | Customer Operations
+S2 acknowledgement | 2 business hours | Customer Operations
+S3 acknowledgement | 1 business day | Customer Operations
+S4 acknowledgement | 2 business days | Customer Operations
+S1 status updates | Every 30 minutes | Incident Commander
+# 8.2 Customer information handling
+Support agents must not request passwords, MFA codes, private keys, or API secrets.
+Customer exports must use approved encrypted transfer mechanisms.
+Sensitive customer attachments must be stored only in approved PulseDesk locations.
+Escalations involving security concerns must be routed to Information Security.
+# 8.3 Service review
+Customer Operations publishes a monthly service review containing ticket volume, SLA performance, major incidents, recurring issues, and corrective actions. Engineering receives recurring technical-defect trends for prioritization.
+# 8.4 Service ownership
+The VP Customer Operations is accountable for customer support. Daniel Brooks is the designated executive owner. The NovaCore service owner remains Engineering, while Customer Operations owns the customer-facing support process.
+# 9. Governance, Audit, and Knowledge Management
+# 9.1 Policy exceptions
+Exceptions must document the affected system, policy requirement, business justification, risk, compensating control, owner, approval authority, start date, and expiration date. Security policy exceptions require CISO approval. Exceptions must have an expiration date and cannot be indefinite.
+# 9.2 Audit evidence
+System owners must retain access-review evidence for at least 12 months.
+Change records and deployment evidence must be retained for at least 12 months.
+Security incident evidence is retained for at least 180 days unless Legal specifies longer.
+Vendor security assessments are retained for the duration of the vendor relationship plus 12 months.
+# 9.3 Key enterprise relationships
+Subject | Relationship | Object
+NovaCore | owned by | Engineering
+NovaCore | depends on | Orion Identity
+NovaCore | deploys through | DeployHub
+DeployHub | uses secrets from | VaultKey
+NovaCore | sends analytics to | Atlas Data Lake
+Customer support | managed through | PulseDesk
+Billing | managed through | LedgerOne
+Restricted-data vendor | requires approval from | Information Security
+S1 incident | coordinated by | Incident Commander
+Production access | requires | Manager + System Owner
+# 9.4 Knowledge-base test questions
+Which system owns customer analytics events and how long are they retained?
+What approvals are required for production write access?
+What is NovaCore's RPO and RTO?
+Which system does DeployHub use for secrets?
+Who owns PulseDesk?
+What is the remediation target for a critical vulnerability?
+What happens if Orion Identity is unavailable?
+Which purchases require Finance approval?
+What information must a vendor record contain?
+Who coordinates a Severity 1 incident?
+# 10. Document Control
+Document ID: ANT-OPS-400. Version: 4.0. Effective date: 07 October 2026. Owner: Enterprise Architecture Office. Next scheduled review: 07 January 2027. This document is fictional and intended solely for enterprise RAG, OKF, knowledge-graph, entity-extraction, and policy-question-answering testing.

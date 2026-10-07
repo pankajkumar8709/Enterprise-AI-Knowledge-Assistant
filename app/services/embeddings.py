@@ -8,6 +8,7 @@ dot product, matching the HNSW `vector_cosine_ops` index.
 from __future__ import annotations
 
 import logging
+import threading
 from typing import TYPE_CHECKING
 
 from sqlalchemy.orm import Session
@@ -20,16 +21,27 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 _model: SentenceTransformer | None = None
+_model_lock = threading.Lock()
 
 
 def get_model() -> SentenceTransformer:
-    global _model  # noqa: PLW0603
-    if _model is None:
-        from sentence_transformers import SentenceTransformer  # noqa: PLC0415
+    """Return the process-wide SentenceTransformer (lazy, double-checked lock).
 
-        logger.info("loading embedding model %s", settings.embedding_model)
-        _model = SentenceTransformer(settings.embedding_model)
-        logger.info("embedding model loaded")
+    Ingestion tasks and search requests run in the threadpool, so several
+    threads can hit this on the first request burst. Without the lock each
+    thread built its own SentenceTransformer concurrently, which intermittently
+    crashed with ``Cannot copy out of meta tensor`` and failed the ingestion
+    job. The lock serialises the one-time load; later calls are lock-free.
+    """
+    global _model
+    if _model is None:
+        with _model_lock:
+            if _model is None:  # double-checked: another thread may have loaded it
+                from sentence_transformers import SentenceTransformer
+
+                logger.info("loading embedding model %s", settings.embedding_model)
+                _model = SentenceTransformer(settings.embedding_model)
+                logger.info("embedding model loaded")
     return _model
 
 
@@ -74,8 +86,8 @@ def embed_document_chunks(db: Session, document_id: int, version: int) -> int:
     Returns the number of chunks embedded. Raises on model/DB errors so the
     ingestion pipeline can mark the job failed and retry.
     """
-    from app.models.chunk import Chunk  # noqa: PLC0415
-    from app.models.document import Document  # noqa: PLC0415
+    from app.models.chunk import Chunk
+    from app.models.document import Document
 
     document = db.query(Document).filter(Document.id == document_id).first()
     if document is None:
@@ -99,7 +111,7 @@ def embed_document_chunks(db: Session, document_id: int, version: int) -> int:
     for i in range(0, len(chunks), batch_size):
         batch = chunks[i : i + batch_size]
         texts = [
-            embed_chunk_text(document.title, c.section_title, c.text)
+            (f"{document.title} > {c.section_title}\n" if c.section_title else f"{document.title}\n") + c.text
             for c in batch
         ]
         vectors = embed_texts(texts)
@@ -122,7 +134,7 @@ def backfill_embeddings(db: Session) -> dict[str, int]:
 
     Returns ``{"total": N, "embedded": M}``.
     """
-    from app.models.chunk import Chunk  # noqa: PLC0415
+    from app.models.chunk import Chunk
 
     total = db.query(Chunk).filter(Chunk.embedding.is_(None)).count()
     if total == 0:
@@ -132,7 +144,7 @@ def backfill_embeddings(db: Session) -> dict[str, int]:
     logger.info("backfill: %d chunks need embeddings", total)
 
     # Group by (document_id, version) to reuse the document title.
-    from sqlalchemy import distinct  # noqa: PLC0415
+    from sqlalchemy import distinct
 
     pairs = (
         db.query(distinct(Chunk.document_id), Chunk.version)

@@ -1,8 +1,10 @@
 import hashlib
+import logging
 import secrets
 from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, status
+from passlib.exc import UnknownHashError
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -11,6 +13,8 @@ from app.core.security import create_access_token, hash_password, verify_passwor
 from app.models.refresh_token import RefreshToken
 from app.models.user import User, UserRole
 from app.schemas.auth import TokenResponse, TokenUser
+
+logger = logging.getLogger(__name__)
 
 
 def _hash_refresh_token(raw_token: str) -> str:
@@ -73,7 +77,16 @@ def create_admin_user(db: Session, payload) -> User:
 
 def authenticate_user(db: Session, email: str, password: str) -> User | None:
     user = db.query(User).filter(func.lower(User.email) == email.lower()).first()
-    if not user or not user.is_active or not verify_password(password, user.hashed_password):
+    if not user or not user.is_active:
+        return None
+
+    try:
+        password_matches = verify_password(password, user.hashed_password)
+    except UnknownHashError:
+        logger.error("User %s has an unrecognized password hash; password reset is required", user.id)
+        return None
+
+    if not password_matches:
         return None
     return user
 

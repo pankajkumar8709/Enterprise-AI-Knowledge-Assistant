@@ -40,6 +40,20 @@ Implements `build_plan.md` §13 (React 18 + TypeScript strict + Vite + Tailwind)
 
 ### Fixed (found while verifying Phase 9 end to end)
 
+- **Env-managed administrator** — `ADMIN_EMAIL` and `ADMIN_PASSWORD` now
+  provision/synchronize one marked admin account at startup. Email/password
+  changes update that account; conflicting email ownership fails startup.
+- **`app/services/auth.py`** — an unrecognized stored password hash previously
+  raised Passlib `UnknownHashError` and returned HTTP 500 on login. It now logs
+  the affected user ID and fails closed through the standard 401 invalid-credentials
+  response; the account still needs a password reset.
+- **`app/core/config.py`** — lowered the default OKF minimum score from `0.30`
+  to `0.25`. An approved employee fact matching “Who is the HR manager?” scored
+  `0.2809` and was discarded just below the old threshold, causing the grounded
+  answer fallback despite relevant approved knowledge being present.
+- **`app/services/answer.py`** — GPT-OSS emits citations as `【S1】`, while the
+  parser only recognized `[S1]`. Full-width citation markers are now normalized
+  to `[S#]` before source validation so cited-source metadata and UI links work.
 - **`app/services/knowledge.py`** — legacy `knowledge_objects.relations` rows can contain
   predicates outside the §6.2 closed list (`derived_from`, `member_of`, written before the
   validator existed). The read model validated stored values and raised, so `GET /knowledge`,
@@ -101,10 +115,11 @@ Implements `build_plan.md` §14 Phase 8.
   Auto-titles conversation from first message. Returns 503 on `LLMUnavailableError`.
 - **`alembic/versions/20261006_0010_phase8_chat.py`**: Migration creating
   `conversations`, `messages`, `message_sources` with FK cascades and indexes.
-- **`tests/test_phase8.py`**: 28 tests covering confidence formula, citation
+- **`tests/test_phase8.py`**: 29 tests covering confidence formula, citation
   parsing, system prompt content, prompt builder, LLM wrapper guard and retry
   detection, answer fallback (no context), mocked LLM happy path,
-  `INSUFFICIENT_CONTEXT` response, and all chat API endpoints (auth, CRUD,
+  `INSUFFICIENT_CONTEXT` response, GPT-OSS full-width citation normalization,
+  and all chat API endpoints (auth, CRUD,
   auto-title, message persistence, 503 on LLM error).
 
 ### Changed

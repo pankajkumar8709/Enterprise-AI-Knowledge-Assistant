@@ -448,6 +448,12 @@ Replace the values with your PostgreSQL configuration.
 
 > ⚠️ Never commit `.env` or database credentials, JWT secrets, API keys, or other sensitive information to GitHub.
 
+To provision one local administrator from `.env`, set both `ADMIN_EMAIL` and
+`ADMIN_PASSWORD`. The backend creates or synchronizes that account on startup.
+Changing either value takes effect after restarting the backend; changing the
+email updates the same managed account. Use a strong password and keep `.env`
+out of source control.
+
 ---
 
 # 🗄️ Database Setup

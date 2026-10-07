@@ -1,4 +1,5 @@
 import uuid
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,8 +8,22 @@ from app.api.router import api_router
 from app.core.config import settings
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import configure_logging, request_id_var
+from app.db.session import SessionLocal
+from app.services.admin_bootstrap import sync_configured_admin
 
 configure_logging()
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    if settings.admin_email.strip() or settings.admin_password.get_secret_value():
+        db = SessionLocal()
+        try:
+            sync_configured_admin(db)
+        finally:
+            db.close()
+    yield
+
 
 app = FastAPI(
     title=settings.app_name,
@@ -17,6 +32,7 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
     description="Enterprise AI knowledge assistant API (OKF + RAG).",
+    lifespan=lifespan,
 )
 
 # CORS restricted to configured origins (spec §4/§11, audit F-026).

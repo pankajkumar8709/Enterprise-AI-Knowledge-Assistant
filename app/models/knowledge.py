@@ -6,6 +6,7 @@ from sqlalchemy import (
     Date,
     DateTime,
     Enum,
+    FetchedValue,
     Float,
     ForeignKey,
     Index,
@@ -106,12 +107,18 @@ class KnowledgeObject(TimestampMixin, Base):
     )
     department_ids: Mapped[list] = mapped_column(JSON_TYPE, default=list, nullable=False)
     confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
-    # Phase 5.5/§9.3: search_text = name + flattened attributes, indexed by
-    # trigram/tsvector on PostgreSQL (search_tsv generated column, migration only).
+    # Phase 5.5/§9.3: search_text = name + flattened attributes, trigram-indexed on PostgreSQL.
     search_text: Mapped[str | None] = mapped_column(Text, nullable=True)
-    # Full-text vector over search_text (generated in migration 0009 on
-    # PostgreSQL; NULL on other dialects where the expression cannot exist).
-    search_tsv: Mapped[object | None] = mapped_column(TSVECTOR(), nullable=True)
+    # Full-text vector over search_text. On PostgreSQL this is a GENERATED
+    # ALWAYS STORED column (migration 0009), so the ORM must never send a
+    # value: server_default=FetchedValue() makes INSERT emit DEFAULT, which
+    # GENERATED ALWAYS columns accept. On SQLite the migration never ran,
+    # so it stays a plain nullable column there.
+    search_tsv: Mapped[object | None] = mapped_column(
+        TSVECTOR(),
+        nullable=True,
+        server_default=FetchedValue(),
+    )
     valid_from: Mapped[date | None] = mapped_column(Date, nullable=True)
     valid_to: Mapped[date | None] = mapped_column(Date, nullable=True)
     created_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)

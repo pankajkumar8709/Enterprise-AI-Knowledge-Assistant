@@ -11,7 +11,7 @@ import logging
 from dataclasses import dataclass
 from datetime import date
 
-from sqlalchemy import Float, String, cast, func, literal, or_
+from sqlalchemy import ColumnElement, Float, String, case, cast, func, literal, or_
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -76,10 +76,16 @@ def okf_search(
     fts_rank = func.ts_rank_cd(KnowledgeObject.search_tsv, tsquery).cast(Float)
 
     # type_boost: 1 if the object type is in the classifier's hinted types.
+    # CASE (not CAST(boolean AS FLOAT)) — PostgreSQL cannot cast boolean to
+    # double precision, which made every OKF-scored query fail to compile.
     hint_set = set(type_hints or [])
+    type_boost: ColumnElement[float]
     if hint_set:
-        type_boost = func.cast(
-            KnowledgeObject.object_type.in_(list(hint_set)),
+        type_boost = cast(
+            case(
+                (KnowledgeObject.object_type.in_(list(hint_set)), 1),
+                else_=0,
+            ),
             Float,
         )
     else:

@@ -12,7 +12,7 @@ env/
 
 
 .frebuff
-.build_temp
+.build_tmp/
 .mypy_cache
 .pytest_cache
 .ruff_cache
