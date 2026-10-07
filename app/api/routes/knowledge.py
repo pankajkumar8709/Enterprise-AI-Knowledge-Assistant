@@ -129,11 +129,14 @@ def bulk_review(
     current_user=Depends(get_current_active_admin),
 ) -> dict:
     count, _ = bulk_review_knowledge_objects(db, payload.ids, payload.action, current_user, note=None)
+    # Keep the audit row compact: entity_id is VARCHAR(80), so the count lives
+    # in entity_id and the full id list in the JSONB payload.
     record_audit(
         db,
         action=f"okf.{payload.action}",
         entity_type="knowledge_object",
-        entity_id=",".join(str(i) for i in payload.ids),
+        entity_id=f"bulk:{len(payload.ids)}",
+        metadata={"ids": payload.ids},
         user_id=current_user.id,
         ip=request.client.host if request.client else None,
     )

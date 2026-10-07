@@ -1,3 +1,4 @@
+
 from fastapi import APIRouter
 
 from app.api.routes import admin, auth, chat, departments, documents, health, knowledge, search, users

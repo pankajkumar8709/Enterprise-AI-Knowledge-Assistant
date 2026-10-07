@@ -1,0 +1,474 @@
+NIST Cybersecurity Framework 2.0:
+U.S. Department of Commerce
+Howard Lutnick, Secretary of Commerce
+National Institute of Standards and Technology
+Craig Burkhardt, Acting Under Secretary of Commerce for Standards and Technology
+and Acting NIST Director
+Cybersecurity, Enterprise Risk Management, and
+Workforce Management Quick-Start Guide
+NIST Special Publication
+NIST SP 1308
+https://doi.org/10.6028/NIST.SP.1308
+March 2026
+
+2
+CSF 2.0: CYBERSECURITY , ERM, AND WORKFORCE MANAGEMENT
+QUICK
+START GUIDE
+INTRODUCTION
+Purpose of this Guide
+This Quick-Start Guide (QSG) draws on concepts and practices from enterprise risk management, cybersecurity risk management, and
+workforce management to help organizations improve communication about cybersecurity risks,plan workforce decisions, and
+implement risk-informed responses. The scope of this QSG will vary depending on the user,but generally applies at the organization
+level, where cybersecurity risks of multiple systems are managed, and at the enterprise level, where senior leaders take on unique risk
+management responsibilities spanning multiple organizations(see NIST IR 8286 for a discussion of these levels). This QSG addresses the
+need for agile, continuous workforce adaptation to rapidly evolve for emerging threats and technologies. Organizations should iterate
+through this process regularly, with provisions for rapid response when significant threat landscape changes occur.
+Cybersecurity Risk Management (CSRM)
+Cybersecurity risks are one of many types of risk that all organizations should manage and integrateinto their broader enterprise risk
+management (ERM) strategy. Potential negative impacts to organizations from cybersecurity risks include higher costs, data loss,
+operational disruptions, lost revenue, reputational damage, and reduced innovation. In addition to negative risks, positive risks—where
+an enterprise asset may constitute an opportunity to realize a benefit or positive impact—should also be considered. The NIST
+Cybersecurity Framework (CSF) 2.0 provides guidance for managing cybersecurity risks by helping organizations understand, assess,
+prioritize, and communicate consistently about cybersecurity efforts, including those related to the cybersecurity workforce.
+Making ERM, CSRM, and Workforce Risk-Based Decisions
+Gaps and opportunities related to the sufficiency and competency of an enterprise's cybersecurity workforce are one type of
+cybersecurity risk. This guide helps organizations make informed workforceand risk decisions based on the integration of ERM, CSRM,
+and workforce management strategy. For instance, based on the current organizational risk appetite and tolerance, cybersecurity
+strategy, mission objectives, budget, and existing cybersecurity workforce, anorganization might decide they need tohire, upskill,
+reorganize, or change a risk treatment altogether to effectively address their current cybersecurity risks or to achieve their targeted
+cybersecurity outcomes. People, processes, and technologycombine to achieve acceptable levels of enterprise and cybersecurity risk,
+and cybersecurity workforce assessment is often made more difficult by disconnects between technical and human resources
+teams. The NICE Framework focuses on people, providing a common language for describing cybersecurity work, including the Work
+Roles an organization’s cybersecurity staff must perform.
+Enterprise Risk
+Management
+Cybersecurity
+Risk
+Management
+Workforce
+Management
+Key Terms
+• Enterprise Risk Management: An effective organization-wide
+approach to addressing the full spectrum of the organization’s
+significant risks by understanding the combined impact of risks as
+an interrelated portfolio rather than addressing risks only within
+silos [NIST IR 8286r1].
+• Cybersecurity Risk Management: The process of managing
+uncertainty on or within information and technology [NIST IR
+8286D-upd1].
+• Cybersecurity Workforce Management: Includes individuals and
+teams whose primary work responsibilities impact an
+organization’s ability to protect its data, technology systems,
+and operations—both traditional IT security as well
+as related roles that apply cybersecurity skills and
+knowledge [NIST SP 800-181r1].
+
+3
+RESOURCES TO ALIGN CYBERSECURITY , ERM, AND WORKFORCE MANAGEMENT
+Three NIST resources enable users to align their cybersecurity, ERM, and workforce
+management practices in a streamlined process:
+• The Cybersecurity Framework (CSF) 2.0 helps organizations—regardless of size, sector,
+or maturity—understand and communicate their cybersecurity efforts. At its most
+granular level, the CSF defines Categories and Subcategories of specific outcomes of
+cybersecurity risk management activities. Organizations use those outcomes to
+construct an Organizational Profile. Communities of interest can also use the CSF
+2.0 outcome statements to create a Community Profile, which is a baseline of CSF
+outcomes that addresses shared interests and goals among a group of organizations.
+• The NICE Framework helps organizations improve cybersecurity capabilities,
+communicate work responsibilities, and develop training. Once an organization’s
+current or target cybersecurity posture in terms of CSF cybersecurity outcomes is
+identified, the NICE Framework can be used to identify how to support or reach that
+target goal. The most granular elements of the NICE Framework are Task, Knowledge,
+and Skill (TKS) statements. Work Roles are groups of TKS statements relevant to specific
+cybersecurity functions.
+• The NIST IR 8286 series provides a suite of guidance documents and templates to
+support improved communication between cybersecurity professionals and
+organizational leadership and to align cybersecurity risk management with broader
+ERM practices.
+Some units within an organization may already use individual resources described above;
+however, organizations will benefit from using all three together. This QSG connects the
+three resources and their respective stakeholder groups in a holistic, workforce-focused
+cybersecurity risk management process. Additional resources are listed on page 11.
+Enterprise Risk
+Management
+(ERM)
+Cybersecurity
+Risk
+Management
+(CSF)
+Workforce
+Management
+(NICE
+Framework)
+NIST IR 8286This QSG
+Questions to Consider
+• What cybersecurity risks are likely to affect delivery of the organization’s mission?
+• What actions are necessary to mitigate identified cybersecurity risks?
+• How is cybersecurity being incorporated into the broader ERM strategy?
+• How are workforce capabilities of third parties and vendors assessed and monitored?
+• How should information sharing and decision making among ERM, CSRM, and workforce
+teams take place?
+• Who has the skills and knowledge necessary to achieve a given cybersecurity outcome?
+• What contractual requirements exist for competencies and certifications of vendor staff?
+• Which cybersecurity functions should be automated vs. requiring human judgment?
+CSF 2.0: CYBERSECURITY , ERM, AND WORKFORCE MANAGEMENT
+QUICK
+START GUIDE
+
+4
+NOTIONAL APPLICATION OF THE CSF
+CSF 2.0: CYBERSECURITY , ERM, AND WORKFORCE MANAGEMENT
+QUICK
+START GUIDE
+The remainder of this guide is organized into the five Cybersecurity
+Framework Profile implementation steps in alignment with
+CSRM/ERM integration and workforce management.
+5 Steps for Creating and Using
+a CSF Organizational Profile
+Scope the Organizational Profile
+Gather needed information
+Create the Organizational Profile
+Analyze gaps and create an action
+plan
+Implement action plan and update
+Profile, repeating cycle as necessary
+Five Cybersecurity Framework Profile implementation steps in alignment with
+CSRM/ERM integration (figure 7, NIST IR 8286Cr1)
+d
+When used together, these stepsenable users to align their cybersecurity, ERM, and workforce
+management practices to adequately address risks and inform continuous improvement of CSRM.
+1
+2
+3
+4
+5
+Note: the Business Impact Analysis in Step 1 provides a business process prioritization to inform risk direction (see NIST IR 8286Cr1).
+
+5
+STEP 1: SCOPE THE ORGANIZATIONAL PROFILE
+Overview: The scope defines the high-level facts, assumptions, and constraints on which the Profiles will be based. The first step is to
+convene stakeholders from across the enterprise with the perspective and authority to collect risk and workforce data, articulate needs,
+and execute identified risk responses. The purpose of the group will be to define the scope of the effort, align security risks to the
+enterprise mission, and make informed risk and workforce decisions based upon current and desired risk context, priorities, budget, etc.
+Sample activities in this step:
+1. Identify accountable leads from board-level, executive leadership, cybersecurity, enterprise risk management, and
+workforce management teams and establish an initial process timeline.
+2. Review the organization's mission, goals, objectives and high-level priorities.
+3. Conduct/review the business impact analysis (BIA), which includes identifying high value assets that are critical to achieving
+organizational objectives. This information is used to scope the CSF Organizational Profile. The BIA examines the potential impact
+associated with the loss or degradation of an enterprise’s information assets based on a qualitative or quantitativeassessment of the
+criticality and sensitivity of those assets. Learn more in NIST IR 8286D-upd1.
+4. Establish change management protocols and executive sponsorship to ensure cross-functional collaboration among teams.
+5. Identify third-party dependencies and include their workforce capabilities in scope.
+No
+tes:
+• An o
+rganization may use several Profiles. Each Profile can have a distinct scope (e.g., enterprise, system), which defines the high-level
+facts and assumptions on which the Profile is based.
+• Stakeholder teams convened in this step may or may not have experience working closely together. Efforts should be made to obtain a
+shared understanding of each unit’s roles, responsibilities, and internal processes and to create a high performing team.
+• Organizations may find it beneficial to pilot the process described in this QSG by beginning with a subset of CSF outcomes.
+Relevant CSF Core Category:
+Organizational Context (GV.OC)
+T
+he circumstances – mission, stakeholder
+expectations, dependencies, and legal,
+regulatory, and contractual requirements –
+surrounding the organization’s cybersecurity
+risk management decisions are understood.
+CSF 2.0: CYBERSECURITY , ERM, AND WORKFORCE MANAGEMENT
+QUICK
+START GUIDE
+Key Term: High Value Asset
+Information or an information system that is so
+critical to an organization that the loss or
+corruption of this information or loss of access
+to the system would have serious impacts on
+the organization’s ability to perform its mission
+or conduct business [NIST SP 800-160 Vol. 2
+Rev. 1].
+
+6
+STEP 2: GATHER THE INFORMATION NEEDED TO PREPARE THE ORGANIZATIONAL PROFILE
+Overview: Having a clear picture of the organization’s current CSRM, ERM, and workforce context and risk
+environment helps leadership adequately address the most critical risks to an organization’s mission.
+ERM Information Source Considerations
+• Risk appetite and risk tolerance statements, which are used to define parameters for determining
+acceptable levels of risk
+• BIA registers
+• Enterprise risk profiles
+• Third-party risk assessments, including vendor workforce capabilities
+CSRM Information Source Considerations
+• A list of cybersecurity requirements, laws, rules, regulations, and standardsfollowed by
+the organization
+• Emerging and evolving risk factors that require new workforce capabilities
+• Organizational policies
+• Key Risk Indicators and Key Performance Indicators
+• Cybersecurity risk registers
+Workforce Information Source Considerations
+• Workforce planning information, such as organizational charts or lists of filled and
+unfilled cybersecurity and risk management positions
+• Inventory of existing skillsets within the organization (including professional certification data)
+• Existing recruiting and training programs
+• The NICE Framework to CSF 2.0 Crosswalk
+Additional Information Source Considerations
+• CSF Community Profiles, which can be used as the basis for an organization’s own Target Profile
+• NIST Guide to Creating Community Profiles
+Relevant CSF Core Category and Subcategories:
+Risk Management Strategy (GV.RM)
+The organization's priorities, constraints, risk tolerance and appetite
+statements, and assumptions are established, communicated, and used to
+support operational risk decisions.
+• GV.RM-05: Lines of communication across the organization are
+established for cybersecurity risks, including risks from suppliers and
+other third parties.
+• GV.RM-06: A standardized method for calculating, documenting,
+categorizing, and prioritizing cybersecurity risks is established and
+communicated.
+CSF 2.0: CYBERSECURITY , ERM, AND WORKFORCE MANAGEMENT
+QUICK
+START GUIDE
+Key Term: Business Impact Analysis (BIA) Register
+A centralized registry of important asset management information, such as
+system ownership, contact information for key stakeholders, and
+characteristics of the physical devices (or services). Since asset
+management is an important element of cybersecurity risk management,
+this information is quite valuable for protecting the asset, detecting cyber
+events, responding quickly to potential issues, and recovering services
+when necessary. A BIA register is related to but separate from a risk
+register, which is a repository of risk information including the data
+understood about risks over time [NIST IR 8286D-upd1].
+
+7
+STEP 3: CREATE THE ORGANIZATIONAL PROFILE
+Overview: An Organizational Profile describes an organization’s current and/or target cybersecurity posture in terms of
+cybersecurity outcomes from the Cybersecurity Framework (CSF) Core. Organizational Profiles are used to understand,
+tailor, assess, and prioritize cybersecurity outcomes based on an organization’s mission objectives, stakeholder
+expectations, threat landscape, and requirements. Organizational Profiles can be categorized as:
+• A Current Profile that specifies the CSF outcomes an organization currently achieves, and which characterizes
+how or to what extent each outcome is being achieved.
+• A Target Profile specifies the desired CSF outcomes an organization has selected and prioritized for achieving its
+cybersecurity risk management objectives. It considers anticipated changes to the organization’s cybersecurity
+posture, such as: new requirements, new technology adoption, and trends in threat intelligence.
+• Note: These are viewed side-by-side as one artifact within the CSF Organizational Profile template to help
+organizations identify and analyze the risks presented within the gap between Current and Target.
+Sample activities in this step:
+1. Review the CSF Functions, Categories, and Subcategories to determine outcomes the organization currently
+achieves, and to what extent. This step provides an opportunity for enterprise stakeholders to review and analyze
+what is currently being done while considering enterprise risk context and risk strategy.
+2. Review the CSF Functions, Categories, and Subcategories to determine target-state outcomes, with a clear
+understanding of organizational priorities and budget. This step provides an opportunity for cybersecurity risk
+managers, informed by an understanding of the risk implications defined in thecurrent profile, to determine the
+desired set of processes and activities that will accomplish stakeholder expectations cost-effectively and efficiently.
+3. Throughout each of the above activities, workforce managers, in conjunction with the CSRM and ERM teams,
+examine how workforce roles and skills contribute to risk management success, or could be improved to do
+so. Continuous profile updates reflect improvements and adjustments based on evolving risk conditions.
+Drive P
+rogress Over Time with CSF Profiles
+Note: The gaps within this graphic are uniform to illustrate the
+general concept, but gaps between Current and Target state will vary.
+CSF 2.0: CYBERSECURITY , ERM, AND WORKFORCE MANAGEMENT
+QUICK
+START GUIDE
+Resources
+• NIST provides a customizable CSF Organizational Profile
+template as a spreadsheet. You can download and use
+it to create Current and Target Profiles for
+your organization.
+• View the CSF 2.0 Profiles page in the CSF 2.0 Resource
+Library.
+
+8
+STEP 4: ANALYZE GAPS BETWEEN CURRENT AND TARGET PROFILES AND CRE ATE AN ACTION PLAN
+Overview: Once the team has completed the Current and Target profiles, conduct a gap analysis to identify, at a very high level, the risks
+created by gaps exposed between Current and Target. This gap analysis will support the development of a prioritized action plan
+supported by a risk register.
+Sample activities in this step:
+1. Using a pre-existing risk register (if available) and NIST CSF outcome statements, review knownrisks and make necessary
+adjustments to the risk register. Add risks identified during the gap analysis that maynot have been identified.
+2. Review the risk register to understand which risks are most critical to achieving the organization’s mission and assess who will be the
+risk owner and risk action owner. The focus shifts to analyzing the internal and external workforce gaps relative to risk.
+3. Carefully consider and designate risk ownership. Those designated as the risk owners should continuously monitor risk conditions
+and remain accountable to internal and external authorities. A gap analysisbetween the assigned risk owner and the risk work role
+can be conducted to see if the practitioner has the competencies necessary to address the problem.Since risk conditions may
+change as information is aggregated, responsibility and accountability should be periodically reviewed to ensure that the risk owner
+is appropriate.
+4. Complete a gap analysis using a crosswalk between the NICE Framework and the CSF.Does the organization have the requisite staff
+needed to adequately address the risk? Begin considering whether it is possible to hire orupskill employees to fill
+identified gaps. Are there other gaps that exist, such asin roles or job descriptions, organizational or reporting structure, etc.?
+CSF 2.0: CYBERSECURITY , ERM, AND WORKFORCE MANAGEMENT
+QUICK
+START GUIDE
+Relevant CSF Core Category and
+Subcategories: Roles, Responsibilities,
+and Authorities (GV.RR)
+Cybersecurity roles, responsibilities, and authorities to foster
+accountability, performance assessment, and continuous
+improvement are established and communicated.
+• GV.RR-01: Organizational leadership is responsible and
+accountable for cybersecurity risk and fosters a culture that
+is risk-aware, ethical, and continually improving
+• GV.RR-02: Roles, responsibilities, and authorities related to
+cybersecurity risk management are established,
+communicated, understood, and enforced
+• GV.RR-03: Adequate resources are allocated commensurate
+with the cybersecurity risk strategy, roles, responsibilities,
+and policies
+• GV.RR-04: Cybersecurity is included in human resources
+practices
+Key Term: Risk Register
+A risk register is “a repository of risk information, including the
+data understood about risks over time. Typically, a risk register
+contains a description of the risk, the impact if the risk should
+occur, the probability of its occurrence, mitigation strategies,
+risk owners, and a ranking to identify higher priority risks.” Each
+register evolves and matures as other risk activities take place
+[NIST IR 8286r1].
+Sample Risk Register
+ID Priority Risk
+Description
+Risk
+Category
+Current Assessment Risk
+Response
+Type
+Risk Response
+Cost
+Risk Response
+Description
+Risk
+Owner
+Risk
+Action
+Owner
+Status
+Likelihood Impact Exposure
+Rating
+
+9
+STEP 5: IMPLEMENT THE ACTION PLAN AND UPDATE THE ORGANIZATIONAL PROFILE
+Overview: At this step in the CSRM/ERM/workforce alignment process, cybersecurity risk practitioners understand
+stakeholder expectations, budget, priorities, high value assets, and risks. Equipped with this information, they can
+now determine the appropriate workforce or risk responses to adequately address the most critical risks to the
+organization.
+S
+ample activities in this step:
+C
+onvene a team to jointly select workforce responses for identified high-priority risks. Workforce responses can
+include the following, individually or in combination:
+• Upskill current employees through professional development, mentorship, or hiring new staff into
+developmental programs such as internships, apprenticeships, or co-ops.
+• Create new positions, modify existing ones, or potentially implement a reorganization to address risks.
+• Recruit fully competent staff to fill a position or positions using the NICE Framework to help identify
+relevant Work Roles and associated Tasks, Knowledge, and Skills.
+• Augment staff by contracting with third-parties.
+1. Workforce management team: Assign estimated costs for workforce responses selected for each Subcategory,
+and add details related to timeline, metrics, success criteria, and implementation considerations for associated
+people, processes, and technology. Costs and timelines will vary depending on organization characteristics. If
+the identified risks are positive risks, organizations may wish to consider ways to realize, share, or enhance
+those opportunities [NIST IR 8286r1].
+2. If workforce-focused risk responses are not possible, consider adjusting risk response. For example, if training
+and hiring are not viable options for an absent workforce capability, the organization may consider selecting a
+different mitigation strategy or changing the risk response type to, for example, accept, avoid, or transfer .
+3. The leadership team finalizes and signs off on updated risk register(s).
+Key Terms
+• Task: An activity that is
+directed toward the
+achievement of
+organizational objectives.
+• Knowledge: A retrievable set
+of concepts within memory.
+• Skill: The capacity to perform
+an observable action.
+Resources
+• The NICE Framework helps you understand the wide variety of
+cybersecurity roles and responsibilities that exist across an organization.
+It can be used to help assess the current workforce as well as identify
+capability gaps, develop career pathways, create employee upskilling or
+career plans, and identify courses and training that align with those
+needs.
+• An Employer’s Guide to Writing Effective Cybersecurity Job Descriptions
+provides tips on how to use the NICE Framework when hiring so that
+you will be equipped to author and communicate about position
+responsibilities and find the candidate that meets your needs.
+• For small businesses with limited resources, the Building Your Small
+Business’ Cybersecurity Team: From In-House to Outsourcing resource
+helps identify options for possible workforce responses.
+CSF 2.0: CYBERSECURITY , ERM, AND WORKFORCE MANAGEMENT
+QUICK
+START GUIDE
+Relationship Between Task,
+Knowledge, and Skill Statements.
+Credit: NICE Program Office
+
+10
+ITERATION
+Overview: In the preceding steps, enterprise stakeholders collected risk information, assessed workforce readiness, and
+identified workforce and risk responses to address high-priority risks. Now begins the task of continuous monitoring,
+“which allows organizations to maintain the authorizations of systems and common controls in highly dynamic
+environments of operation with changing mission and business needs, threats, vulnerabilities, and technologies. Having
+access to security and privacy information on a continuing basis through reports and dashboards gives organizational
+officials the ability to make effective and timely risk management decisions, including ongoing authorization decisions”
+[SP 800-53r5].
+Sample activities:
+1. Manage: Stakeholders implement identified risk responses and, where applicable, incorporate those responses
+into broader ERM processes. CSRM/ERM/workforce strategies are continuously monitored, evaluated, and
+adapted to be successful. Stakeholder teams develop plans and processes for continued collaboration to regularly
+evaluate how effectively risks are being addressed.
+2. Evaluate: Establish a process for evaluating how effectively planned interventions have addressed risks, including
+regular check-ins among stakeholder teams working in priority areas. Consider reassessing the risk after the
+intervention has been in place for a specified timeframe. Ensure the risk register is updated and that cybersecurity
+risks are incorporated into broader ERM portfolios, if applicable (see NIST IR 8286r1 for a discussion of risk
+portfolios). An organization's finance and accounting staff should be involved; if evaluation takes place at the
+enterprise level, audit committees may be involved as well. This also includes verifying that controls and
+authorities persist coherently and aren’t fragmented across the enterprise.
+3. Adjust: Once stakeholders have evaluated the chosen workforce intervention and other risk interventions to
+determine whether they have adequately addressed risk to the organization, the next action is to adjust where
+necessary. Further workforce responses—such as contracting, temporary workforce augmentation, upskilling,
+reskilling, reassignment of roles or responsibilities—and risk response adjustments may be necessary.
+CSF 2.0: CYBERSECURITY , ERM, AND WORKFORCE MANAGEMENT
+QUICK
+START GUIDE
+Continuous Monitoring of CSRM, ERM, and
+Workforce Strategy.
+Learn m
+ore about the Manage, Evaluate, Adjust
+(MEA) lifecycle within NIST IR 8286Cr1
+Evaluate
+Adjust
+Manage
+
+11
+ADDITIONAL RESOURCES
+Additional Resources
+• Understanding the Cybersecurity Framework: Other quick-start guides focused on small businesses, cybersecurity supply
+chain risk management, ERM, and other subjects are available on the CSF 2.0 Resource Center.
+• Risk identification, analysis, and prioritization:
+• IR 8286Ar1 provides comprehensive information on risk registers and more granular risk detail records.
+• SP 800-30r1, SP 800-221, and SP 800-221A discuss risk assessments and the integration of information and
+communications technology into ERM processes.
+• The NIST Risk Management Framework provides a comprehensive process for managing information security and
+privacy risks at the system level.
+• Workforce assessment and best practices: The NICE Framework Resource Center provides additional formats for the NICE
+Framework, in-depth cybersecurity workforce development resources, and information about cybersecurity workforce
+partnerships, such as the RAMPS communities. Organizations can receive assistance with NICE Framework implementation
+by emailing NICEframework@nist.gov.
+• Crosswalk for the CSF 2.0 and NICE Framework helps organizations identify priority Work Roles(Note: several Work
+Roles may map to each CSF Subcategory).
+• NICE Framework Components supports identification of priority Work Roles and relevant Tasks, Knowledge,
+and Skills to target in training and recruitment.
+• Building a Cybersecurity and Privacy Learning Program helps organizations create or mature an organizational
+learning program in support of an informed and capable cybersecurity and privacy workforce.
+• The NIST Cybersecurity Career Ambassador Program seeks to create a network of employers, educators, and others
+who serve as champions to prepare, grow, and sustain a skilled cybersecurity workforce.
+• The NIST Small Business Cybersecurity Corner provides resources specifically tailored to small businesses.
+Glossary of Acronyms
+• BIA: Business Impact Analysis
+• CSRM: Cybersecurity Risk Management
+• CSF: Cybersecurity Framework
+• ERM: Enterprise Risk Management
+• QSG: Quick-Start Guide
+• TKS: Task, Knowledge, and Skill
+CSF 2.0: CYBERSECURITY , ERM, AND WORKFORCE MANAGEMENT
+QUICK START GUIDE

@@ -82,6 +82,7 @@ export interface DocumentDto {
   chunk_count: number;
   chunking_started_at: string | null;
   chunking_completed_at: string | null;
+  auto_approve_knowledge: boolean;
   created_at: string;
   updated_at: string;
 }

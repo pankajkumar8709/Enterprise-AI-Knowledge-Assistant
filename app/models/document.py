@@ -50,6 +50,10 @@ class Document(TimestampMixin, Base):
     storage_path: Mapped[str] = mapped_column(String(500), nullable=False)
     sha256: Mapped[str | None] = mapped_column(String(64), index=True, nullable=True)
     uploaded_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    # Admin trust flag (spec §7.4.6 relaxation): when true, knowledge extracted
+    # from this document is created directly as `approved` instead of
+    # `pending_review`. Only admins can toggle it (PATCH is admin-only).
+    auto_approve_knowledge: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     visibility: Mapped[Visibility] = mapped_column(
         Enum(
             Visibility,

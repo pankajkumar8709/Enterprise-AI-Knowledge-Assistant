@@ -42,6 +42,7 @@ export function ChatWindow({ conversationId, onSelectConversation }: ChatWindowP
         setHistoryOpen(false);
       }}
       onNew={() => {
+        session.resetDraft();
         onSelectConversation(null);
         setHistoryOpen(false);
       }}
@@ -58,16 +59,6 @@ export function ChatWindow({ conversationId, onSelectConversation }: ChatWindowP
 
   return (
     <div className="flex min-h-[calc(100vh-8rem)] gap-6">
-      <aside className="hidden w-72 shrink-0 lg:block">
-        <div className="sticky top-20 h-[calc(100vh-8rem)] rounded-2xl border border-slate-200 bg-white p-3">
-          {list}
-        </div>
-      </aside>
-
-      <Drawer open={historyOpen} onClose={() => setHistoryOpen(false)} title="Conversations" side="left" widthClassName="w-72">
-        <div className="-mx-5 -my-4 h-[calc(100vh-9rem)] p-3">{list}</div>
-      </Drawer>
-
       <section className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
@@ -129,6 +120,24 @@ export function ChatWindow({ conversationId, onSelectConversation }: ChatWindowP
       </section>
 
       <SourcePanel source={openSource} onClose={() => setOpenSource(null)} />
+
+      {/* Chat history lives on the right side of the page (desktop: docked
+          panel; mobile/tablet: slide-in drawer from the right). */}
+      <aside className="hidden w-72 shrink-0 lg:block">
+        <div className="sticky top-20 h-[calc(100vh-8rem)] rounded-2xl border border-slate-200 bg-white p-3">
+          {list}
+        </div>
+      </aside>
+
+      <Drawer
+        open={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        title="Conversations"
+        side="right"
+        widthClassName="w-72"
+      >
+        <div className="-mx-5 -my-4 h-[calc(100vh-9rem)] p-3">{list}</div>
+      </Drawer>
     </div>
   );
 }

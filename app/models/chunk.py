@@ -2,8 +2,8 @@ import enum
 from datetime import datetime
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import JSON, DateTime, Enum, ForeignKey, Index, Integer, String, Text, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import JSON, DateTime, Enum, FetchedValue, ForeignKey, Index, Integer, String, Text, UniqueConstraint
+from sqlalchemy.orm import Mapped, deferred, mapped_column, relationship
 
 from app.core.config import settings
 from app.models.base import TSVECTOR, Base, TimestampMixin
@@ -73,9 +73,12 @@ class Chunk(TimestampMixin, Base):
     embedding: Mapped[list | None] = mapped_column(
         Vector(settings.embedding_dim).with_variant(JSON(), "sqlite"), nullable=True
     )
-    # Full-text vector for §9.2 (generated in migration 0009 on PostgreSQL;
-    # NULL on other dialects where the expression cannot exist).
-    tsv: Mapped[object | None] = mapped_column(TSVECTOR(), nullable=True)
+    # Full-text vector — PostgreSQL GENERATED ALWAYS STORED column.
+    # deferred + FetchedValue: never sent in INSERT/UPDATE; loaded on access.
+    tsv: Mapped[object | None] = deferred(
+        mapped_column(TSVECTOR(), nullable=True,
+                      server_default=FetchedValue(), server_onupdate=FetchedValue())
+    )
     visibility: Mapped[Visibility] = mapped_column(
         Enum(
             Visibility,

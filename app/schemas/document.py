@@ -33,6 +33,7 @@ class DocumentRead(BaseModel):
     chunk_count: int
     chunking_started_at: datetime | None
     chunking_completed_at: datetime | None
+    auto_approve_knowledge: bool = False
     created_at: datetime
     updated_at: datetime
 
@@ -68,6 +69,9 @@ class DocumentMetadataUpdate(BaseModel):
     title: DocumentTitle | None = None
     visibility: Visibility | None = None
     department_ids: list[int] | None = None
+    # Trusted-source flag: when true, knowledge extracted from this document
+    # is created directly as approved (admin-only endpoint).
+    auto_approve_knowledge: bool | None = None
 
 
 class JobRead(BaseModel):

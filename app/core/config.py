@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import AliasChoices, Field
+from pydantic import AliasChoices, Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     # Spec §4 JWT_REFRESH_DAYS.
     jwt_refresh_days: int = Field(default=7, ge=1, le=365)
     database_url: str = Field(alias="DATABASE_URL")
+    admin_email: str = ""
+    admin_password: SecretStr = SecretStr("")
     log_level: str = "INFO"
     document_upload_dir: str = "storage/documents"
     document_extraction_dir: str = "storage/extractions"
@@ -55,7 +57,7 @@ class Settings(BaseSettings):
     cache_ttl_seconds: int = 900
     # --- OKF (spec §4) ---
     okf_top_k: int = 8
-    okf_min_score: float = 0.30
+    okf_min_score: float = 0.25
     okf_auto_approve_threshold: float = 1.01  # never auto-approve
     okf_min_confidence_keep: float = 0.40
     classifier_min_confidence: float = 0.60

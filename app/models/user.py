@@ -27,3 +27,4 @@ class User(TimestampMixin, Base):
         nullable=False,
     )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    is_bootstrap_admin: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)

@@ -231,6 +231,7 @@ def update_document_metadata(
     title: str | None = None,
     visibility: Visibility | None = None,
     department_ids: list[int] | None = None,
+    auto_approve_knowledge: bool | None = None,
 ) -> Document:
     """PATCH /documents/{id} — metadata + ACL; ACL changes propagate in one transaction (spec §5)."""
 
@@ -243,6 +244,8 @@ def update_document_metadata(
     if department_ids is not None and list(department_ids) != list(document.department_ids or []):
         document.department_ids = list(department_ids)
         acl_changed = True
+    if auto_approve_knowledge is not None:
+        document.auto_approve_knowledge = bool(auto_approve_knowledge)
 
     db.add(document)
     if acl_changed:

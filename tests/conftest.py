@@ -5,6 +5,9 @@ from pathlib import Path
 
 os.environ["DATABASE_URL"] = "sqlite:///./test_phase1.db"
 os.environ["JWT_SECRET"] = "test-secret-key-that-is-at-least-thirty-two-characters"
+os.environ["LLM_EXTERNAL_ALLOWED"] = "false"
+os.environ["ADMIN_EMAIL"] = ""
+os.environ["ADMIN_PASSWORD"] = ""
 TEST_STORAGE_ROOT = Path(tempfile.mkdtemp(prefix="phase_backend_tests_"))
 os.environ["DOCUMENT_UPLOAD_DIR"] = str((TEST_STORAGE_ROOT / "uploads").resolve())
 os.environ["DOCUMENT_EXTRACTION_DIR"] = str((TEST_STORAGE_ROOT / "extractions").resolve())

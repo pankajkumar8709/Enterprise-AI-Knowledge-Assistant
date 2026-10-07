@@ -34,7 +34,7 @@ _FALLBACK_ANSWER = (
     "I couldn't find this in the company knowledge I have access to. "
     "Try rephrasing, or contact the relevant department."
 )
-_CITATION_RE = re.compile(r"\[S(\d+)\]")
+_CITATION_RE = re.compile(r"(?:\[S(\d+)\]|【S(\d+)】)")
 
 
 @dataclass
@@ -172,10 +172,10 @@ def _clean_citations(text: str, valid_refs: set[str]) -> tuple[str, set[str]]:
     cited: set[str] = set()
 
     def replace(m: re.Match) -> str:
-        ref = f"S{m.group(1)}"
+        ref = f"S{m.group(1) or m.group(2)}"
         if ref in valid_refs:
             cited.add(ref)
-            return m.group(0)
+            return f"[{ref}]"
         return ""
 
     cleaned = _CITATION_RE.sub(replace, text)

@@ -122,10 +122,12 @@ def run_ingestion(db: Session, *, document_id: int, version: int, job_id: int) -
 
 
 def _run_pipeline(db: Session, document: Document) -> None:
-    """One pipeline attempt: extracting → cleaning → chunking → [embedding] → [okf] → indexing.
+    """One pipeline attempt: extracting → cleaning → chunking → embedding → okf → indexing.
 
-    The `embedding` and `okf_extracting` stages are wired in Phase 6/Phase 8;
-    until then documents become `ready` for the stages that exist.
+    Ingestion is only ever triggered by the admin-only upload/reprocess
+    endpoints, so the OKF stage below runs for admin actions only. A failure
+    in the knowledge stage must not fail the document: its text, chunks and
+    embeddings are valid, and extraction can be re-run from the admin UI.
     """
 
     # Stage: extracting + cleaning (spec §7.2 — extraction service performs both).
@@ -136,11 +138,33 @@ def _run_pipeline(db: Session, document: Document) -> None:
     document = chunk_document(db, document, ChunkingOptions())
 
     # Stage: embedding (spec §7.2).
-    from app.services.embeddings import embed_document_chunks  # noqa: PLC0415
+    from app.services.embeddings import embed_document_chunks
 
     embed_document_chunks(db, document.id, document.version)
 
-    # Stage: okf_extracting (Phase 8) — skipped while LLM_EXTERNAL_ALLOWED=false.
+    # Stage: okf_extracting (spec §7.2 step 5; deterministic rule-based
+    # extraction — no LLM required). Objects land as pending_review; identical
+    # re-extraction is deduplicated by object_key (spec §6.3).
+    try:
+        from app.services.knowledge import extract_knowledge_from_document
+
+        okf_result = extract_knowledge_from_document(db, document.id)
+        logger.info(
+            "okf extraction for document %s: %s new, %s updated, %s archived",
+            document.id,
+            okf_result.created,
+            okf_result.updated,
+            okf_result.archived,
+        )
+        record_audit(
+            db,
+            action="okf.extract",
+            entity_type="document",
+            entity_id=str(document.id),
+            metadata={"created": okf_result.created, "updated": okf_result.updated, "auto": True},
+        )
+    except Exception:
+        logger.exception("okf extraction failed for document %s; continuing pipeline", document.id)
 
     # Stage: indexing.
     document.status = DocumentStatus.READY

@@ -21,7 +21,7 @@ from app.core.deps import get_current_active_admin, get_current_user
 from app.db.session import get_db
 from app.models.chunk import Chunk, ChunkStrategy
 from app.models.document import ChunkingStatus, Document, DocumentStatus, ExtractionStatus, Visibility
-from app.models.ingestion_job import JobStatus
+from app.models.ingestion_job import IngestionJob, JobStatus
 from app.models.user import User
 from app.schemas.document import (
     ChunkPreviewListResponse,
@@ -59,6 +59,7 @@ from app.services.documents import (
 )
 from app.services.extraction import extract_document_text, get_extracted_text
 from app.services.ingestion import queue_ingestion, run_ingestion_task
+from app.services.knowledge import approve_pending_for_document
 
 router = APIRouter()
 
@@ -180,14 +181,30 @@ def patch_document(
         title=payload.title,
         visibility=payload.visibility,
         department_ids=payload.department_ids,
+        auto_approve_knowledge=payload.auto_approve_knowledge,
     )
+    approved_count = 0
+    if payload.auto_approve_knowledge:
+        # Trusted-source rule: enabling the flag also approves facts from this
+        # document that were still waiting for review.
+        approved_count = approve_pending_for_document(
+            db,
+            document.id,
+            reviewed_by_id=current_user.id,
+            note="auto-approved: document marked as trusted source",
+        )
     record_audit(
         db,
         action="document.update",
         entity_type="document",
         entity_id=str(document.id),
         user_id=current_user.id,
-        metadata={"title": document.title, "visibility": document.visibility.value},
+        metadata={
+            "title": document.title,
+            "visibility": document.visibility.value,
+            "auto_approve_knowledge": document.auto_approve_knowledge,
+            "pending_approved": approved_count,
+        },
         ip=_client_ip(request),
     )
     if acl_changed:
@@ -238,6 +255,24 @@ def reprocess(
     current_user=Depends(get_current_active_admin),
 ) -> DocumentRead:
     document = get_document_or_404(db, document_id)
+    # Guard against double-clicks / overlapping reprocess runs: two concurrent
+    # ingestion jobs on one document version re-chunk simultaneously and race
+    # on the chunk rows (observed as StaleDataError: "expected to update N
+    # row(s); 0 were matched").
+    active_job = (
+        db.query(IngestionJob)
+        .filter(
+            IngestionJob.document_id == document.id,
+            IngestionJob.version == document.version,
+            IngestionJob.status.in_([JobStatus.QUEUED, JobStatus.RUNNING]),
+        )
+        .first()
+    )
+    if active_job is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="An ingestion job is already queued or running for this document version; wait for it to finish",
+        )
     document = reprocess_document(db, document)
     job = queue_ingestion(db, document)
     background_tasks.add_task(run_ingestion_task, document.id, document.version, job.id)

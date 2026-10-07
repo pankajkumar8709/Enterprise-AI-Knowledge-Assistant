@@ -512,7 +512,7 @@ def _persist_versioned_object(
         department_ids=department_ids or [],
         created_by_id=created_by_id,
         reviewed_by_id=reviewed_by_id,
-        reviewed_at=datetime.now(UTC) if reviewed_by_id else None,
+        reviewed_at=datetime.now(UTC) if (reviewed_by_id or review_note) else None,
         review_note=review_note,
         search_text=_build_search_text(name, payload),
     )
@@ -579,6 +579,13 @@ def extract_knowledge_from_document(db: Session, document_id: int):
     created = 0
     updated = 0
     candidate_keys: set[str] = set()
+    # Trusted-source rule (admin toggle on the document): facts extracted from
+    # a trusted document are created directly as approved. Everything else
+    # waits for admin review per spec §7.4.6
+    # (OKF_AUTO_APPROVE_THRESHOLD=1.01 -> never auto-approve).
+    trusted = bool(getattr(document, "auto_approve_knowledge", False))
+    object_status = KnowledgeObjectStatus.APPROVED if trusted else KnowledgeObjectStatus.PENDING_REVIEW
+    auto_review_note = "auto-approved: trusted document" if trusted else None
     for candidate in candidates:
         knowledge_object, was_update = _persist_versioned_object(
             db,
@@ -590,11 +597,10 @@ def extract_knowledge_from_document(db: Session, document_id: int):
             source_excerpt=candidate.source_excerpt,
             source_document_id=document.id,
             extraction_method="document_extraction",
-            # Spec §7.4.6: extracted facts always wait for admin review
-            # (OKF_AUTO_APPROVE_THRESHOLD=1.01 -> never auto-approve).
-            object_status=KnowledgeObjectStatus.PENDING_REVIEW,
+            object_status=object_status,
             visibility=document.visibility,
             department_ids=list(document.department_ids or []),
+            review_note=auto_review_note,
         )
         candidate_keys.add(knowledge_object.object_key)
         items.append(knowledge_object)
@@ -802,3 +808,40 @@ def bulk_review_knowledge_objects(
     for knowledge_id in ids:
         reviewed.append(_review_knowledge_object(db, knowledge_id, user, new_status, note))
     return len(reviewed), reviewed
+
+
+def approve_pending_for_document(
+    db: Session,
+    document_id: int,
+    *,
+    reviewed_by_id: int | None,
+    note: str,
+) -> int:
+    """Approve every current pending_review object extracted from one document.
+
+    Used when an admin marks a document as a trusted source: previously
+    extracted facts that were still waiting for review are approved in bulk
+    (each recording who enabled the trust and why). Returns the count.
+    """
+
+    pending = (
+        db.query(KnowledgeObject)
+        .filter(
+            KnowledgeObject.source_document_id == document_id,
+            KnowledgeObject.status == KnowledgeObjectStatus.PENDING_REVIEW,
+            KnowledgeObject.is_current.is_(True),
+        )
+        .all()
+    )
+    now = datetime.now(UTC)
+    for knowledge_object in pending:
+        knowledge_object.status = KnowledgeObjectStatus.APPROVED
+        knowledge_object.reviewed_by_id = reviewed_by_id
+        knowledge_object.reviewed_at = now
+        knowledge_object.review_note = note
+        db.add(knowledge_object)
+    if pending:
+        db.commit()
+        for knowledge_object in pending:
+            db.refresh(knowledge_object)
+    return len(pending)

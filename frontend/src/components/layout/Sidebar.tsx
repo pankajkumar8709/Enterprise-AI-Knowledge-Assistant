@@ -106,7 +106,7 @@ export function Sidebar({ compact = false, onNavigate, className }: SidebarProps
 
       <div className="mt-auto px-3 pb-2">
         <p className={cn('text-[11px] leading-4 text-slate-400', compact ? 'hidden lg:block' : 'block')}>
-          Phase 9 frontend
+          v0.9.0
         </p>
       </div>
     </nav>

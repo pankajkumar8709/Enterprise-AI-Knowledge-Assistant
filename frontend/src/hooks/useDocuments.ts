@@ -165,7 +165,12 @@ export function useUpdateDocument(id: number) {
   const refresh = useRefreshDocuments();
 
   return useMutation({
-    mutationFn: async (input: { title?: string; visibility?: Visibility; department_ids?: number[] }) => {
+    mutationFn: async (input: {
+      title?: string;
+      visibility?: Visibility;
+      department_ids?: number[];
+      auto_approve_knowledge?: boolean;
+    }) => {
       const { data } = await api.patch<DocumentDto>(`/documents/${id}`, input);
       return data;
     },
