@@ -1,0 +1,165 @@
+================================================================================
+DOCUMENT METADATA
+================================================================================
+Document ID:          DOC-NPD-010
+Title:                Master Project Directory & Operational Registry
+Owner:                Operations / Project Management Office (PMO)
+Author / Maintainer:  Meera Reddy (EMP-1080, COO) & Aisha Khan (EMP-1402, HRBP)
+Version:              1.8 (Active)
+Effective Date:       2026-01-01
+Last Updated:         2026-09-20
+Status:               Active
+Access Level:         Internal / All Employees
+Classification:       Confidential
+Tags:                 projects, project-directory, project-managers, tech-stack, budgets, timelines, related-products
+================================================================================
+
+1. MASTER PROJECT DIRECTORY LISTING
+
+--------------------------------------------------------------------------------
+PROJECT ID: PRJ-2001
+PROJECT NAME: Project Titan (NextGen SaaS Microservices Rewrite)
+--------------------------------------------------------------------------------
+- Project Manager:      Priya Sharma (EMP-1008, Head of Engineering)
+- Lead Architect:       Suresh Kumar (EMP-1101, Principal Architect)
+- Department:           Engineering (DPT-02)
+- Team Members:         Rohit Verma (EMP-1105), Sara Thomas (EMP-1106), Ali Hassan (EMP-1107), Kavita Krishnan (EMP-1102)
+- Start Date:           2025-06-01 | Target End Date: 2026-12-31
+- Status:               Active / In Progress
+- Technology Stack:     Go, Python, React, PostgreSQL, Docker, Kubernetes, AWS
+- Total Budget:         $2,500,000 USD
+- Client:               Internal / All SaaS Enterprise Customers
+- Objectives:           Re-architect core legacy monolithic SaaS platform into scalable microservices.
+- Major Risks:          Database migration downtime during schema cutover.
+- Dependencies:         Zero-Trust Rollout (PRJ-2002)
+- Related Products:     Nexora Cloud (PRD-101), Nexora Flow (PRD-106)
+
+--------------------------------------------------------------------------------
+PROJECT ID: PRJ-2002
+PROJECT NAME: Zero-Trust Network & Infrastructure Rollout
+--------------------------------------------------------------------------------
+- Project Manager:      Amit Patel (EMP-1015, Head of IT)
+- Technical Lead:       Tarun Bajaj (EMP-1455, Sr. Systems Administrator)
+- Department:           Information Technology (DPT-03)
+- Team Members:         Vikram Joshi (EMP-1456), Kiran Patel (EMP-1350)
+- Start Date:           2025-09-15 | Target End Date: 2026-11-30
+- Status:               Active
+- Technology Stack:     Palo Alto GlobalProtect, Okta, YubiKey, Teleport, Linux
+- Total Budget:         $850,000 USD
+- Client:               Internal Security Infrastructure
+- Objectives:           Implement strict Zero-Trust access controls across all offices (India & Singapore).
+- Related Products:     Nexora Secure (PRD-102)
+
+--------------------------------------------------------------------------------
+PROJECT ID: PRJ-2003
+PROJECT NAME: CS Chatbot AI Integration
+--------------------------------------------------------------------------------
+- Project Manager:      David Lee (EMP-1050, Head of Customer Support)
+- Technical Lead:       Wei Chen (EMP-1201, L2 Support Lead)
+- Department:           Customer Support (DPT-07)
+- Team Members:         Chloe Tan (EMP-1150), Dr. Ananya Sen (EMP-1490)
+- Start Date:           2026-01-10 | Target End Date: 2026-10-31
+- Status:               Active
+- Technology Stack:     Node.js, Python, LangChain, OpenAI API, Zendesk Webhooks
+- Total Budget:         $400,000 USD
+- Related Products:     Nexora Desk (PRD-105), Nexora AI Studio (PRD-104)
+
+--------------------------------------------------------------------------------
+PROJECT ID: PRJ-2004
+PROJECT NAME: NLP Engine v4 Development
+--------------------------------------------------------------------------------
+- Project Manager:      Dr. Sanjay Verma (EMP-1090, Head of R&D)
+- Lead AI Researcher:   Dr. Ananya Sen (EMP-1490, Staff AI Researcher)
+- Department:           Research & Development (DPT-11)
+- Team Members:         Rohit Verma (EMP-1105)
+- Start Date:           2025-11-01 | Target End Date: 2027-01-15
+- Status:               Active
+- Technology Stack:     PyTorch, Hugging Face, vLLM, Python, CUDA, NVIDIA A100
+- Total Budget:         $1,800,000 USD
+- Related Products:     Nexora Analytics (PRD-103), Nexora AI Studio (PRD-104)
+
+--------------------------------------------------------------------------------
+PROJECT ID: PRJ-2005
+PROJECT NAME: HRMS Enterprise Migration
+--------------------------------------------------------------------------------
+- Project Manager:      Rahul Desai (EMP-1001, Head of HR)
+- HRBP Lead:            Aisha Khan (EMP-1402, HR Business Partner)
+- Department:           Human Resources (DPT-01)
+- Team Members:         Ritu Sharma (EMP-1121), Maya Lin (EMP-1120)
+- Start Date:           2026-02-01 | Target End Date: 2026-11-15
+- Status:               Active
+- Technology Stack:     Workday API, Python, PostgreSQL, React
+- Total Budget:         $350,000 USD
+- Related Products:     Nexora Flow (PRD-106)
+
+--------------------------------------------------------------------------------
+PROJECT ID: PRJ-2006
+PROJECT NAME: Global Unified Payroll
+--------------------------------------------------------------------------------
+- Project Manager:      Sneha Iyer (EMP-1022, CFO)
+- Technical Lead:       Arjun Nair (EMP-1134, Sr. Payroll Manager)
+- Department:           Finance (DPT-04)
+- Team Members:         Deepa Joshi (EMP-1135), Ritu Sharma (EMP-1121)
+- Start Date:           2025-10-01 | Target End Date: 2026-12-01
+- Status:               Active
+- Technology Stack:     SAP SuccessFactors, Financial APIs, Python
+- Total Budget:         $600,000 USD
+- Related Products:     Nexora Analytics (PRD-103)
+
+--------------------------------------------------------------------------------
+PROJECT ID: PRJ-2007
+PROJECT NAME: SecOps Shield & ISO 27001 Audit
+--------------------------------------------------------------------------------
+- Project Manager:      Karthik Natarajan (EMP-1072, CISO)
+- Audit Lead:           Kiran Patel (EMP-1350, Sr. Security Analyst)
+- Department:           Cybersecurity (DPT-09)
+- Team Members:         Manish Pandey (EMP-1351), Neha Gupta (EMP-1065)
+- Start Date:           2026-03-01 | Target End Date: 2026-10-15
+- Status:               Active / Final Audit Phase
+- Technology Stack:     Splunk, Wiz.io, Vanta, AWS Security Hub
+- Total Budget:         $300,000 USD
+- Related Products:     Nexora Vault (PRD-107), Nexora Secure (PRD-102)
+
+--------------------------------------------------------------------------------
+PROJECT ID: PRJ-2008
+PROJECT NAME: APAC SaaS Market Expansion
+--------------------------------------------------------------------------------
+- Project Manager:      Vikram Singh (EMP-1035, VP of Sales)
+- Sales Lead:           John D'Souza (EMP-1250, Enterprise AE)
+- Department:           Sales (DPT-05)
+- Team Members:         Pooja Hegde (EMP-1251), David Lee (EMP-1050)
+- Start Date:           2026-01-15 | Target End Date: 2027-03-31
+- Status:               Active
+- Technology Stack:     Salesforce CRM, Hubspot, LinkedIn Sales Navigator
+- Total Budget:         $1,200,000 USD
+- Related Products:     Nexora Cloud (PRD-101)
+
+--------------------------------------------------------------------------------
+PROJECT ID: PRJ-2009
+PROJECT NAME: Corporate Rebranding 2026
+--------------------------------------------------------------------------------
+- Project Manager:      Anjali Rao (EMP-1042, CMO)
+- Brand Lead:           Aditi Bhatia (EMP-1280, Brand Manager)
+- Department:           Marketing (DPT-06)
+- Team Members:         Maya Lin (EMP-1120)
+- Start Date:           2026-04-01 | Target End Date: 2026-11-30
+- Status:               Active
+- Technology Stack:     Figma, WordPress, Webflow, Adobe Creative Cloud
+- Total Budget:         $500,000 USD
+- Related Products:     Nexora Insight (PRD-108)
+
+--------------------------------------------------------------------------------
+PROJECT ID: PRJ-2011
+PROJECT NAME: Orion Cloud Multi-Tenant Architecture
+--------------------------------------------------------------------------------
+- Project Manager:      Rohit Verma (EMP-1105, Sr. Backend Engineer)
+- Technical Sponsor:    Priya Sharma (EMP-1008, Head of Engineering)
+- Department:           Engineering (DPT-02)
+- Team Members:         Sara Thomas (EMP-1106), Ali Hassan (EMP-1107)
+- Start Date:           2026-02-15 | Target End Date: 2026-12-15
+- Status:               Active
+- Technology Stack:     Go, Kubernetes, Terraform, AWS EKS, PostgreSQL, Redis
+- Total Budget:         $950,000 USD
+- Client:               Internal / Cloud Engineering
+- Objectives:           Build multi-tenant isolation layers for Orion Cloud infrastructure.
+- Related Products:     Nexora Cloud (PRD-101)

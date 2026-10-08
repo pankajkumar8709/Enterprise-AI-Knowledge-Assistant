@@ -1,0 +1,20 @@
+================================================================================
+DOCUMENT METADATA
+================================================================================
+Document ID:          DOC-SAG-009
+Title:                Global Enterprise Software Architecture & Systems Blueprint
+Owner:                Engineering / Architecture Council
+Author / Lead Arch:   Suresh Kumar (EMP-1101, Principal Architect)
+Approved By:          Priya Sharma (EMP-1008, Head of Engineering)
+Version:              2.2 (Active)
+Effective Date:       2026-04-15
+Last Updated:         2026-09-10
+Status:               Active
+Access Level:         Internal / Technical Staff
+Classification:       Confidential
+Tags:                 architecture, microservices, cloud-topology, graphql, kafka, kubernetes, redis, disaster-recovery
+================================================================================
+
+SECTION 1: OVERALL SYSTEM TOPOLOGY
+
+Nexora’s enterprise software stack utilizes a microservices architecture deployed across a multi-region cloud infrastructure (AWS primary, GCP secondary fallback). All core traffic flows through an edge API Gateway layer enforcing Zero-Trust security.

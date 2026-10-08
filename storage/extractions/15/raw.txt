@@ -1,0 +1,62 @@
+================================================================================
+DOCUMENT METADATA
+================================================================================
+Document ID:          DOC-NLC-015
+Title:                Legal Governance, Data Privacy, and Regulatory Compliance Manual
+Owner:                Legal & Compliance
+Department:           Legal & Compliance (DPT-08)
+Author / Maintainer:  Neha Gupta (EMP-1065, General Counsel)
+Approved By:          Meera Reddy (EMP-1080, COO) & Executive Board
+Version:              3.0 (Active)
+Effective Date:       2026-01-01
+Last Updated:         2026-09-01
+Status:               Active
+Access Level:         Internal / All Employees
+Classification:       Confidential
+Tags:                 legal, compliance, data-privacy, dpdp-act, pdpa, data-retention, ip-assignment, nda, cert-in
+================================================================================
+
+SECTION 1: DATA PRIVACY & STATUTORY COMPLIANCE FRAMEWORKS
+
+1.1 Regional Privacy Compliance
+Nexora Technologies Pvt. Ltd. processes employee, customer, and partner data under strict international and regional privacy laws:
+- India Operations: Governed by the Digital Personal Data Protection (DPDP) Act, 2023. Data Protection Officer (DPO): General Counsel Neha Gupta (EMP-1065).
+- Singapore Operations: Governed by the Personal Data Protection Act (PDPA) 2012.
+- Global SaaS Customers: Compliant with EU General Data Protection Regulation (GDPR) standards via Standard Contractual Clauses (SCCs).
+
+1.2 Employee & Customer Data Consent
+Personal Identifiable Information (PII) is collected exclusively for legitimate business, payroll, and security verification purposes. Processing customer PII requires explicit consent or lawful contractual necessity.
+
+
+SECTION 2: INSTITUTIONAL DATA RETENTION SCHEDULE
+
+Nexora mandates strict document lifecycle and retention schedules across all corporate records:
+
++-----------------------------------+-----------------------+---------------------------------------+-------------------------------------------------------+
+| Record Category                   | Retention Period      | Custodian Department                  | Disposal / Destruction Protocol                       |
++-----------------------------------+-----------------------+---------------------------------------+-------------------------------------------------------+
+| Financial Books & Tax Records     | 7 Calendar Years      | Finance (DPT-04 / CFO Sneha Iyer)     | Secure shredding / Cryptographic digital purge.       |
++-----------------------------------+-----------------------+---------------------------------------+-------------------------------------------------------+
+| Employee Personnel & BGV Files    | 10 Years Post-Exit    | Human Resources (DPT-01 / Rahul Desai)| Permanent deletion from HRMS after 10-year window.    |
++-----------------------------------+-----------------------+---------------------------------------+-------------------------------------------------------+
+| Security & System Audit Logs      | 7 Calendar Years      | Cybersecurity (DPT-09 / CISO Natarajan)| Compressed cold storage in immutable AWS S3 Vault.    |
++-----------------------------------+-----------------------+---------------------------------------+-------------------------------------------------------+
+| Customer Data (Post-Termination)  | 30 Days Post-Exit     | Engineering / Cloud Ops (DPT-02)      | Automated multi-pass overwrite sanitize procedure.    |
++-----------------------------------+-----------------------+---------------------------------------+-------------------------------------------------------+
+| IP Filings, Patents, Trademarks   | Permanent / Indefinite| Legal & Compliance (DPT-08)           | Permanent archival in Legal Document Safe.            |
++-----------------------------------+-----------------------+---------------------------------------+-------------------------------------------------------+
+
+
+SECTION 3: INTELLECTUAL PROPERTY (IP) & NON-DISCLOSURE AGREEMENTS (NDAs)
+
+3.1 Intellectual Property Assignment
+All software code, microservice architectures, algorithms, machine learning models (e.g., NLP Engine v4 PRJ-2004), documentation, designs, and inventions created by employees or contractors during their employment with Nexora belong 100% exclusively to Nexora Technologies Pvt. Ltd. Employees execute a binding IP Assignment Agreement on Day 1 of onboarding.
+
+3.2 Non-Disclosure Agreements (NDAs)
+Before exchanging Level 3 (Confidential) or Level 4 (Restricted) information with external vendors, clients, or partners, a bilateral Non-Disclosure Agreement (NDA) must be drafted or approved by Legal Counsel Neha Gupta (EMP-1065). Standard NDAs enforce a 3-year confidentiality obligation post-termination.
+
+
+SECTION 4: REGULATORY INCIDENT REPORTING OBLIGATIONS
+
+- CERT-In Mandatory Reporting (India): In compliance with Cyber Security Directions under Section 70B of the Information Technology Act, 2000, any confirmed cybersecurity incident (such as ransomware, unauthorized data access, or network intrusion) must be reported to the CERT-In portal within six (6) hours of confirmation by General Counsel Neha Gupta (EMP-1065).
+- PDPC Mandatory Reporting (Singapore): Personal data breaches impacting 500 or more individuals in Singapore must be reported to the Personal Data Protection Commission (PDPC) within 72 hours.

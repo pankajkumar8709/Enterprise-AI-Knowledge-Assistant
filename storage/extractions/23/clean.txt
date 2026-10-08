@@ -1,0 +1,106 @@
+DOCUMENT METADATA
+Document ID: DOC-NIT-007
+Title: Standard IT Operations & Asset Management Manual
+Owner: Information Technology
+Department: Information Technology (DPT-03)
+Author / Maintainer: Amit Patel (EMP-1015, Head of IT) & Tarun Bajaj (EMP-1455, Sr. SysAdmin)
+Version: 3.0 (Active)
+Effective Date: 2026-02-01
+Last Updated: 2026-08-20
+Status: Active
+Access Level: Internal / All Employees
+Classification: Confidential
+Tags: it-ops, laptop-allocation, vpn-setup, wifi-access, password-reset, helpdesk-sla, troubleshooting
+
+SECTION 1: HARDWARE PROVISIONING & LAPTOP ALLOCATION
+
+1.1 Standard Hardware Allocation Profiles
+All new joiners at Nexora Technologies receive company-owned hardware based on their job role profile. Hardware allocation is managed by IT Systems Administrator Tarun Bajaj (EMP-1455) under the supervision of IT Head Amit Patel (EMP-1015).
+
+- Profile A (Engineering, R&D, Cybersecurity):
+* Hardware: Apple MacBook Pro 16" (M3 Pro, 36GB RAM, 1TB SSD) OR Dell XPS 15 (Intel i9, 64GB RAM, 1TB SSD, NVIDIA RTX 4060).
+* Accessories: Dual 27" 4K Monitors, USB-C Docking Station, YubiKey 5C NFC Security Token.
+- Profile B (Sales, Marketing, HR, Finance, Operations, Legal, Procurement):
+* Hardware: Lenovo ThinkPad T14s (Intel i7, 16GB RAM, 512GB SSD) OR Apple MacBook Air 15" (M3, 16GB RAM, 512GB SSD).
+* Accessories: Single 27" Monitor, USB-C Multi-port Adapter, YubiKey 5 NFC Token.
+
+1.2 Laptop Offboarding & Asset Refresh Cycle
+- Asset Refresh Cycle: Laptops are refreshed every 36 months. Old laptops are securely wiped using DoD 5220.22-M standards by Procurement Specialist Ramesh Babu (EMP-1499).
+- Offboarding Protocol: On an employee's Last Working Day (LWD), all physical hardware must be surrendered to the local IT desk by 4:00 PM local time.
+
+SECTION 2: SOFTWARE INSTALLATION & AUTHORIZED CATALOG
+
+2.1 Mobile Device Management (MDM)
+All company machines are pre-enrolled in Nexora’s MDM platform (Jamf Pro for macOS; Microsoft Intune for Windows). Removing or tampering with MDM agents triggers an immediate security alert to CISO Karthik Natarajan (EMP-1072).
+
+2.2 Self-Service Software Portal
+Employees can install approved applications without local admin credentials using the "Nexora Self-Service App".
+- Approved Standard Software Catalog:
+* Productivity: Google Workspace, Slack Enterprise, Microsoft Teams, Zoom
+* Security: Nexora Secure Agent (PRD-102), Palo Alto GlobalProtect VPN, CrowdStrike Falcon
+* Development (Engineering only): Docker Desktop, IntelliJ IDEA, VS Code, Git, Postman
+
+SECTION 3: IDENTITY, EMAIL, AND CLOUD ACCESS MANAGEMENT
+
+3.1 Google Workspace & Email Setup
+- Standard Email Format: `first.last@nexora.com` (e.g., `rohit.v@nexora.com`).
+- Storage Quota: 1 TB per user.
+- Password Complexity: Minimum 16 characters, including uppercase, lowercase, numbers, and special characters. Passwords expire every 90 days.
+
+3.2 Corporate VPN & Multi-Factor Authentication (MFA)
+- VPN Client: Palo Alto GlobalProtect VPN.
+- Gateway Addresses:
+* India Primary: `vpn-in.nexora.com` (Bengaluru / Hyderabad / Pune)
+* APAC Primary: `vpn-sg.nexora.com` (Singapore)
+- MFA Requirement: All VPN logins require hardware-token push authentication via Okta Verify + YubiKey. Password-only logins are rejected.
+
+SECTION 4: OFFICE WI-FI & NETWORK INFRASTRUCTURE
+
+4.1 Office Wi-Fi Networks
+- SSID: `Nexora-Internal`
+* Security: WPA3-Enterprise (802.1X). Log in using standard corporate Active Directory credentials.
+- SSID: `Nexora-Guest`
+* Security: Captive Portal. Restricted to internet access only; no access to internal RFC1918 subnets. Requires SMS sponsor verification by a host employee.
+
+4.2 Cloud Infrastructure & Server Access
+- Cloud Access (AWS/GCP): Managed via AWS IAM Identity Center and Teleport Bastion hosts.
+- SSH Key Policy: Direct SSH using password authentication is disabled. SSH access requires temporary short-lived X.509 certificates issued through Teleport, managed by Network Engineer Vikram Joshi (EMP-1456).
+
+SECTION 5: BACKUP, DATA RETENTION, AND HELPDESK SLAS
+
+5.1 Automated Endpoint Backup
+Endpoints automatically back up user profile data (`/Users` or `C:\Users`) every 24 hours to Druva InSync cloud storage. System files and application binaries are excluded.
+
+5.2 IT Helpdesk SLAs & Escalation Matrix
+Employees must log all IT issues via the IT Service Portal or Slack channel `#it-helpdesk`.
+
++---------------------+-----------------------+----------------------+----------------------+
+| Ticket Severity | Definition | Response SLA | Resolution SLA |
++---------------------+-----------------------+----------------------+----------------------+
+| P1 - Critical | Entire office down / | 15 Minutes | 2 Hours |
+| | Security breach | | |
+| P2 - High | Single team blocked / | 30 Minutes | 4 Hours |
+| | Laptop hardware failure| | |
+| P3 - Normal | Individual software | 2 Hours | 24 Hours |
+| | issue / Access request | | |
+| P4 - Low | Hardware upgrade / | 8 Hours | 72 Hours |
+| | General query | | |
++---------------------+-----------------------+----------------------+----------------------+
+
+- IT Support Escalation Contact:
+* Level 1: IT Helpdesk Team (`it-support@nexora.com`)
+* Level 2: Sr. SysAdmin Tarun Bajaj (EMP-1455)
+* Level 3: Head of IT Amit Patel (EMP-1015)
+
+SECTION 6: TROUBLESHOOTING COMMON IT ISSUES
+
+6.1 Issue: VPN Failed to Establish Security Association
+- Symptoms: GlobalProtect client stuck at 94% "Connecting".
+- Root Cause: Stale RADIUS token session or local network UDP port 4500 blocked.
+- Resolution Steps:
+1. Open terminal and run: `sudo launchctl stop com.paloaltonetworks.gp.daemon`
+2. Clear local DNS cache: `sudo dscacheutil -flushcache`
+3. Restart GlobalProtect client and re-authenticate via Okta MFA.
+
+6.2 Issue: YubiKey Hardware Token Not Recognized
+- Resolution: Insert key, open Self-Service Portal, execute "Re-sync Cryptographic Token", and press YubiKey gold contact button for 3 seconds when prompted.

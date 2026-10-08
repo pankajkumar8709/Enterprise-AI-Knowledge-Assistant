@@ -1,0 +1,53 @@
+================================================================================
+DOCUMENT METADATA
+================================================================================
+Document ID:          DOC-NED-003
+Title:                Nexora Global Employee Directory
+Owner:                Information Technology
+Department:           Information Technology
+Version:              1.15
+Effective Date:       2026-10-01
+Last Updated:         2026-10-07
+Status:               Active
+Access Level:         Internal / All Active Employees
+Classification:       Internal
+Tags:                 employee-directory, employee-ids, departments, managers, project-assignments, skills
+================================================================================
+
+# Global Employee Roster (Sample Node Set: Key Leadership & Team Members)
+
+| Employee ID | Name | Department | Designation | Manager (ID) | Office | Email | Joining Date | Skills | Current Project | Status |
+|---|---|---|---|---|---|---|---|---|---|---|
+| EMP-1001 | Rahul Desai | Human Resources | Head of HR | EMP-1080 | Bengaluru | r.desai@nexora.com | 2018-02-15 | HR Strategy, Compliance, Compensation | HRMS Migration | Active |
+| EMP-1008 | Priya Sharma | Engineering | Head of Engineering | EMP-1080 | Bengaluru | p.sharma@nexora.com | 2019-06-10 | Cloud Arch, Distributed Systems, Microservices | Project Titan | Active |
+| EMP-1015 | Amit Patel | Information Tech | Head of IT | EMP-1080 | Pune | a.patel@nexora.com | 2019-11-01 | Cloud Infra, Networking, Zero-Trust | Zero-Trust Rollout | Active |
+| EMP-1022 | Sneha Iyer | Finance | CFO | EMP-1080 | Mumbai | s.iyer@nexora.com | 2017-08-20 | Financial Modeling, Audit, M&A | Q4 Forecasting | Active |
+| EMP-1035 | Vikram Singh | Sales | VP of Sales | EMP-1080 | Delhi | v.singh@nexora.com | 2020-01-15 | Enterprise SaaS Sales, Negotiations | APAC Expansion | Active |
+| EMP-1042 | Anjali Rao | Marketing | CMO | EMP-1080 | Bengaluru | a.rao@nexora.com | 2021-03-01 | Brand Strategy, Product Marketing | Rebranding 2026 | Active |
+| EMP-1050 | David Lee | Customer Support | Head of Customer Support | EMP-1080 | Singapore | d.lee@nexora.com | 2022-05-10 | Customer Experience, CRM, Service SLA | CS Chatbot AI | Active |
+| EMP-1065 | Neha Gupta | Legal & Compliance | General Counsel | EMP-1080 | Mumbai | n.gupta@nexora.com | 2018-09-01 | Corporate Law, IP, Regulatory Compliance | SaaS Contracts Revamp | Active |
+| EMP-1072 | Karthik Natarajan | Cybersecurity | CISO | EMP-1080 | Hyderabad | k.natarajan@nexora.com | 2021-07-22 | SecOps, Pentesting, Incident Response | ISO 27001 Audit | Active |
+| EMP-1080 | Meera Reddy | Operations | COO | EMP-0001 | Bengaluru | m.reddy@nexora.com | 2016-01-10 | Operations Management, Global Strategy | Global Synergy | Active |
+| EMP-1090 | Dr. Sanjay Verma | Research & Dev | Head of R&D | EMP-1080 | Pune | s.verma@nexora.com | 2020-08-14 | AI/ML, Natural Language Processing, PyTorch | NLP Engine v4 | Active |
+| EMP-1099 | Rajesh Khanna | Procurement | Head of Procurement | EMP-1022 | Hyderabad | r.khanna@nexora.com | 2019-04-12 | Vendor Management, Strategic Sourcing | Hardware Refresh 2026 | Active |
+| EMP-1101 | Suresh Kumar | Engineering | Principal Architect | EMP-1008 | Bengaluru | s.kumar@nexora.com | 2020-02-01 | Java, Go, System Design | Project Titan | Active |
+| EMP-1102 | Kavita Krishnan | Engineering | Lead QA Engineer | EMP-1008 | Hyderabad | k.krishnan@nexora.com | 2021-04-15 | Selenium, Cypress, Automation | Project Titan | Active |
+| EMP-1105 | Rohit Verma | Engineering | Sr. Backend Engineer | EMP-1008 | Bengaluru | rohit.v@nexora.com | 2021-09-01 | Python, Go, FastAPI, PostgreSQL | Project Titan | Active |
+| EMP-1106 | Sara Thomas | Engineering | Frontend Developer | EMP-1105 | Bengaluru | s.thomas@nexora.com | 2023-01-15 | React, TypeScript, Tailwind | Project Titan | Active |
+| EMP-1107 | Ali Hassan | Engineering | DevOps Lead | EMP-1008 | Hyderabad | a.hassan@nexora.com | 2022-03-10 | Docker, Kubernetes, Terraform, AWS | Project Titan | Active |
+| EMP-1120 | Maya Lin | Human Resources | Talent Acquisition Lead | EMP-1001 | Bengaluru | m.lin@nexora.com | 2021-11-20 | Tech Recruiting, Candidate Sourcing | Tech Hiring Q3 | Active |
+| EMP-1121 | Ritu Sharma | Human Resources | HR Operations Specialist | EMP-1001 | Bengaluru | ritu.s@nexora.com | 2022-02-10 | Payroll Audit, HRMS | HRMS Migration | Active |
+| EMP-1134 | Arjun Nair | Finance | Senior Payroll Manager | EMP-1022 | Mumbai | a.nair@nexora.com | 2020-06-05 | Statutory Compliance, Payroll, Tax | Global Payroll Unified | Active |
+| EMP-1135 | Deepa Joshi | Finance | Senior Accountant | EMP-1022 | Mumbai | d.joshi@nexora.com | 2021-08-19 | Corporate Tax, SAP, Financial Reporting | Q4 Forecasting | Active |
+| EMP-1150 | Chloe Tan | Customer Support | Support Agent L1 | EMP-1201 | Singapore | c.tan@nexora.com | 2024-01-10 | Zendesk, Customer Relations | APAC Support Ops | Active |
+| EMP-1201 | Wei Chen | Customer Support | L2 Support Lead | EMP-1050 | Singapore | w.chen@nexora.com | 2022-08-20 | ITIL, ITSM, Jira Service Management | CS Chatbot AI | Active |
+| EMP-1250 | John D'Souza | Sales | Enterprise AE | EMP-1035 | Delhi | j.dsouza@nexora.com | 2021-02-14 | B2B SaaS, Salesforce, Pipeline Mgmt | APAC Expansion | Active |
+| EMP-1251 | Pooja Hegde | Sales | Sales Operations Lead | EMP-1035 | Delhi | p.hegde@nexora.com | 2022-05-01 | CRM Analytics, Hubspot, Forecasting | APAC Expansion | Active |
+| EMP-1280 | Aditi Bhatia | Marketing | Brand Manager | EMP-1042 | Bengaluru | a.bhatia@nexora.com | 2022-10-10 | Content Strategy, PR, Media Relations | Rebranding 2026 | Active |
+| EMP-1350 | Kiran Patel | Cybersecurity | Sr. Security Analyst | EMP-1072 | Hyderabad | kiran.p@nexora.com | 2024-02-10 | SIEM, Splunk, Vulnerability Assessment | ISO 27001 Audit | Active |
+| EMP-1351 | Manish Pandey | Cybersecurity | Incident Response Lead | EMP-1072 | Hyderabad | m.pandey@nexora.com | 2022-11-15 | Threat Hunting, Forensics, Malware | SecOps Shield | Active |
+| EMP-1402 | Aisha Khan | Human Resources | HR Business Partner | EMP-1001 | Delhi | a.khan@nexora.com | 2023-11-01 | Employee Relations, Performance Mgmt | HRMS Migration | Active |
+| EMP-1455 | Tarun Bajaj | Information Tech | Sr. Systems Administrator| EMP-1015 | Pune | t.bajaj@nexora.com | 2022-07-15 | Active Directory, Azure, Linux Infra | Zero-Trust Rollout | Active |
+| EMP-1456 | Vikram Joshi | Information Tech | Network Engineer | EMP-1015 | Pune | v.joshi@nexora.com | 2023-04-01 | Cisco, Firewalls, SD-WAN | Network Refresh | Active |
+| EMP-1490 | Dr. Ananya Sen | Research & Dev | Staff AI Researcher | EMP-1090 | Pune | a.sen@nexora.com | 2021-06-01 | LLM Fine-Tuning, Python, Transformers | NLP Engine v4 | Active |
+| EMP-1499 | Ramesh Babu | Procurement | Vendor Risk Specialist | EMP-1099 | Hyderabad | r.babu@nexora.com | 2023-08-12 | Contract Negotiation, SLA Audit | Vendor Renewals | Active |

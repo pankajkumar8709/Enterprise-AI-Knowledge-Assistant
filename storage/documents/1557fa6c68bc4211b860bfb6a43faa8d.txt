@@ -1,0 +1,96 @@
+================================================================================
+DOCUMENT METADATA
+================================================================================
+Document ID:          DOC-ENG-008
+Title:                Software Engineering Standards and Operating Handbook
+Owner:                Engineering
+Department:           Engineering (DPT-02)
+Author / Maintainer:  Priya Sharma (EMP-1008, Head of Engineering) & Suresh Kumar (EMP-1101, Principal Architect)
+Version:              4.0 (Active)
+Effective Date:       2026-03-01
+Last Updated:         2026-09-01
+Status:               Active
+Access Level:         Internal / Engineering & R&D
+Classification:       Confidential
+Tags:                 coding-standards, git-workflow, pull-requests, ci-cd, api-standards, incident-response, testing
+
+VERSION HISTORY:
+- Version 3.0 (Deprecated 2026-02-28): Utilized GitFlow branching strategy (release branches, long-lived develop branch). Deprecated due to deployment bottlenecks.
+- Version 4.0 (Active 2026-03-01): Adopted Short-Lived Feature Branching / Trunk-Based Development with mandatory automated CI/CD canary deployments.
+================================================================================
+
+SECTION 1: CODING STANDARDS & CODE QUALITY
+
+1.1 Language-Specific Formatting Guidelines
+All source code must pass automated linters and formatters in the CI/CD pipeline prior to pull request merge.
+- Python: Code must adhere to PEP 8 standards. Enforced using `black` (line length 88) and `ruff` for static analysis. Type hints (`mypy --strict`) are mandatory for all public functions.
+- TypeScript / JavaScript: Enforced using `eslint` with `@typescript-eslint/recommended` rules and `prettier`. Single quotes, no semicolons.
+- Go: Standard `gofmt` and `golangci-lint` rules apply. Errors must be explicitly handled; ignoring errors (`_`) is strictly forbidden.
+- Java: Google Java Style Guide enforced via `spotless` Maven/Gradle plugin.
+
+1.2 Static Application Security Testing (SAST)
+All commits trigger SonarQube SAST analysis. Code with critical security vulnerabilities or code coverage below 85% is blocked from merging.
+
+
+SECTION 2: GIT WORKFLOW & BRANCHING STRATEGY
+
+2.1 Trunk-Based Development Model
+Nexora Engineering enforces a modified Trunk-Based Development model.
+- Master Branch (`main`): The sole source of truth. Always in a release-ready state. Direct commits to `main` are strictly blocked via GitHub branch protection rules.
+- Short-Lived Feature Branches: Naming convention required:
+  * Feature: `feature/PROJ-1234-short-description`
+  * Bug Fix: `fix/PROJ-5678-short-description`
+  * Hotfix: `hotfix/PROJ-9999-short-description`
+- Maximum Branch Lifetime: Feature branches must not live longer than 48 hours without merging or rebasing onto `main`.
+
+2.2 Commit Message Format
+Commits must follow Conventional Commits specification:
+`type(scope): subject line matching Jira issue ID`
+Example: `feat(auth): Add PKCE flow to OAuth2 client [PRJ-2001]`
+
+
+SECTION 3: PULL REQUESTS & CODE REVIEWS
+
+3.1 Pull Request (PR) Requirements
+Before requesting a review, the PR author must verify:
+- All automated unit tests and integration tests pass.
+- PR size is under 400 lines of modified code (excluding auto-generated mocks).
+- A clear description and video/screenshot proof of test validation is attached.
+
+3.2 Mandatory Reviewers
+- Minimum Required Approvals: At least TWO peer reviews required.
+- Architectural Review: PRs affecting core microservices (`Project Titan`) require explicit approval from Principal Architect Suresh Kumar (EMP-1101) or DevOps Lead Ali Hassan (EMP-1107).
+- QA Verification: Lead QA Engineer Kavita Krishnan (EMP-1102) must sign off on automated integration test suites.
+
+
+SECTION 4: TESTING, CI/CD PIPELINES, AND API STANDARDS
+
+4.1 Testing Pyramid Requirements
+- Unit Tests: Mandatory for all business logic. Minimum 85% branch coverage required.
+- Integration Tests: Tests interactions with database, Redis, and external APIs using Testcontainers.
+- End-to-End (E2E) Tests: Automated Cypress/Playwright suites managed by QA Lead Kavita Krishnan (EMP-1102).
+
+4.2 CI/CD Pipeline Stages (GitHub Actions)
+1. `Lint & SAST`: Runs linters, SonarQube, and dependency vulnerability scans (`snyk`).
+2. `Unit & Integration Test`: Executes test suites in parallel containers.
+3. `Build Container`: Compiles binary and builds Docker image tagged with Git SHA.
+4. `Deploy to Staging`: Automatically deploys image to Kubernetes staging cluster.
+5. `Canary Production Rollout`: Deploys to 10% of production traffic, auto-promotes to 100% after 15 minutes of zero errors.
+
+4.3 REST & gRPC API Design Standards
+- REST APIs: Must adhere to OpenAPI 3.0 specification. Endpoints must use plural nouns (e.g., `GET /api/v1/users`).
+- gRPC: Used for high-throughput inter-service microservice communication. Proto files must be versioned in the `nexora/proto-registry` repository.
+
+
+SECTION 5: MAJOR INCIDENT HANDLING & ON-CALL PLAYBOOK
+
+5.1 Incident Severity Levels
+- Severity 0 (P0 - Critical Outage): Core platform (e.g., Nexora Cloud) unavailable for > 5% of global users.
+- Severity 1 (P1 - Major Degradation): Partial feature outage, elevated latency (> 2 seconds).
+
+5.2 On-Call Escalation Rota
+On-call engineers are rotated weekly. Incident response is managed via PagerDuty.
+- Primary On-Call: Sr. Backend Engineer Rohit Verma (EMP-1105).
+- Secondary On-Call: Frontend Developer Sara Thomas (EMP-1106).
+- Incident Commander (P0/P1): Head of Engineering Priya Sharma (EMP-1008).
+- Post-Mortem Requirement: A blameless post-mortem must be published within 48 hours of incident resolution.

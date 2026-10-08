@@ -1,0 +1,93 @@
+================================================================================
+DOCUMENT METADATA
+================================================================================
+Document ID:          DOC-CIR-012
+Title:                Cybersecurity Incident Response Plan & Playbooks
+Owner:                Cybersecurity & InfoSec
+Department:           Cybersecurity (DPT-09)
+Author / Lead Arch:   Karthik Natarajan (EMP-1072, CISO) & Manish Pandey (EMP-1351, Incident Response Lead)
+Approved By:          Meera Reddy (EMP-1080, COO) & Neha Gupta (EMP-1065, General Counsel)
+Version:              2.1 (Active)
+Effective Date:       2026-03-01
+Last Updated:         2026-09-12
+Status:               Active
+Access Level:         Restricted / Incident Response Cadre & Executive Leadership
+Classification:       Confidential / Highly Restricted
+Tags:                 incident-response, severity-matrix, playbooks, ransomware, phishing, data-leakage, cert-in, escalation
+================================================================================
+
+SECTION 1: INCIDENT RESPONSE TEAM (CSIRT) STRUCTURE
+
+In the event of a cybersecurity event or operational disruption, the Cybersecurity Incident Response Team (CSIRT) is convened immediately.
+
+- CSIRT Incident Commander:    Karthik Natarajan (EMP-1072, CISO)
+- Incident Response Lead:      Manish Pandey (EMP-1351, IR Lead)
+- Forensics & Lead Analyst:    Kiran Patel (EMP-1350, Sr. Security Analyst)
+- Infrastructure Lead:         Amit Patel (EMP-1015, Head of IT)
+- Legal & Regulatory Counsel: Neha Gupta (EMP-1065, General Counsel)
+- Corporate Communications:    Anjali Rao (EMP-1042, CMO)
+- HR Liaison:                  Rahul Desai (EMP-1001, Head of HR)
+
+
+SECTION 2: SEVERITY CLASSIFICATION & RESPONSE SLA MATRIX
+
++-------------------+---------------------------------------------------------+--------------------+---------------------+-------------------------------------------------------+
+| Severity Level    | Impact Criteria                                         | Triage SLA Target  | Containment SLA     | Mandatory Notification Requirements                   |
++-------------------+---------------------------------------------------------+--------------------+---------------------+-------------------------------------------------------+
+| Severity 0 (SEV-0)| Active Ransomware, Root CA Compromise, Total Production | <= 15 Minutes      | <= 2 Hours          | Executive Board, CERT-In (within 6 Hours), PDPC,      |
+| Critical Emergency| Outage of Nexora Cloud (PRD-101) or Vault (PRD-107).   | (24/7 Page)        |                     | Affected Enterprise Clients.                          |
++-------------------+---------------------------------------------------------+--------------------+---------------------+-------------------------------------------------------+
+| Severity 1 (SEV-1)| Stolen Admin Laptop with cached tokens, Unencrypted DB  | <= 30 Minutes      | <= 4 Hours          | CISO Karthik Natarajan, General Counsel Neha Gupta,   |
+| High Severity     | Exfiltration, Leaked Production API Credentials.        |                    |                     | Head of IT Amit Patel.                                |
++-------------------+---------------------------------------------------------+--------------------+---------------------+-------------------------------------------------------+
+| Severity 2 (SEV-2)| Localized Malware blocked by EDR, Single User Account   | <= 2 Hours         | <= 12 Hours         | IR Lead Manish Pandey, Affected Employee Manager.     |
+| Medium Severity   | Compromise, Suspicious Anomalous Geo Login.            |                    |                     |                                                       |
++-------------------+---------------------------------------------------------+--------------------+---------------------+-------------------------------------------------------+
+| Severity 3 (SEV-3)| Isolated Phishing Email Submission, Failed Password     | <= 8 Hours         | <= 24 Hours         | Internal Security Log Filing.                         |
+| Low Severity      | Brute Force Attempt on GlobalProtect VPN gateway.       |                    |                     |                                                       |
++-------------------+---------------------------------------------------------+--------------------+---------------------+-------------------------------------------------------+
+
+
+SECTION 3: SIX-STAGE INCIDENT RESPONSE LIFECYCLE
+
+The CSIRT executes all incident investigations following the NIST SP 800-61 framework across six mandatory phases:
+
+1. Detection & Identification: Automated alert ingestion via Splunk SIEM / CrowdStrike EDR or manual escalation to `security-alert@nexora.com`.
+2. Severity Triage: IR Lead Manish Pandey (EMP-1351) assigns severity level (SEV-0 to SEV-3) within prescribed SLA window.
+3. Containment: Short-term isolation (host network disconnection, API token revocation, Active Directory account disablement).
+4. Eradication: Removal of malicious binaries, wiping compromised endpoints, patching underlying zero-day vulnerabilities.
+5. Recovery: Restoring systems from clean, uninfected backups, verifying integrity, re-enabling network ingress traffic.
+6. Post-Incident Review & Lessons Learned: Mandatory blameless post-mortem published within 48 hours for SEV-0/SEV-1 events.
+
+
+SECTION 4: STANDARDIZED INCIDENT RESPONSE PLAYBOOKS
+
+PLAYBOOK A: RANSOMWARE & MALWARE INFECTION (SEV-0)
+1. Automated Containment: Upon EDR signature or ransomware behavior detection, host isolation script automatically executes, cutting network traffic at the NIC level.
+2. Network Isolation: SysAdmin Tarun Bajaj (EMP-1455) revokes the affected endpoint's 802.1X radius access and disables Active Directory accounts.
+3. Forensic Imaging: Security Analyst Kiran Patel (EMP-1350) captures RAM memory dumps and disk images for forensic analysis prior to device re-imaging.
+4. Restoral Protocol: Systems are rebuilt from bare-metal using Jamf/Intune profiles. Data restored from isolated immutable cloud backups (Druva / AWS S3 Object Lock).
+5. Payment Policy: Nexora Technologies maintains an absolute policy prohibiting ransom payments under any circumstances.
+
+PLAYBOOK B: PHISHING & LEAKED CREDENTIALS (SEV-1 / SEV-2)
+1. Token Invalidation: Okta admin invalidates all active session cookies and OAuth refresh tokens for the compromised identity.
+2. Password & YubiKey Reset: Password forced reset in Active Directory; YubiKey token revoked and re-bound.
+3. Log Sweep: Analyst sweeps Splunk SIEM logs for all API and SSH actions executed by the compromised identity during the preceding 72 hours.
+4. Email Purge: Google Workspace Admin purges malicious phishing messages globally across all 1,500 employee inboxes.
+
+PLAYBOOK C: STOLEN LAPTOP & MOBILE DEVICE (SEV-1)
+1. Device Remote Wipe: Tarun Bajaj (EMP-1455) triggers Jamf/Intune remote wipe signal.
+2. Access Revocation: Okta, GlobalProtect VPN, and AWS Teleport Bastion credentials instantly revoked for the user.
+3. Physical Facility Lockout: Operations Manager Meera Reddy (EMP-1080) deactivates the employee’s office biometric turnstile badge.
+
+PLAYBOOK D: UNAUTHORIZED DATABASE ACCESS & DATA LEAKAGE (SEV-0)
+1. Connection Termination: Principal Architect Suresh Kumar (EMP-1101) terminates active connection pools to affected PostgreSQL Aurora or ClickHouse databases.
+2. Key Rotation: Secrets in Nexora Vault (PRD-107) and AWS KMS are immediately rotated.
+3. Regulatory Reporting: General Counsel Neha Gupta (EMP-1065) prepares statutory breach notifications for CERT-In (India) and PDPC (Singapore).
+
+
+SECTION 5: REGULATORY & EXTERNAL COMMUNICATION SLAS
+
+- CERT-In Reporting (India): Mandated reporting of cybersecurity incidents (e.g., ransomware, DB leaks, unauthorized access) to the Indian Computer Emergency Response Team within six (6) hours of confirmation.
+- PDPA Reporting (Singapore): Mandated reporting to the Personal Data Protection Commission (PDPC) within 72 hours if personal data of Singapore residents is affected.
+- Public & Media Statements: All external statements are issued exclusively by CMO Anjali Rao (EMP-1042). No engineer or employee is permitted to comment publicly regarding an active security incident.

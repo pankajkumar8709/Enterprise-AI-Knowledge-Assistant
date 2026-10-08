@@ -1,0 +1,259 @@
+NEXORA TECHNOLOGIES PVT. LTD.
+Global Enterprise Software Architecture &
+Systems Blueprint
+DOC-SAG-009 | Comprehensive Engineering Architecture Specification v2.2
+Document ID:
+DOC-SAG-009
+Effective Date:
+2026-04-15
+Document Title:
+Global Software Architecture Guide
+Last Updated:
+2026-09-10
+Owner:
+Engineering / Architecture Council
+Status / Version:
+Active / Version 2.2
+Department:
+Engineering (DPT-02)
+Classification:
+Confidential / Restricted
+Lead Architect:
+Suresh Kumar (EMP-1101, Principal
+Arch)
+Approved By:
+Priya Sharma (EMP-1008, Head Eng)
+Tags:
+microservices, cloud-topology, kafka,
+kubernetes, redis, disaster-recovery,
+zero-trust
+Access Level:
+Internal Technical Staff
+1. EXECUTIVE SUMMARY & ARCHITECTURAL VISION
+Nexora Technologies Pvt. Ltd. operates an enterprise-grade, highly available, and cloud-native software architecture
+designed to power our core SaaS products (including Nexora Cloud PRD-101, Nexora Secure PRD-102, Nexora
+Analytics PRD-103, and Nexora AI Studio PRD-104). This blueprint serves as the definitive technical standard for all
+engineering pods across our Bengaluru HQ, Hyderabad, Pune, Delhi, Mumbai, and Singapore locations.
+The architecture is engineered around six foundational pillars: Zero-Trust Security by Design, Microservice
+Decoupling, Event-Driven Streaming, Multi-Region High Availability (99.99% Uptime SLA), Continuous Observability,
+and Automated Failover Resilience.
+1.1 Guiding Architectural Principles
+ Domain-Driven Isolation: Microservices boundaries are aligned strictly with business domain capabilities to
+minimize runtime dependencies.
+ Zero-Trust Network Architecture: No implicit trust exists between internal services. All internal traffic requires
+mutual TLS (mTLS) via Istio service mesh.
+ Stateless Execution Layer: Application pods remain completely stateless, offloading state to fault-tolerant
+PostgreSQL RDS Aurora and Redis clusters.
+ Automated Canary Continuous Deployment: Zero-downtime canary deployments enforced via automated
+GitHub Actions CI/CD workflows.
+2. OVERALL SYSTEM TOPOLOGY & EDGE ARCHITECTURE
+The overall system topology follows a tiered, defense-in-depth layout. All client requests originate from external web,
+mobile, or enterprise API callers, pass through Cloudflare Enterprise DDoS Protection, and route through our API
+Gateway layer into the Kubernetes microservices mesh.
+CONFIDENTIAL
+|   Internal Technical & Architecture Distribution Only
+Page 1 of 5
+
++-----------------------------------------------------------------------------------+
+|                                  CLIENT LAYER                                     |
+|     Web Browsers (React 18)   |   Mobile Apps   |   Enterprise API Clients        |
++-----------------------------------------------------------------------------------+
+|
+v  (HTTPS / WSS / TLS 1.3)
++-----------------------------------------------------------------------------------+
+|                           EDGE & PERIMETER SECURITY                               |
+|  Cloudflare Enterprise DDoS Protection  -->  Kong API Gateway (OAuth2 / Rate Limit) |
++-----------------------------------------------------------------------------------+
+|
+v  (gRPC / mTLS Istio Mesh)
++-----------------------------------------------------------------------------------+
+|                              MICROSERVICES MESH                                   |
+|  +--------------------+   +--------------------+   +---------------------------+  |
+|  | Auth Service       |   | Nexora Cloud Core  |   | AI Inference Engine       |  |
+|  | (OAuth2 / OIDC)    |   | (Go / Kubernetes)  |   | (Python FastAPI / vLLM)   |  |
+|  +--------------------+   +--------------------+   +---------------------------+  |
+|  +--------------------+   +--------------------+   +---------------------------+  |
+|  | Analytics Service  |   | Workflow Engine    |   | Support Bot Service       |  |
+|  | (ClickHouse / C++) |   | (Nexora Flow)      |   | (Node.js / LangChain)     |  |
+|  +--------------------+   +--------------------+   +---------------------------+  |
++-----------------------------------------------------------------------------------+
+|
+v
++-----------------------------------------------------------------------------------+
+|                        PERSISTENCE & EVENT BUS LAYER                              |
+|  PostgreSQL Aurora (Primary/Replica) | Redis Cluster (Cache) | Apache Kafka Bus  |
++-----------------------------------------------------------------------------------+
+2.1 Edge Security and API Gateway (Kong)
+All incoming ingress traffic enters through Cloudflare Enterprise Anycast DNS with active Web Application Firewall
+(WAF) filtering. Approved requests reach the internal Kong API Gateway cluster hosted on AWS EKS across three
+Availability Zones in `ap-south-1` (Mumbai).
+Kong executes centralized responsibilities including OAuth2/JWT token verification, API rate-limiting (token bucket
+algorithm), TLS 1.3 termination, and path-based routing to internal gRPC/REST service endpoints.
+3. FRONTEND & MICRO-FRONTEND ARCHITECTURE
+Nexora's frontend architecture standardizes on React 18, TypeScript 5.2, and Next.js (App Router with Server-Side
+Rendering). Styling is driven by Tailwind CSS and the proprietary Nexora Design System (NDS) component library.
+3.1 Webpack 5 Module Federation
+To support independent release velocity across engineering teams, the single-page application (SPA) portal utilizes
+Webpack 5 Module Federation. A host container shell dynamically loads remote micro-frontend bundles at runtime:
+ Cloud Dashboard Remote: Developed by Core Engineering (Lead: Rohit Verma, EMP-1105). Provides control
+interface for Nexora Cloud (PRD-101).
+ Analytics Remote: Developed by R&D; Pod (Lead: Dr. Ananya Sen, EMP-1490). Renders real-time telemetry and
+reporting for Nexora Analytics (PRD-103).
+ Support Remote: Developed by CS Engineering Pod (Lead: Wei Chen, EMP-1201). Integrates AI chatbot and
+ticketing for Nexora Desk (PRD-105).
+NEXORA TECHNOLOGIES PVT. LTD.
+DOC-SAG-009: Global Software Architecture Guide v2.2
+CONFIDENTIAL
+|   Internal Technical & Architecture Distribution Only
+Page 2 of 5
+
+3.2 Client-Side State Management & Data Fetching
+Local component state is handled via React hooks, while global application state uses Zustand for zero-boilerplate
+lightweight storage. Server-side caching, background refetching, and optimistic mutations are governed by TanStack
+Query v5.
+4. BACKEND MICROSERVICES & CONTAINER ORCHESTRATION
+Backend services are designed as lightweight microservices deployed on AWS Elastic Kubernetes Service (EKS).
+Kubernetes clusters are maintained across primary region `ap-south-1` (Mumbai) and secondary DR region
+`asia-southeast1` (Singapore) under the management of SysAdmin Tarun Bajaj (EMP-1455) and DevOps Lead Ali
+Hassan (EMP-1107).
+Service Name
+Tech Stack
+Primary Product
+Lead Engineer
+Protocol
+Auth Service
+Go 1.22, OAuth2, Redis
+Nexora Secure (PRD-102)
+Tarun Bajaj (EMP-1455)
+gRPC / REST
+Cloud Core Service
+Go 1.22, Docker SDK, AWS
+API
+Nexora Cloud (PRD-101)
+Rohit Verma (EMP-1105)
+gRPC
+AI Inference Engine
+Python 3.11, FastAPI, vLLM,
+PyTorch
+Nexora AI Studio (PRD-104)
+Dr. Ananya Sen
+(EMP-1490)
+gRPC / HTTPS
+Analytics Query
+Engine
+C++20, ClickHouse, Kafka
+Nexora Analytics (PRD-103)
+Suresh Kumar
+(EMP-1101)
+gRPC
+Workflow Engine
+Java 21, Spring Boot,
+Postgres
+Nexora Flow (PRD-106)
+Sara Thomas
+(EMP-1106)
+REST / Kafka
+Support Bot Service
+Node.js 20, TypeScript,
+LangChain
+Nexora Desk (PRD-105)
+Wei Chen (EMP-1201)
+WebSockets /
+REST
+4.1 Service Mesh & In-Cluster Communication
+All internal pod-to-pod communication is encrypted via Istio Service Mesh v1.20 using SPIFFE/SPIRE certificate
+identities. Istio sidecar proxies enforce mutual TLS (mTLS), strict circuit breaking (Max 100 concurrent requests/pod),
+and automatic retry policies.
+5. EVENT-DRIVEN MESSAGING & DATA PIPELINES
+For asynchronous workflows, decoupling, and high-volume audit logging, Nexora utilizes a multi-node Apache Kafka
+cluster stretched across three Availability Zones. Kafka topic retention and partition strategies ensure zero data loss.
+Kafka Topic Name
+Partition Count
+Retention Period
+Producer / Consumer Services
+nexora.audit.events
+12 Partitions
+7 Years (S3
+Archive)
+All Services -> Security & Legal Vault (PRD-107)
+nexora.telemetry.metrics
+32 Partitions
+30 Days
+Cloud Agents -> Analytics Engine (PRD-103)
+nexora.notifications.email
+8 Partitions
+7 Days
+Workflow Engine -> SendGrid Email Dispatcher
+nexora.billing.metering
+12 Partitions
+3 Years
+SaaS Services -> Finance Payroll & Billing (DPT-04)
+NEXORA TECHNOLOGIES PVT. LTD.
+DOC-SAG-009: Global Software Architecture Guide v2.2
+CONFIDENTIAL
+|   Internal Technical & Architecture Distribution Only
+Page 3 of 5
+
+6. PERSISTENCE, STORAGE, & DISTRIBUTED CACHING
+Nexora employs a polyglot persistence architecture tailored to workload requirements:
+ Relational Persistence: Managed PostgreSQL 15 (AWS RDS Aurora Multi-AZ). Handles transactional user
+accounts, subscriptions, and RBAC permissions. Primary writer in Mumbai (`ap-south-1`) with read-replicas in
+Singapore (`asia-southeast1`).
+ Analytical Datastore: ClickHouse distributed cluster. Processes petabyte-scale telemetry metrics with columnar
+compression exceeding 5:1.
+ Secrets & KMS: Nexora Vault (PRD-107) integrated with AWS KMS hardware security modules for dynamic DB
+password rotation every 24 hours.
+ Distributed In-Memory Cache: Multi-node Redis Cluster v7.0 managing user session tokens, rate-limiting
+counters, and L2 query caching with a sustained hit ratio > 92%.
+7. IDENTITY, SECURITY, & AUTHORIZATION FRAMEWORK
+In alignment with the Zero-Trust Network Rollout (PRJ-2002) led by Head of IT Amit Patel (EMP-1015) and CISO
+Karthik Natarajan (EMP-1072), all system access follows strict Identity and Access Management (IAM) controls.
+7.1 Authentication & Token Lifecycle
+Authentication utilizes OAuth 2.0 and OpenID Connect (OIDC) backed by Okta Enterprise. Successful logins issue
+short-lived, RSA-256 signed JSON Web Tokens (JWT) valid for 15 minutes, coupled with long-lived encrypted refresh
+tokens stored in HTTP-only secure cookies.
+7.2 Authorization Engine (OPA / RBAC)
+Fine-grained authorization uses Open Policy Agent (OPA) sidecars. Rego policies evaluate user identity, group
+membership, tenant ID, resource labels, and IP origin in under 2 milliseconds.
+8. OBSERVABILITY, MONITORING, & INCIDENT RESPONSE
+Comprehensive observability is powered by the three pillars of telemetry: Metrics, Logs, and Traces.
+ Metrics: Prometheus scraping metrics from `/metrics` endpoints across all pods every 15 seconds, visualized via
+Grafana dashboards.
+ Log Aggregation: FluentBit log shippers sending structured JSON logs to Elasticsearch (ELK Stack) with 30-day
+hot retention.
+ Distributed Tracing: OpenTelemetry SDKs instrumented across Go, Python, Java, and Node services sending
+trace context to Jaeger.
+8.1 On-Call Escalation Rota
+PagerDuty manages automated on-call rotations. P0/P1 incidents trigger SMS and phone calls to Primary On-Call
+Engineer Rohit Verma (EMP-1105) and Secondary On-Call Sara Thomas (EMP-1106), escalating to Head of
+Engineering Priya Sharma (EMP-1008) if unacknowledged within 10 minutes.
+NEXORA TECHNOLOGIES PVT. LTD.
+DOC-SAG-009: Global Software Architecture Guide v2.2
+CONFIDENTIAL
+|   Internal Technical & Architecture Distribution Only
+Page 4 of 5
+
+9. DISASTER RECOVERY & HIGH AVAILABILITY SLAs
+Nexora guarantees high availability for core enterprise production systems:
+Target Metric
+SLA Target Guarantee
+Technical Recovery Mechanism
+Monthly Platform Uptime
+99.99% Availability
+Multi-AZ AWS EKS deployment + Route 53 global traffic routing
+Recovery Point Objective (RPO)
+< 5 Minutes Data Loss
+Continuous Aurora PostgreSQL cross-region WAL streaming to
+Singapore
+Recovery Time Objective (RTO)
+< 30 Minutes Downtime
+Automated Terraform DR failover stack execution in GCP Singapore
+10. ARCHITECTURAL GOVERNANCE & VERSIONING
+The Architecture Review Board (ARB) convenes bi-weekly under the leadership of Principal Architect Suresh
+Kumar (EMP-1101) and Head of HR Rahul Desai (for staffing impact). Any proposal introducing new databases,
+languages, or external SaaS dependencies requires a formal Architecture Decision Record (ADR) approval.
+NEXORA TECHNOLOGIES PVT. LTD.
+DOC-SAG-009: Global Software Architecture Guide v2.2
+CONFIDENTIAL
+|   Internal Technical & Architecture Distribution Only
+Page 5 of 5

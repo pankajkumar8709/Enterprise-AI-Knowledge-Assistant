@@ -1,0 +1,82 @@
+================================================================================
+DOCUMENT METADATA
+================================================================================
+Document ID:          DOC-BCP-017
+Title:                Enterprise Business Continuity and Disaster Recovery Plan
+Owner:                Operations / IT
+Department:           Operations (DPT-10) & Information Technology (DPT-03)
+Author / Maintainer:  Meera Reddy (EMP-1080, COO) & Amit Patel (EMP-1015, Head of IT)
+Approved By:          Karthik Natarajan (EMP-1072, CISO) & Executive Board
+Version:              2.0 (Active)
+Effective Date:       2026-04-01
+Last Updated:         2026-09-15
+Status:               Active
+Access Level:         Restricted / Disaster Response Cadre & Management
+Classification:       Confidential
+Tags:                 bcp, dr, disaster-recovery, rto, rpo, failover, backup-retention, emergency-contacts
+================================================================================
+
+SECTION 1: DISASTER RECOVERY FRAMEWORK & TARGET SLAS
+
+1.1 Objectives
+This plan outlines the operational procedures, technical failovers, alternate facility protocols, and emergency communications required to maintain organizational resilience and restore Nexora’s SaaS products and internal infrastructure during a catastrophic disaster.
+
+1.2 Target Recovery Metrics (RTO & RPO)
+
++-----------------------------------+-----------------------------------+-----------------------------------+
+| System / Product Scope            | Recovery Time Objective (RTO)     | Recovery Point Objective (RPO)    |
++-----------------------------------+-----------------------------------+-----------------------------------+
+| Production Core: Nexora Cloud     | <= 30 Minutes                     | <= 5 Minutes                      |
+| (PRD-101) & Nexora Secure (PRD-102)|                                   | (Continuous WAL Replication)      |
++-----------------------------------+-----------------------------------+-----------------------------------+
+| Analytics & AI: Nexora Analytics  | <= 2 Hours                        | <= 15 Minutes                     |
+| (PRD-103) & AI Studio (PRD-104)   |                                   | (Kafka Topic Partition Replay)    |
++-----------------------------------+-----------------------------------+-----------------------------------+
+| Internal Enterprise Tools: HRMS,  | <= 4 Hours                        | <= 1 Hour                         |
+| Financial SAP, Active Directory   |                                   | (Hourly Automated Snapshots)      |
++-----------------------------------+-----------------------------------+-----------------------------------+
+
+
+SECTION 2: BACKUP & DATA RETENTION SCHEDULE
+
+- Database Replication: Managed PostgreSQL 15 (AWS RDS Aurora) executes continuous Write-Ahead Logging (WAL) cross-region replication from primary writer `ap-south-1` (Mumbai) to secondary reader `asia-southeast1` (Singapore).
+- Immutable S3 Object Lock: Daily database backups and system state snapshots are stored in AWS S3 buckets configured with WORM (Write Once Read Many) Object Lock for 7 years to prevent ransomware tampering.
+- Endpoint Backups: Laptops automatically sync user profile data every 24 hours to Druva InSync cloud storage, managed by SysAdmin Tarun Bajaj (EMP-1455).
+
+
+SECTION 3: DISASTER COMMAND STRUCTURE & EMERGENCY CONTACTS
+
+In the event of a disaster declaration, the Disaster Recovery Executive Command (DREC) assumes operational control:
+
+- Disaster Commander (Overall Leadership):   Meera Reddy (EMP-1080, COO)
+- Technical Recovery Lead (Infrastructure): Amit Patel (EMP-1015, Head of IT)
+- Security & Risk Lead:                    Karthik Natarajan (EMP-1072, CISO)
+- Engineering Recovery Lead:               Priya Sharma (EMP-1008, Head of Eng)
+- Legal & Regulatory Lead:                 Neha Gupta (EMP-1065, General Counsel)
+- HR & Employee Safety Lead:              Rahul Desai (EMP-1001, Head of HR)
+- Financial Recovery Lead:                 Sneha Iyer (EMP-1022, CFO)
+
+
+SECTION 4: STANDARDIZED DISASTER SCENARIOS & RECOVERY PROCEDURES
+
+SCENARIO A: PRIMARY DATA CENTER / REGIONAL CLOUD OUTAGE (AWS Mumbai Outage)
+1. Disaster Trigger: AWS `ap-south-1` region experiences total facility loss or network isolation exceeding 15 minutes.
+2. Automated DNS Failover: AWS Route 53 health check fails -> Automated DNS CNAME failover shifts global traffic to secondary cluster in GCP Singapore (`asia-southeast1`).
+3. Database Promotion: Secondary Aurora read-replica in Singapore is promoted to primary read-write master via automated Terraform failover script executed by DevOps Lead Ali Hassan (EMP-1107).
+4. Client Notification: CMO Anjali Rao (EMP-1042) posts live status updates to `https://status.nexora.com`.
+
+SCENARIO B: PHYSICAL HEADQUARTERS DISASTER (Bengaluru Campus Loss)
+1. Trigger: Fire, natural disaster, or extended civic disruption rendering Bengaluru HQ inaccessible.
+2. Immediate Remote Work Activation: COO Meera Reddy activates 100% WFH protocol. All Bengaluru staff transition to remote operation using laptops and Palo Alto VPN.
+3. Alternate Facility Operations: Critical hardware provisioning shifts to secondary IT office in Pune under SysAdmin Tarun Bajaj (EMP-1455); Hyderabad office acts as backup operations center.
+
+SCENARIO C: CATASTROPHIC RANSOMWARE OR DATABASE CORRUPTION
+1. Trigger: Unauthorized malicious encryption or logical data corruption of production databases.
+2. Isolation: CISO Karthik Natarajan executes emergency network kill-switch isolating compromised cluster subnets.
+3. Clean Recovery: Engineers rebuild Kubernetes clusters from clean IaC repositories; data is restored from immutable S3 snapshots to a clean point-in-time prior to infection.
+
+
+SECTION 5: TESTING & DRILL SCHEDULE
+
+- Bi-Annual DR Failover Simulations: Conducted every April and October. Simulates total primary cloud outage with full live traffic failover to DR region.
+- Quarterly Tabletop Exercises: Led by Incident Response Lead Manish Pandey (EMP-1351) testing executive command response to simulated ransomware and physical office loss scenarios.

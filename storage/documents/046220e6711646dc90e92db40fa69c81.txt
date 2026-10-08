@@ -1,0 +1,154 @@
+================================================================================
+DOCUMENT METADATA
+================================================================================
+Document ID:          DOC-NPC-006
+Title:                Nexora Enterprise Product Catalog & Technical Manual
+Owner:                Product Management
+Department:           Engineering / R&D / Cybersecurity / CS
+Version:              2.4 (Active)
+Effective Date:       2026-05-01
+Last Updated:         2026-09-15
+Status:               Active
+Access Level:         Internal / Sales / Customer Support / Engineering
+Classification:       Confidential
+Tags:                 product-catalog, nexora-cloud, nexora-secure, nexora-ai, pricing, SLAs, technical-specs
+================================================================================
+
+1. EXECUTIVE PRODUCT PORTFOLIO OVERVIEW
+Nexora Technologies Pvt. Ltd. develops and manages an integrated suite of eight core enterprise SaaS and cloud software products. This document outlines the technical architecture, operational SLAs, licensing tiers, platform dependencies, and lifecycle histories for each product.
+
+
+2. PRODUCT CATALOG DIRECTORY
+
+--------------------------------------------------------------------------------
+PRODUCT ID: PRD-101
+PRODUCT NAME: Nexora Cloud
+--------------------------------------------------------------------------------
+- Product Owner:        Priya Sharma (EMP-1008, Head of Engineering)
+- Primary Department:   Engineering (DPT-02)
+- Description:          Enterprise-grade Multi-Cloud Infrastructure Management and Orchestration Platform providing automated provisioning, cost optimization, and multi-tenant resource isolation.
+- Core Features:
+  * Multi-cloud resource abstraction (AWS, GCP, Azure, On-Prem OpenStack)
+  * Real-time cloud cost anomaly detection and automated rightsizing
+  * Infrastructure-as-Code (IaC) state management and policy enforcement
+  * Automated compliance auditing (SOC2, HIPAA, ISO 27001)
+- Pricing & Subscription Tiers:
+  * Standard Tier: $1,200/month (Up to 50 cloud nodes, 99.9% SLA)
+  * Enterprise Tier: $4,500/month (Unlimited nodes, multi-region failover, 99.99% SLA)
+  * Dedicated Private Tenant: Custom Quote (Billed annually, dedicated VPC isolation)
+- Technical Requirements & Supported Platforms:
+  * Supported OS: Ubuntu 20.04+, RHEL 8+, Windows Server 2022
+  * Container Runtime: Docker v24.0+, Kubernetes v1.26+
+  * Network Requirements: Minimum 1 Gbps egress with TLS 1.3 encryption
+- Operational SLA & Support Levels:
+  * SLA: 99.99% Monthly Uptime Guarantee with financial credit backing.
+  * Support Level: 24/7 Tier-3 Dedicated Support provided by Customer Support (DPT-07).
+- Limitations: Maximum 10,000 active concurrent cluster nodes per control plane instance.
+- Release History & Versioning:
+  * Version 1.0 (Deprecated 2024-03-01): Monolithic control plane. Discontinued.
+  * Version 2.2 (Historical 2025-06-15): Introduced AWS/GCP dual-cloud sync.
+  * Version 3.1 (Current Active): Kubernetes native, automated FinOps engine.
+- Frequently Asked Questions (FAQs):
+  Q: Does Nexora Cloud require root access on host instances?
+  A: No, Nexora Cloud operates via a non-privileged eBPF agent with read-only host metrics.
+
+--------------------------------------------------------------------------------
+PRODUCT ID: PRD-102
+PRODUCT NAME: Nexora Secure
+--------------------------------------------------------------------------------
+- Product Owner:        Karthik Natarajan (EMP-1072, CISO)
+- Primary Department:   Cybersecurity (DPT-09)
+- Description:          Zero-Trust Endpoint Security and Identity Threat Detection & Response (ITDR) suite featuring continuous access evaluation and micro-segmentation.
+- Core Features:
+  * Real-time endpoint detection and automated quarantine (EDR/XDR)
+  * Context-aware Risk-Based Authentication (RBA) engine
+  * Encrypted network micro-segmentation tunnel
+  * Automated credential exposure scanning across dark web sources
+- Pricing & Subscription Tiers:
+  * Business Plan: $8 per user/month (Minimum 100 seats)
+  * Enterprise Defense: $18 per user/month (Includes 24/7 Managed SOC monitoring)
+- Technical Requirements & Supported Platforms:
+  * Operating Systems: Windows 10/11 Enterprise, macOS 12+, Linux Kernel 5.4+
+  * Agent Footprint: < 150 MB RAM, < 2% CPU utilization under peak load
+- Operational SLA & Support Levels:
+  * SLA: 99.95% Availability; Threat Telemetry Ingestion Delay < 500 ms.
+  * Support Level: 24/7 Priority Tier-3 Response by Cybersecurity Ops (DPT-09).
+- Release History & Versioning:
+  * Version 1.5 (Deprecated 2025-01-10): Legacy signature-based engine.
+  * Version 2.0 (Current Active): AI-driven behavioral threat detection engine.
+
+--------------------------------------------------------------------------------
+PRODUCT ID: PRD-103
+PRODUCT NAME: Nexora Analytics
+--------------------------------------------------------------------------------
+- Product Owner:        Dr. Sanjay Verma (EMP-1090, Head of R&D)
+- Primary Department:   Research & Development (DPT-11) / Finance (DPT-04)
+- Description:          High-throughput distributed real-time data streaming and predictive business intelligence analytics engine.
+- Core Features:
+  * Sub-second SQL queries over petabyte-scale unstructured datasets
+  * Predictive revenue, churn, and cash flow forecasting models
+  * Interactive drag-and-drop executive dashboards
+  * Direct connectors for SAP, Salesforce, PostgreSQL, and Snowflake
+- Pricing & Subscription Tiers:
+  * Growth Plan: $2,000/month (Includes 5 TB ingested data/month)
+  * Scale Plan: $6,000/month (Includes 25 TB ingested data/month)
+- Operational SLA & Support Levels:
+  * SLA: 99.90% Dashboard Uptime; Query latency < 2 seconds for 95% of requests.
+
+--------------------------------------------------------------------------------
+PRODUCT ID: PRD-104
+PRODUCT NAME: Nexora AI Studio
+--------------------------------------------------------------------------------
+- Product Owner:        Dr. Sanjay Verma (EMP-1090, Head of R&D)
+- Primary Department:   Research & Development (DPT-11)
+- Description:          Low-code Enterprise Generative AI platform for fine-tuning, evaluating, deploying, and monitoring domain-specific Large Language Models (LLMs).
+- Core Features:
+  * Automated Retrieval-Augmented Generation (RAG) pipeline builder
+  * Model evaluation workbench (hallucination scoring, toxicity filtering)
+  * Multi-GPU inference serving with vLLM acceleration
+  * On-premises model deployment with air-gapped security mode
+- Pricing & Subscription Tiers:
+  * Developer Tier: $500/month (1 Compute Node, Shared GPU cluster)
+  * Enterprise AI Tier: $8,000/month (Dedicated 8x NVIDIA A100 GPU cluster)
+- Release History:
+  * Version 1.0 (Current Active): Integrated with NLP Engine v4 architecture.
+
+--------------------------------------------------------------------------------
+PRODUCT ID: PRD-105
+PRODUCT NAME: Nexora Desk
+--------------------------------------------------------------------------------
+- Product Owner:        David Lee (EMP-1050, Head of Customer Support)
+- Primary Department:   Customer Support (DPT-07)
+- Description:          Omnichannel customer support platform integrated with automated AI agent deflection and SLA management.
+- Core Features: Multi-channel ticketing (Email, Chat, Voice, API), SLA breach auto-escalation, AI response suggestions.
+- Pricing: $45 per agent/month. SLA: 99.95% uptime.
+
+--------------------------------------------------------------------------------
+PRODUCT ID: PRD-106
+PRODUCT NAME: Nexora Flow
+--------------------------------------------------------------------------------
+- Product Owner:        Priya Sharma (EMP-1008, Head of Engineering)
+- Primary Department:   Engineering (DPT-02)
+- Description:          Enterprise Business Process Automation (BPA) and Workflow Engine for cross-departmental approval chains.
+- Core Features: Visual workflow designer, BPMN 2.0 compliance, webhooks, automated audit trail.
+- Pricing: $1,500/instance/month.
+
+--------------------------------------------------------------------------------
+PRODUCT ID: PRD-107
+PRODUCT NAME: Nexora Vault
+--------------------------------------------------------------------------------
+- Product Owner:        Karthik Natarajan (EMP-1072, CISO)
+- Primary Department:   Cybersecurity (DPT-09)
+- Description:          Hardware-Backed Enterprise Secrets and Key Management System (KMS) for cryptographic keys, API tokens, and DB credentials.
+- Core Features: HSM integration, auto-rotation of secrets, zero-knowledge architecture.
+- Pricing: $3,000/month (Enterprise Vault Cluster).
+
+--------------------------------------------------------------------------------
+PRODUCT ID: PRD-108
+PRODUCT NAME: Nexora Insight
+--------------------------------------------------------------------------------
+- Product Owner:        Anjali Rao (EMP-1042, CMO)
+- Primary Department:   Marketing (DPT-06) / Sales (DPT-05)
+- Description:          Customer Data Platform (CDP) and market intelligence engine aggregating user telemetry across web, mobile, and SaaS applications.
+- Core Features: User cohort segmentation, campaign ROI tracking, predictive churn alerts.
+- Pricing: $2,500/month.

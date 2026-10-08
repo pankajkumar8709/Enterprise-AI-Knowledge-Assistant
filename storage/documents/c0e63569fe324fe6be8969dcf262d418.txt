@@ -1,0 +1,68 @@
+================================================================================
+DOCUMENT METADATA
+================================================================================
+Document ID:          DOC-NFE-013
+Title:                Corporate Finance, Expense Reimbursement, and Travel Policy
+Owner:                Finance & Accounting
+Department:           Finance (DPT-04)
+Author / Maintainer:  Sneha Iyer (EMP-1022, CFO) & Arjun Nair (EMP-1134, Sr. Payroll Manager)
+Approved By:          Meera Reddy (EMP-1080, COO)
+Version:              3.2 (Active)
+Effective Date:       2026-01-01
+Last Updated:         2026-07-20
+Status:               Active
+Access Level:         Internal / All Employees
+Classification:       Confidential
+Tags:                 finance, expenses, travel-allowance, hotel-per-diem, approval-thresholds, corporate-cards, inr-limits
+================================================================================
+
+1. TRAVEL ALLOWANCES & PER-DIEM RATES
+
+1.1 Domestic Travel within India (Bengaluru, Hyderabad, Pune, Delhi, Mumbai)
+- Air Travel: Economy Class for Individual Contributors (ICs) and Managers. Business Class permitted only for Vice Presidents (e.g., VP of Sales Vikram Singh EMP-1035) and C-Suite Executives (CFO Sneha Iyer, COO Meera Reddy). Bookings must be made at least 14 days in advance via Nexora Travel Desk.
+- Accommodation Capping:
+  * Tier 1 Cities (Bengaluru, Mumbai, Delhi NCR): Maximum ₹7,500 per night (excluding taxes).
+  * Tier 2 Cities (Pune, Hyderabad, others): Maximum ₹5,500 per night (excluding taxes).
+- Daily Meal Allowance (Per-Diem): Fixed rate of ₹2,000 per day. Receipts required for individual meals exceeding ₹500.
+- Local Transportation: Ola/Uber Premier or pre-booked airport cabs reimbursable at actuals.
+
+1.2 International Travel (Singapore APAC Hub & Global)
+- Accommodation Capping (Singapore): Maximum SGD $350 per night (Approximately ₹22,000/night).
+- Daily Meal Allowance (Singapore): Fixed rate of SGD $100 per day (Approximately ₹6,300/day).
+- Travel Insurance: Comprehensive global travel insurance is auto-provisioned by Finance Lead Arjun Nair (EMP-1134) upon flight confirmation.
+
+
+2. EXPENSE SUBMISSION & REIMBURSEMENT WORKFLOW
+
+2.1 Submission Guidelines & SLAs
+- Timeline: Expenses must be submitted via the Nexora HRMS Expense Module within 30 calendar days of the expense date or travel completion. Submissions older than 60 days will be automatically rejected and deemed non-reimbursable.
+- Itemized Invoices: Valid GST/Tax invoices displaying Nexora Technologies Pvt. Ltd.'s corporate GSTIN are mandatory for all claims exceeding ₹200.
+- Reimbursement Processing SLA: Approved claims are disbursed bi-weekly alongside the regular payroll cycle by Senior Payroll Manager Arjun Nair (EMP-1134).
+
+
+3. FINANCIAL APPROVAL HIERARCHY & AUTHORIZATION THRESHOLDS
+
+All corporate expenses, purchase reimbursements, and client entertainment claims must adhere strictly to the following authorization limits:
+
++-----------------------------------+---------------------------------------------------------------------------------------------------+
+| Expense Amount (INR)              | Required Approving Authority                                                                      |
++-----------------------------------+---------------------------------------------------------------------------------------------------+
+| Up to ₹50,000                     | Direct Manager Approval (e.g., Head of Engineering Priya Sharma EMP-1008 for engineering staff).  |
++-----------------------------------+---------------------------------------------------------------------------------------------------+
+| ₹50,001 to ₹2,00,000              | Department Head Approval (e.g., VP of Sales Vikram Singh EMP-1035, IT Head Amit Patel EMP-1015). |
++-----------------------------------+---------------------------------------------------------------------------------------------------+
+| ₹2,00,001 to ₹10,00,000           | Chief Financial Officer (Sneha Iyer, EMP-1022) OR Chief Operating Officer (Meera Reddy, EMP-1080).|
++-----------------------------------+---------------------------------------------------------------------------------------------------+
+| Greater than ₹10,00,000           | Dual Sign-Off: CFO Sneha Iyer AND Chief Executive Officer (CEO).                                  |
++-----------------------------------+---------------------------------------------------------------------------------------------------+
+
+
+4. CORPORATE CREDIT CARDS & CLIENT ENTERTAINMENT
+
+4.1 Corporate Card Eligibility & Governance
+- Corporate Credit Cards are issued exclusively to Department Heads, C-Suite Officers, and designated Enterprise Account Executives (e.g., John D'Souza EMP-1250) for business development.
+- Monthly Reconciliation: Cardholders must upload receipts and perform monthly expense coding in the Finance Portal by the 5th of each month. Senior Accountant Deepa Joshi (EMP-1135) audits all corporate card statements.
+
+4.2 Client Entertainment & Meals
+- Spend Capping: Client entertainment is capped at ₹5,000 per head per event. Total spend exceeding ₹25,000 per client event requires prior written pre-approval from VP of Sales Vikram Singh (EMP-1035).
+- Alcohol Expenditure: Permitted only during client dinners, subject to local state regulations, and capped at 30% of the total meal bill.

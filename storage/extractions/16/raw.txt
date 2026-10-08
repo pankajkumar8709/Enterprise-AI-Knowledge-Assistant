@@ -1,0 +1,66 @@
+================================================================================
+DOCUMENT METADATA
+================================================================================
+Document ID:          DOC-NPP-014
+Title:                Enterprise Procurement & Vendor Management Policy
+Owner:                Procurement
+Department:           Procurement (DPT-12)
+Author / Maintainer:  Rajesh Khanna (EMP-1099, Head of Procurement) & Ramesh Babu (EMP-1499, Vendor Risk Specialist)
+Approved By:          Sneha Iyer (EMP-1022, CFO)
+Version:              2.3 (Active)
+Effective Date:       2026-02-01
+Last Updated:         2026-08-30
+Status:               Active
+Access Level:         Internal / Management & Procurement Staff
+Classification:       Confidential
+Tags:                 procurement, vendor-onboarding, purchase-orders, quotation-thresholds, vendor-risk, emergency-procurement
+================================================================================
+
+SECTION 1: VENDOR ONBOARDING & RISK EVALUATION
+
+1.1 Vendor Registration Workflow
+All external vendors providing hardware, software, cloud infrastructure, or consulting services to Nexora Technologies Pvt. Ltd. must undergo formal registration managed by Vendor Risk Specialist Ramesh Babu (EMP-1499).
+
+1.2 Vendor Due Diligence & Security Vetting
+Before issuing a Purchase Order (PO), the vendor must submit:
+- Corporate Registration & Tax Identification (PAN, GSTIN in India; UEN in Singapore).
+- SOC 2 Type II Report or ISO 27001 Certification (Mandatory for all SaaS/Cloud software vendors).
+- Cybersecurity Review Clearance: Evaluated and signed off by CISO Karthik Natarajan (EMP-1072) to ensure compliance with Zero-Trust guidelines.
+- Anti-Bribery & Corruption Declaration: In compliance with the Foreign Corrupt Practices Act (FCPA) and local anti-corruption laws, vetted by General Counsel Neha Gupta (EMP-1065).
+
+
+SECTION 2: PROCUREMENT THRESHOLDS & QUOTATION RULES
+
+Procurement requisitions must adhere to competitive bidding rules based on total contract value:
+
++-----------------------------------+-------------------------+---------------------------------------------------------------------------------+
+| Requisition Value Threshold (INR) | Minimum Bids Required   | Required Approval Level                                                         |
++-----------------------------------+-------------------------+---------------------------------------------------------------------------------+
+| Up to ₹1,00,000                   | Single Direct Quote     | Line Manager & Direct Department Head Approval.                                 |
++-----------------------------------+-------------------------+---------------------------------------------------------------------------------+
+| ₹1,00,001 to ₹5,00,000            | Minimum 3 Competitive   | Approval by Head of Procurement Rajesh Khanna (EMP-1099).                       |
+|                                   | Written Quotations      |                                                                                 |
++-----------------------------------+-------------------------+---------------------------------------------------------------------------------+
+| ₹5,00,001 to ₹25,00,000           | Minimum 3 Competitive   | Vendor Risk Clearance (Ramesh Babu EMP-1499) + Approval by CFO Sneha Iyer       |
+|                                   | Formal Bids             | (EMP-1022).                                                                     |
++-----------------------------------+-------------------------+---------------------------------------------------------------------------------+
+| Greater than ₹25,00,000           | Formal Sealed RFP /     | Board Procurement Committee Sign-Off + Dual Approval: CFO Sneha Iyer & COO      |
+|                                   | Tender Process          | Meera Reddy (EMP-1080).                                                         |
++-----------------------------------+-------------------------+---------------------------------------------------------------------------------+
+
+
+SECTION 3: PURCHASE REQUEST (PR) TO PURCHASE ORDER (PO) WORKFLOW
+
+1. Requisition Initiation: Requester creates a Purchase Request (PR) in the Procurement System specifying business justification, department allocation code, and budget availability.
+2. Sourcing Review: Procurement Specialist Ramesh Babu verifies vendor qualifications and quotation comparison matrix.
+3. PO Generation: Upon reaching required approval thresholds, Head of Procurement Rajesh Khanna (EMP-1099) issues the official binding Purchase Order (PO).
+4. Goods Received Note (GRN): Upon delivery of hardware/services, IT Head Amit Patel (EMP-1015) or requesting manager signs off the GRN in the portal.
+5. Invoice Matching & Payment: Senior Accountant Deepa Joshi (EMP-1135) performs 3-way matching (PO + GRN + Vendor Invoice). Standard Payment Terms: Net 45 Days from invoice receipt date.
+
+
+SECTION 4: EMERGENCY PROCUREMENT PROTOCOL
+
+In the event of a Severity 0 / Severity 1 system outage, data center hardware failure, or active security breach:
+- Emergency Override: Head of IT Amit Patel (EMP-1015) or CISO Karthik Natarajan (EMP-1072) may bypass the 3-quote waiting period to procure critical hardware, software patches, or external forensic incident response services.
+- Verbal Sign-off: Requires verbal approval from COO Meera Reddy (EMP-1080) or CFO Sneha Iyer (EMP-1022).
+- Retroactive Documentation: Formal Purchase Requisition and retroactive PO must be generated within 48 hours post-incident containment.

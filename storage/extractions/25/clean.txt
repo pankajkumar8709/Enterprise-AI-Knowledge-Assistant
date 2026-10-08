@@ -1,0 +1,90 @@
+DOCUMENT METADATA
+Document ID: DOC-NHR-005
+Title: HR Policies: Lifecycle, Performance, and Employee Governance
+Owner: Human Resources
+Department: Human Resources
+Version: 4.2 (Active)
+Effective Date: 2026-02-01
+Last Updated: 2026-02-15
+Status: Active
+Access Level: Restricted / HR & People Managers
+Classification: Confidential
+Tags: recruitment, onboarding, probation, confirmation, promotion, performance-review, pip, internal-mobility, termination
+
+1. RECRUITMENT AND ONBOARDING
+
+1.1 Candidate Selection & Sourcing
+All hiring across Nexora Technologies Pvt. Ltd. must be initiated via an approved Requisition Form on the HRMS. Talent Acquisition (Lead: Maya Lin, EMP-1120) manages candidate sourcing. All offers require sign-off from the Department Head and HR Head Rahul Desai (EMP-1001).
+
+1.2 Background Verification (BGV)
+Every incoming employee undergoes mandatory third-party Background Verification (BGV) covering:
+- Educational degree authenticity.
+- Last 5 years of employment verification.
+- Criminal background search and identity verification.
+- Any falsification of records discovered during BGV results in immediate revocation of the offer or summary termination without notice.
+
+2. PROBATION AND CONFIRMATION PROCESS
+
+2.1 Probationary Period
+- Standard Duration: All newly hired employees undergo a mandatory 6-month probation period starting from their official joining date.
+- Review Touchpoints: Direct managers must conduct formal documented performance check-ins at 30 days, 90 days, and 150 days.
+
+2.2 Confirmation Evaluation Workflow
+At day 150 of probation, the HRMS triggers a Confirmation Review Form to the direct manager.
+- Option A: Confirmation - Recommended if employee meets or exceeds performance standards. Upon sign-off by Department Head, a Confirmation Letter is issued. Notice period changes from 15 days to 60 days.
+- Option B: Extension - Probation may be extended for a maximum of 3 months if performance needs improvement. A written Performance Improvement Agreement must be attached.
+- Option C: Separation - If performance is significantly below standards, service is discontinued with 15 days notice (or salary in lieu thereof).
+
+3. PERFORMANCE REVIEWS AND SALARY REVISIONS
+
+3.1 Appraisal Cycle Schedule
+- Annual Appraisal Cycle: Conducted annually in March. Evaluates performance across the preceding April 1 to March 31 period.
+- Mid-Year Touchpoint: Conducted in September (Focuses on OKR realignment without compensation changes).
+
+3.2 Salary Revisions & Increment Framework
+- Eligibility: Employees confirmed on or before December 31 of the preceding year are eligible for annual salary revisions.
+- Rating-Linked Increment Bands:
+* Rating 5 (Exceeds All Expectations): 15% - 20% Increase
+* Rating 4 (Consistently Exceeds): 10% - 14% Increase
+* Rating 3 (Meets Expectations): 5% - 9% Increase
+* Rating 1 & 2 (Needs Improvement): 0% (Ineligible for increment)
+
+4. PROMOTIONS & INTERNAL MOBILITY
+
+4.1 Promotion Criteria
+Promotions are evaluated during the March annual appraisal cycle. Eligibility requirements:
+- Minimum Tenure: 18 months in the current designation/grade.
+- Performance Track Record: Rating of 4 or 5 in the latest annual appraisal, and no rating below 3 in the preceding 2 years.
+- Executive Approval: Approved by Department Head and Head of HR (Rahul Desai, EMP-1001).
+
+4.2 Internal Job Posting (IJP) & Mobility Rules
+- Eligibility: Employees who have completed 18 months in their current role may apply for internal openings published on the IJP portal.
+- Application Flow: Employee submits application via IJP portal -> Automated alert sent to current manager -> Interview conducted by hiring manager -> If selected, transition occurs within 30 calendar days.
+
+5. EMPLOYEE RECOGNITION & REWARDS
+
+5.1 Monthly & Quarterly Awards
+- Spot Award: Cash prize of ₹10,000 / SGD $200 awarded by managers for exceptional project delivery.
+- Star of the Quarter: Awarded at the department level with a trophy and cash prize of ₹50,000 / SGD $800.
+
+6. DISCIPLINARY PROCEDURES & PERFORMANCE IMPROVEMENT PLANS (PIP)
+
+6.1 Performance Improvement Plan (PIP) Mechanics
+- Trigger: Assigned when an employee receives a Rating 1 or 2 during performance reviews, or displays persistent performance failure.
+- Duration: Exactly 60 calendar days.
+- Process: Direct manager drafts a weekly milestone plan reviewed by HR Business Partner Aisha Khan (EMP-1402). Weekly progress reviews are documented in HRMS.
+- PIP Outcomes:
+* Pass: Employee achieves target metrics and resumes regular status.
+* Fail: Employee service is terminated for cause under poor performance grounds with 30 days severance pay.
+
+7. RESIGNATION, TERMINATION, AND SEPARATION
+
+7.1 Separation Categories
+- Voluntary Resignation: Employee initiates exit via HRMS. 60-day notice served.
+- Involuntary Termination for Cause: Initiated by company due to gross misconduct, POSH breach, fraud, or security violation. Zero notice period, zero severance.
+- Termination for Performance: Initiated post PIP failure with 30 days notice or pay in lieu.
+
+7.2 Exit Interview & Full & Final (F&F) Settlement
+- Exit Interview: Mandatory session conducted by HRBP within the final 5 days of notice period to gather institutional feedback.
+- Asset Offboarding: IT access revoked at 6:00 PM on the Last Working Day (LWD). Laptops returned to IT Head Amit Patel (EMP-1015).
+- F&F Payment: Disbursed by Senior Payroll Manager Arjun Nair (EMP-1134) within 45 days of LWD.

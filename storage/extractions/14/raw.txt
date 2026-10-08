@@ -1,0 +1,192 @@
+================================================================================
+DOCUMENT METADATA
+================================================================================
+Document ID:          DOC-CSK-016
+Title:                Customer Support Knowledge Base & Troubleshooting Matrix
+Owner:                Customer Support
+Department:           Customer Support (DPT-07)
+Author / Maintainer:  David Lee (EMP-1050, Head of Customer Support) & Wei Chen (EMP-1201, L2 Support Lead)
+Version:              3.1 (Active)
+Effective Date:       2026-05-01
+Last Updated:         2026-09-25
+Status:               Active
+Access Level:         Internal / All CS Agents & Technical Staff
+Classification:       Internal
+Tags:                 customer-support, knowledge-base, ticket-priorities, slas, troubleshooting, escalation-matrix, scenarios
+================================================================================
+
+# 1. CUSTOMER SUPPORT PROCESS & SERVICE LEVEL AGREEMENTS (SLAs)
+
+## 1.1 Support Channels & Intake
+Nexora Customer Support operates a 24/7/365 global managed support model out of the APAC Regional Hub in Singapore, supported by engineering pods in Bengaluru and Hyderabad. Support requests are ingested via:
+- Customer Portal: `https://support.nexora.com`
+- Email Ingestion: `support@nexora.com` (Auto-creates ticket in Nexora Desk PRD-105)
+- In-App AI Chatbot: Powered by CS Chatbot AI (PRJ-2003, Lead: Wei Chen EMP-1201)
+- Hotline (P1 Emergency): +65-6800-NEXORA (Singapore) / +91-80-NEXORA-CS (India)
+
+## 1.2 Ticket Priority & SLA Matrix
+
+| Priority Level | Criteria & Business Impact | First Response SLA | Workaround SLA | Resolution SLA | Escalation Target |
+|---|---|---|---|---|---|
+| P1 - Critical Outage | Complete production outage of core products (Nexora Cloud PRD-101, Nexora Secure PRD-102) affecting all users. | <= 15 Minutes | <= 1 Hour | <= 4 Hours | Head of CS David Lee (EMP-1050) & CISO/Eng Head |
+| P2 - High Impact | Primary feature degraded (e.g., Nexora Analytics PRD-103 dashboard slow, webhook failures) without full loss of service. | <= 30 Minutes | <= 4 Hours | <= 12 Hours | L2 Support Lead Wei Chen (EMP-1201) |
+| P3 - Moderate | Non-critical bug or single user account issue; workaround available. | <= 2 Hours | <= 12 Hours | <= 48 Hours | L1 Support Lead / Senior Agent |
+| P4 - Low / Request | General product query, feature request, documentation clarification. | <= 8 Hours | N/A | <= 5 Business Days | L1 Agent Chloe Tan (EMP-1150) |
+
+## 1.3 Escalation Workflow
+1. Tier 1 (L1 Support): Frontline intake handled by L1 Agents (e.g., Chloe Tan, EMP-1150). Focuses on account access, password resets, basic configuration, and ticket triage.
+2. Tier 2 (L2 Support): Technical troubleshooting handled by L2 Support Lead Wei Chen (EMP-1201). Focuses on API integration, log analysis, database sync, and complex product configuration.
+3. Tier 3 (Engineering Pods): Bugs requiring code changes or infrastructure patches are escalated to Product Engineering leads (e.g., Rohit Verma EMP-1105 for Nexora Cloud; Kiran Patel EMP-1350 for Nexora Secure).
+
+
+# 2. REFUND AND SERVICE CREDIT POLICY
+
+- Service Level Agreement (SLA) Credits: If a product fails to meet its monthly uptime SLA (e.g., 99.99% for Nexora Cloud PRD-101), affected enterprise customers are eligible for a service credit.
+- Credit Capping: Maximum 15% credit of the monthly subscription fee for uptime between 99.0% and 99.98%; 30% credit for uptime below 99.0%.
+- Approval Matrix: Refunds or credits up to $1,000 USD require approval from L2 Lead Wei Chen (EMP-1201). Credits exceeding $1,000 USD require written authorization from Head of CS David Lee (EMP-1050) and CFO Sneha Iyer (EMP-1022).
+
+
+# 3. REALISTIC CUSTOMER SUPPORT SCENARIOS & TROUBLESHOOTING GUIDES (1 to 50)
+
+### Category A: Authentication, SSO & Account Issues (Scenarios 1–10)
+- Scenario 1: Customer unable to log in via SAML 2.0 SSO on Nexora Cloud (PRD-101).
+  - Cause: Identity Provider (IdP) X.509 certificate expired.
+  - Resolution: Guide customer admin to upload renewed public X.509 certificate into Nexora Admin Console -> SSO Settings.
+- Scenario 2: User receives "HTTP 401 Unauthorized" when calling Nexora AI Studio (PRD-104) APIs.
+  - Cause: API Key expired or missing `Bearer` prefix in HTTP Authorization header.
+  - Resolution: Verify API key validity in Developer Portal; instruct client to format header as `Authorization: Bearer <API_KEY>`.
+- Scenario 3: Enterprise admin locked out due to 5 consecutive failed MFA attempts on Nexora Secure (PRD-102).
+  - Cause: Out-of-sync TOTP software token or blocked YubiKey hardware token.
+  - Resolution: L2 Lead Wei Chen verifies admin identity via phone callback, triggers emergency MFA reset email.
+- Scenario 4: User email change request across tenant accounts.
+  - Resolution: Require written authorization from customer's designated Account Owner; execute email migration script via L2 console.
+- Scenario 5: SAML response assertions missing mandatory `email` attribute.
+  - Resolution: Advise customer Okta/Azure AD admin to add `AttributeStatement` mapping `user.email` -> `email`.
+- Scenario 6: Customer portal displaying "Session Invalidated - Multiple Concurrent IP Logins".
+  - Cause: Customer user switching active VPN connections causing sudden IP address drift.
+  - Resolution: Adjust tenant session stickiness threshold or whitelist corporate egress IP range.
+- Scenario 7: OAuth2 Refresh Token expiring prematurely after 1 hour.
+  - Cause: Client application improperly requesting `prompt=login` on token refresh calls.
+  - Resolution: Update client codebase to use standard `grant_type=refresh_token`.
+- Scenario 8: User unable to reset password due to expired reset link.
+  - Resolution: Password reset links auto-expire after 15 minutes. Re-issue fresh link via Nexora Desk console.
+- Scenario 9: Multi-Factor Authentication prompt failing on mobile app.
+  - Cause: Device clock drift > 30 seconds.
+  - Resolution: Instruct user to enable automatic network time synchronization on mobile device.
+- Scenario 10: Role-Based Access Control (RBAC) permission denied for "Read-Only Auditor" role.
+  - Cause: OPA policy restriction missing `audit:read` scope.
+  - Resolution: Escalate to Security Analyst Kiran Patel (EMP-1350) to update OPA Rego policy bundle.
+
+### Category B: Nexora Cloud & Infrastructure Infrastructure (Scenarios 11–20)
+- Scenario 11: High latency (> 2,000 ms) reported on Nexora Cloud control plane instances.
+  - Cause: Regional cloud node over-subscription in AWS `ap-south-1`.
+  - Resolution: Trigger automated pod autoscaling rule; redirect control plane traffic to secondary AZ.
+- Scenario 12: Docker container deployment stuck in `CrashLoopBackOff` on Nexora Cloud.
+  - Cause: OOMKilled (Out of Memory) due to default memory limit cap of 512 MB.
+  - Resolution: Assist client in adjusting resource limits in `nexora-manifest.yaml` to 2 GB RAM.
+- Scenario 13: Customer Terraform provider failing with "Error: Provider Version Incompatible".
+  - Cause: Customer using deprecated Nexora Terraform Provider v1.2.
+  - Resolution: Guide customer to upgrade to Active Provider v3.0 supporting OpenAPI 3.0 specs.
+- Scenario 14: Private VPC peering connection dropping packets intermittently.
+  - Cause: Subnet CIDR overlap between customer VPC (`10.0.0.0/16`) and Nexora Cloud default subnet.
+  - Resolution: Provision secondary non-overlapping CIDR block (`172.16.0.0/16`) via IT Engineer Vikram Joshi (EMP-1456).
+- Scenario 15: Automated snapshot backup failing on Nexora Cloud managed PostgreSQL database.
+  - Cause: Database lock contention during peak transaction hours.
+  - Resolution: Reschedule snapshot window to non-peak hours (2:00 AM UTC) and enable WAL continuous archiving.
+- Scenario 16: Customer unable to provision compute nodes in Singapore region (`asia-southeast1`).
+  - Cause: Tenant subscription quota limit reached (Max 50 nodes on Standard Plan).
+  - Resolution: Refer customer to Sales AE John D'Souza (EMP-1250) to upgrade to Enterprise Plan.
+- Scenario 17: Ingress TLS certificate auto-renewal failure on custom domain.
+  - Cause: Missing Let's Encrypt CAA DNS record on customer DNS zone.
+  - Resolution: Instruct client to add DNS CAA record allowing `letsencrypt.org`.
+- Scenario 18: Storage volume expansion request hung at 99%.
+  - Cause: File system rescan required on underlying Linux host.
+  - Resolution: L2 Engineer executes `xfs_growfs` remotely on host partition.
+- Scenario 19: High network egress charges flagged on customer invoice.
+  - Cause: Uncompressed log streaming to external S3 bucket.
+  - Resolution: Enable Gzip log compression on Nexora Cloud agent daemon.
+- Scenario 20: Disaster Recovery failover test failing to route traffic to backup cluster.
+  - Cause: Stale DNS TTL setting on Route 53 CNAME record.
+  - Resolution: Lower DNS TTL from 86400 seconds to 60 seconds.
+
+### Category C: Cybersecurity & Nexora Secure Issues (Scenarios 21–30)
+- Scenario 21: Nexora Secure (PRD-102) endpoint agent flagging legitimate internal developer tool as malware.
+  - Cause: False positive heuristic match on custom compiled Go binary.
+  - Resolution: Escalate binary hash (SHA-256) to CISO Karthik Natarajan (EMP-1072) for global allowlist inclusion.
+- Scenario 22: Endpoint agent causing high CPU utilization (> 80%) on macOS Sonoma laptops.
+  - Cause: Conflict with legacy third-party antivirus file scanner.
+  - Resolution: Issue uninstallation script for legacy scanner; update Nexora Secure agent to v2.0.4.
+- Scenario 23: Nexora Vault (PRD-107) secret rotation failing for database credentials.
+  - Cause: Vault service account lacking `ALTER USER` administrative privileges in target database.
+  - Resolution: Grant master secret manager privileges to Vault service role.
+- Scenario 24: Micro-segmentation network tunnel disconnecting every 30 minutes.
+  - Cause: UDP Port 4500 blocked by customer corporate gateway firewall.
+  - Resolution: Advise customer firewall admin to open outbound UDP 4500 and 500 for IPsec NAT-Traversal.
+- Scenario 25: USB mass storage device blocked notification on developer workstation.
+  - Resolution: Clarify InfoSec Policy DOC-NIS-011 v3.0 (USB hard block active); guide user to submit IT Exception Request if business justified.
+- Scenario 26: Vulnerability scanner reporting outdated OpenSSL library on host agent.
+  - Resolution: Push automated MDM patch bundle containing OpenSSL 3.0.12 update.
+- Scenario 27: Dark web credential alert notification sent to customer security team.
+  - Resolution: Confirm automated credential invalidation; trigger forced password and MFA reset for compromised user.
+- Scenario 28: Zero-Trust network proxy rejecting traffic from Linux workstation.
+  - Cause: Missing local device posture health check certificate.
+  - Resolution: Re-enroll workstation in Microsoft Intune / Jamf Pro MDM profile via SysAdmin Tarun Bajaj (EMP-1455).
+- Scenario 29: Customer unable to export audit logs to external Splunk SIEM.
+  - Cause: Syslog TLS port 6514 handshake timeout.
+  - Resolution: Verify customer SIEM public IP and re-issue mutual TLS client certificate.
+- Scenario 30: Ransomware protection behavioral guard blocking local file batch rename script.
+  - Resolution: Guide user to digitally sign local automation scripts using corporate internal CA certificate.
+
+### Category D: Analytics, AI Studio & Data Pipelines (Scenarios 31–40)
+- Scenario 31: Nexora Analytics (PRD-103) SQL query timing out after 60 seconds.
+  - Cause: Query scanning 50+ TB of unindexedClickHouse telemetry tables.
+  - Resolution: Assist user in adding primary partition key filters (`date`, `tenant_id`) to SQL query.
+- Scenario 32: Nexora AI Studio (PRD-104) model fine-tuning job failing with "CUDA Out of Memory".
+  - Cause: Batch size set too high (64) for single NVIDIA A100 GPU instance.
+  - Resolution: Advise user to decrease training batch size to 16 or enable gradient accumulation.
+- Scenario 33: RAG pipeline in Nexora AI Studio returning hallucinated or out-of-date answers.
+  - Cause: Vector database embeddings index not synchronized post-document ingestion.
+  - Resolution: Trigger manual re-indexing job in RAG pipeline builder console.
+- Scenario 34: Data pipeline ingestion delay on Apache Kafka broker topic `nexora.telemetry.metrics`.
+  - Cause: Consumer group lag due to insufficient partition count.
+  - Resolution: Scale topic partitions from 12 to 32 (Executed by Principal Architect Suresh Kumar EMP-1101).
+- Scenario 35: Salesforce CRM connector failing to import lead records into Nexora Insight (PRD-108).
+  - Cause: Salesforce OAuth REST API daily rate limit exceeded.
+  - Resolution: Adjust sync frequency from 5 minutes to hourly batch synchronization.
+- Scenario 36: Dashboard chart rendering blank for non-admin users in Nexora Analytics.
+  - Cause: Missing row-level security (RLS) policy for assigned user group.
+  - Resolution: Configure tenant data access filter in Dashboard Permission Matrix.
+- Scenario 37: Custom LLM deployment failing health check probe in Nexora AI Studio.
+  - Cause: Model warm-up load time exceeding default 120-second liveness probe timeout.
+  - Resolution: Increase `initialDelaySeconds` to 300 in deployment specification.
+- Scenario 38: CSV data export failing for files larger than 1 GB.
+  - Resolution: Direct user to use asynchronous S3/GCS bucket export feature rather than direct browser download.
+- Scenario 39: Model toxicity filter dropping non-malicious technical medical documents.
+  - Cause: Overly sensitive default keyword filter threshold.
+  - Resolution: Adjust toxicity confidence score threshold from 0.5 to 0.85 in AI Studio safety settings.
+- Scenario 40: PyTorch model inference latency exceeding 1,000 ms per token.
+  - Cause: Missing vLLM execution engine acceleration.
+  - Resolution: Re-deploy model serving container using official Nexora vLLM runtime image.
+
+### Category E: Billing, Subscription & General SLA Inquiries (Scenarios 41–50)
+- Scenario 41: Customer disputed charge for overage compute hours on monthly invoice.
+  - Resolution: Verify CloudWatch ingestion metrics with Senior Accountant Deepa Joshi (EMP-1135); issue one-time goodwill credit if metric anomaly confirmed.
+- Scenario 42: Enterprise customer requesting GST/Tax invoice modification.
+  - Resolution: Forward correct GSTIN details to Finance Manager Arjun Nair (EMP-1134); re-issue corrected invoice within 48 hours.
+- Scenario 43: Payment failure on auto-recurring credit card charge.
+  - Cause: Bank 3D-Secure authentication requirement failed.
+  - Resolution: Send secure manual payment link via Stripe/Razorpay portal to customer billing contact.
+- Scenario 44: Request for SOC 2 Type II report and ISO 27001 audit certificate.
+  - Resolution: Send standardized NDA link; upon signature, auto-dispatch compliance bundle prepared by Kiran Patel (EMP-1350).
+- Scenario 45: Account downgrade request from Enterprise to Growth tier.
+  - Resolution: Verify contract commitment period with VP of Sales Vikram Singh (EMP-1035); process downgrade effective next billing cycle.
+- Scenario 46: Customer requesting dedicated private tenant isolation for Nexora Flow (PRD-106).
+  - Resolution: Route request to Sales AE John D'Souza (EMP-1250) for custom single-tenant pricing quote.
+- Scenario 47: Unused subscription seat licensing refund request.
+  - Resolution: Cite Subscription Policy (seats non-refundable mid-term); offer seat re-assignment to alternate team members.
+- Scenario 48: Currency conversion discrepancy on Singapore invoice (SGD vs. USD).
+  - Resolution: Confirm contract billing currency specification with Legal Counsel Neha Gupta (EMP-1065); adjust exchange rate offset.
+- Scenario 49: Request for custom data retention period extension from 30 days to 1 year.
+  - Resolution: Provision cold-storage S3 vault bucket and update contract billing schedule.
+- Scenario 50: Emergency service suspension due to unpaid invoice past 60 days overdue.
+  - Resolution: Upon payment receipt sign-off by CFO Sneha Iyer (EMP-1022), restore tenant access within 15 minutes.

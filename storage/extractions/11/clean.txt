@@ -1,0 +1,462 @@
+DOCUMENT METADATA
+Document ID: DOC-FAQ-019
+Title: Nexora Enterprise Employee FAQ & Knowledge Portal
+Owner: Human Resources
+Department: Human Resources (DPT-01)
+Author / Maintainer: Rahul Desai (EMP-1001, Head of HR) & Aisha Khan (EMP-1402, HRBP)
+Version: 4.0 (Active)
+Effective Date: 2026-10-01
+Status: Active
+Access Level: Internal / All Employees
+Classification: Internal
+Tags: faq, employee-questions, hr, it, security, leaves, expenses, directory
+
+[Q001] How many annual leave days do I get?
+[A001] Under the active Leave Policy (DOC-NLA-002 v2.0 effective April 1, 2026), full-time employees receive 24 days of Annual Leave per calendar year, accrued at 2.0 days per completed month.
+
+[Q002] Who approves expenses above ₹50,000?
+[A002] According to the Finance Policy (DOC-NFE-013), expenses between ₹50,001 and ₹2,00,000 require approval from your Department Head. Expenses exceeding ₹2,00,000 require approval from CFO Sneha Iyer (EMP-1022).
+
+[Q003] Who is the head of Engineering?
+[A003] Priya Sharma (EMP-1008) is the Head of Engineering.
+
+[Q004] Who manages the Orion Cloud project?
+[A004] Senior Backend Engineer Rohit Verma (EMP-1105) is the Project Manager for Project Orion Cloud (PRJ-2011).
+
+[Q005] What should I do if my laptop is stolen?
+[A005] Notify the IT Security Hotline (+91-80-NEXORA-SEC) or email security@nexora.com within 2 hours. IT SysAdmin Tarun Bajaj (EMP-1455) will issue a remote wipe command via Jamf/Intune, and Incident Lead Manish Pandey (EMP-1351) will isolate your accounts.
+
+[Q006] How many days can I work remotely?
+[A006] Under the 3/2 Hybrid Work Policy (DOC-NHB-001), you can work remotely up to 2 days per week (typically Monday and Friday), while working 3 mandatory days in office (Tuesday, Wednesday, Thursday).
+
+[Q007] Who should I contact for VPN problems?
+[A007] Contact the IT Helpdesk via Slack (#it-helpdesk) or email it-support@nexora.com. Escalations are handled by Senior Systems Administrator Tarun Bajaj (EMP-1455).
+
+[Q008] Which department owns Nexora Secure?
+[A008] The Cybersecurity Department (DPT-09), headed by CISO Karthik Natarajan (EMP-1072), owns Nexora Secure (PRD-102).
+
+[Q009] Who is responsible for cybersecurity incidents?
+[A009] The Cybersecurity Incident Response Team (CSIRT), led by CISO Karthik Natarajan (EMP-1072) and Incident Response Lead Manish Pandey (EMP-1351), handles all security incidents.
+
+[Q010] What is the notice period?
+[A010] Confirmed employees must serve a 60-day notice period upon resignation. Employees on probation must serve a 15-day notice period.
+
+[Q011] Who is the Head of HR?
+[A011] Rahul Desai (EMP-1001) is the Head of Human Resources.
+
+[Q012] Who is the CFO of Nexora?
+[A012] Sneha Iyer (EMP-1022) is the Chief Financial Officer.
+
+[Q013] Who is the CISO of Nexora?
+[A013] Karthik Natarajan (EMP-1072) is the Chief Information Security Officer.
+
+[Q014] Who is the COO of Nexora?
+[A014] Meera Reddy (EMP-1080) is the Chief Operating Officer.
+
+[Q015] Who is the General Counsel / Head of Legal?
+[A015] Neha Gupta (EMP-1065) is the General Counsel.
+
+[Q016] Who is the Head of IT?
+[A016] Amit Patel (EMP-1015) is the Head of Information Technology.
+
+[Q017] Who is the VP of Sales?
+[A017] Vikram Singh (EMP-1035) is the VP of Sales.
+
+[Q018] Who is the CMO / Head of Marketing?
+[A018] Anjali Rao (EMP-1042) is the Chief Marketing Officer.
+
+[Q019] Who is the Head of Customer Support?
+[A019] David Lee (EMP-1050) is the Head of Customer Support, based in Singapore.
+
+[Q020] Who is the Head of R&D?
+[A020] Dr. Sanjay Verma (EMP-1090) is the Head of Research & Development.
+
+[Q021] Who is the Head of Procurement?
+[A021] Rajesh Khanna (EMP-1099) is the Head of Procurement.
+
+[Q022] What is the probation period for new employees?
+[A022] The standard probation period is 6 months for IC and managerial roles, and 9 months for Vice President and executive roles.
+
+[Q023] How many casual leaves do I get per year?
+[A023] Employees receive 8 days of Casual Leave (CL) per calendar year, fully credited on January 1st.
+
+[Q024] How many sick leaves do I get per year?
+[A024] Employees receive 12 days of Sick Leave (SL) per year, accrued at 1.0 day per completed month.
+
+[Q025] Can I carry forward unused Casual Leave or Sick Leave?
+[A025] No. Both Casual Leave and Sick Leave lapse completely on December 31st and cannot be carried forward.
+
+[Q026] How many Annual Leave days can I carry forward to the next year?
+[A026] Under Policy v2.0 (DOC-NLA-002), you can carry forward a maximum of 10 unused Annual Leave days to the next calendar year.
+
+[Q027] What is the maximum number of Annual Leave days that can be encashed at exit?
+[A027] Employees can encash up to 30 days of unused Annual Leave basic pay upon separation from the company.
+
+[Q028] When do I need to provide a medical certificate for Sick Leave?
+[A028] A medical certificate from a registered practitioner is required if Sick Leave extends beyond 3 consecutive working days.
+
+[Q029] What is the Maternity Leave entitlement?
+[A029] Eligible female employees receive 26 weeks (182 calendar days) of fully paid Maternity Leave.
+
+[Q030] What is the Paternity Leave entitlement?
+[A030] Male employees receive 4 weeks (20 working days) of fully paid Paternity Leave, to be used within 6 months of childbirth.
+
+[Q031] What is the penalty for clocking in late?
+[A031] Clocking in after 9:45 AM is a late arrival. Three late arrivals in a calendar month trigger an automatic deduction of 0.5 days from your Casual Leave balance.
+
+[Q032] What are the core collaboration hours?
+[A032] Core collaboration hours are 10:30 AM to 3:30 PM local time. All employees must be accessible during this window.
+
+[Q033] What password length is required under current InfoSec policy?
+[A033] Under active Policy v3.0 (DOC-NIS-011), passwords must be at least 16 characters long with uppercase, lowercase, numbers, and special symbols.
+
+[Q034] How often do corporate passwords expire?
+[A034] Corporate passwords expire every 90 days.
+
+[Q035] Is MFA mandatory for accessing Nexora systems?
+[A035] Yes, hardware-backed YubiKey 5 Series MFA is mandatory for all internal and remote logins.
+
+[Q036] Can I use personal USB flash drives on my work laptop?
+[A036] No, removable media mass storage is hard-blocked at the kernel level across all company endpoints.
+
+[Q037] What is the maximum hotel allowance for domestic travel in Tier 1 cities?
+[A037] Under DOC-NFE-013, the hotel capping for Tier 1 Indian cities (Bengaluru, Mumbai, Delhi) is ₹7,500 per night excluding taxes.
+
+[Q038] What is the daily meal allowance (per diem) for travel in India?
+[A038] The fixed daily meal allowance for domestic business travel within India is ₹2,000 per day.
+
+[Q039] What is the hotel allowance for business travel to Singapore?
+[A039] The hotel capping for Singapore travel is SGD $350 per night (approx. ₹22,000).
+
+[Q040] What is the daily meal per diem for Singapore travel?
+[A040] The meal per diem for Singapore is SGD $100 per day (approx. ₹6,300).
+
+[Q041] Within how many days must travel expenses be submitted?
+[A041] Expense claims must be submitted via HRMS within 30 calendar days of travel completion. Claims older than 60 days are rejected.
+
+[Q042] Who manages Project Titan?
+[A042] Priya Sharma (EMP-1008, Head of Engineering) is the Project Manager for Project Titan (PRJ-2001).
+
+[Q043] Who is the Principal Architect for Project Titan?
+[A043] Suresh Kumar (EMP-1101) is the Principal Architect.
+
+[Q044] Who manages the Zero-Trust Rollout project?
+[A044] Amit Patel (EMP-1015, Head of IT) manages the Zero-Trust Network Rollout (PRJ-2002).
+
+[Q045] Who manages the CS Chatbot AI project?
+[A045] David Lee (EMP-1050, Head of CS) manages the CS Chatbot AI project (PRJ-2003).
+
+[Q046] Who manages the NLP Engine v4 development?
+[A046] Dr. Sanjay Verma (EMP-1090, Head of R&D) manages NLP Engine v4 (PRJ-2004).
+
+[Q047] Who manages the HRMS Enterprise Migration project?
+[A047] Rahul Desai (EMP-1001, Head of HR) manages the HRMS Migration project (PRJ-2005).
+
+[Q048] Who manages the Global Unified Payroll project?
+[A048] Sneha Iyer (EMP-1022, CFO) manages Global Unified Payroll (PRJ-2006).
+
+[Q049] Who manages the SecOps Shield & ISO 27001 Audit project?
+[A049] Karthik Natarajan (EMP-1072, CISO) manages PRJ-2007.
+
+[Q050] Who manages the APAC SaaS Market Expansion project?
+[A050] Vikram Singh (EMP-1035, VP of Sales) manages APAC Expansion (PRJ-2008).
+
+[Q051] Who manages the Corporate Rebranding 2026 project?
+[A051] Anjali Rao (EMP-1042, CMO) manages Corporate Rebranding 2026 (PRJ-2009).
+
+[Q052] Who owns the Nexora Cloud product?
+[A052] Priya Sharma (EMP-1008, Head of Engineering) owns Nexora Cloud (PRD-101).
+
+[Q053] What SLA does Nexora Cloud guarantee?
+[A053] Nexora Cloud guarantees a 99.99% monthly uptime SLA for Enterprise customers.
+
+[Q054] Who owns the Nexora Secure product?
+[A054] Karthik Natarajan (EMP-1072, CISO) owns Nexora Secure (PRD-102).
+
+[Q055] Who owns Nexora Analytics and Nexora AI Studio?
+[A055] Dr. Sanjay Verma (EMP-1090, Head of R&D) owns both PRD-103 and PRD-104.
+
+[Q056] Who owns Nexora Desk?
+[A056] David Lee (EMP-1050, Head of CS) owns Nexora Desk (PRD-105).
+
+[Q057] Who owns Nexora Flow?
+[A057] Priya Sharma (EMP-1008, Head of Engineering) owns Nexora Flow (PRD-106).
+
+[Q058] Who owns Nexora Vault?
+[A058] Karthik Natarajan (EMP-1072, CISO) owns Nexora Vault (PRD-107).
+
+[Q059] Who owns Nexora Insight?
+[A059] Anjali Rao (EMP-1042, CMO) owns Nexora Insight (PRD-108).
+
+[Q060] What is the minimum tenure required before I can apply for an internal job transfer?
+[A060] Under DOC-NHR-005, you must complete at least 18 months in your current role before applying for an internal transfer or IJP.
+
+[Q061] What rating do I need on my performance review to be eligible for promotion?
+[A061] You must achieve an "Exceeds Expectations" rating (Rating 4 or 5) in your latest annual appraisal.
+
+[Q062] How long is the Performance Improvement Plan (PIP) duration?
+[A062] A PIP lasts exactly 60 calendar days.
+
+[Q063] What happens if an employee fails a PIP?
+[A063] Failure to meet PIP milestones results in termination of employment for poor performance with 30 days severance pay.
+
+[Q064] Who chairs the POSH Internal Complaints Committee?
+[A064] General Counsel Neha Gupta (EMP-1065) chairs the Internal Complaints Committee (ICC).
+
+[Q065] Where can I report a confidential POSH complaint?
+[A065] Email posh-compliance@nexora.com or file a ticket through the HR Portal.
+
+[Q066] How many minimum quotes are required for a purchase between ₹1,00,001 and ₹5,00,000?
+[A066] Under DOC-NPP-014, at least 3 competitive written quotations are required, approved by Head of Procurement Rajesh Khanna (EMP-1099).
+
+[Q067] Who must approve purchase requisitions exceeding ₹5,00,000?
+[A067] Requisitions between ₹5,00,001 and ₹25,00,000 require vendor risk sign-off from Ramesh Babu (EMP-1499) and approval from CFO Sneha Iyer (EMP-1022).
+
+[Q068] What are standard payment terms for vendor invoices?
+[A068] Standard payment terms are Net 45 days from receipt of a valid invoice displaying Nexora's GSTIN.
+
+[Q069] Within how many hours must a cybersecurity incident be reported to CERT-In in India?
+[A069] Confirmed cybersecurity incidents must be reported to CERT-In within 6 hours by General Counsel Neha Gupta (EMP-1065).
+
+[Q070] What is the statutory reporting window for personal data breaches to Singapore PDPC?
+[A070] Personal data breaches affecting 500+ individuals in Singapore must be reported to the PDPC within 72 hours.
+
+[Q071] How long are financial books and tax records retained?
+[A071] Financial books and tax records are retained for 7 calendar years under the custody of CFO Sneha Iyer.
+
+[Q072] How long are employee personnel files retained post-exit?
+[A072] Personnel and BGV files are retained for 10 years post-exit by Human Resources.
+
+[Q073] How long are security and system audit logs stored?
+[A073] System and security audit logs are stored for 7 calendar years in cold S3 storage.
+
+[Q074] Who leads the Talent Acquisition team?
+[A074] Maya Lin (EMP-1120) is the Talent Acquisition Lead.
+
+[Q075] Who is the HR Business Partner for Tech teams?
+[A075] Aisha Khan (EMP-1402) is the HRBP for Tech.
+
+[Q076] Who is the Senior Payroll Manager?
+[A076] Arjun Nair (EMP-1134) is the Senior Payroll Manager.
+
+[Q077] Who is the Senior Accountant auditing corporate cards?
+[A077] Deepa Joshi (EMP-1135) is the Senior Accountant.
+
+[Q078] Who is the Senior Systems Administrator in IT?
+[A078] Tarun Bajaj (EMP-1455) is the Senior Systems Administrator based in Pune.
+
+[Q079] Who is the Network Engineer in Pune?
+[A079] Vikram Joshi (EMP-1456) is the Network Engineer.
+
+[Q080] Who is the Incident Response Lead in Cybersecurity?
+[A080] Manish Pandey (EMP-1351) is the Incident Response Lead.
+
+[Q081] Who is the Senior Security Analyst handling ISO 27001 audits?
+[A081] Kiran Patel (EMP-1350) is the Senior Security Analyst.
+
+[Q082] Who is the Staff AI Researcher in R&D?
+[A082] Dr. Ananya Sen (EMP-1490) is the Staff AI Researcher working on NLP Engine v4.
+
+[Q083] Who is the Vendor Risk Specialist in Procurement?
+[A083] Ramesh Babu (EMP-1499) is the Vendor Risk Specialist.
+
+[Q084] What branching strategy does Nexora Engineering use?
+[A084] Nexora Engineering uses Trunk-Based Development with short-lived feature branches (DOC-ENG-008 v4.0).
+
+[Q085] What is the maximum allowed lifetime for a feature branch?
+[A085] Feature branches must not live longer than 48 hours without merging or rebasing onto `main`.
+
+[Q086] How many peer code reviews are required to merge a Pull Request?
+[A086] At least TWO peer approvals are required for all PRs.
+
+[Q087] What code coverage percentage is required to pass CI/CD static testing?
+[A087] Minimum 85% branch test coverage is required by SonarQube.
+
+[Q088] Who is the primary on-call engineer for engineering incidents?
+[A088] Senior Backend Engineer Rohit Verma (EMP-1105) is the Primary On-Call.
+
+[Q089] Who is the secondary on-call engineer?
+[A089] Frontend Developer Sara Thomas (EMP-1106) is the Secondary On-Call.
+
+[Q090] Who acts as Incident Commander for P0 engineering outages?
+[A090] Head of Engineering Priya Sharma (EMP-1008) serves as Incident Commander.
+
+[Q091] What is the RTO target for core SaaS infrastructure?
+[A091] The Recovery Time Objective (RTO) is less than or equal to 30 minutes.
+
+[Q092] What is the RPO target for database persistence?
+[A092] The Recovery Point Objective (RPO) is less than or equal to 5 minutes via Aurora WAL streaming.
+
+[Q093] Which backup cloud region serves as the disaster recovery site for Mumbai?
+[A093] GCP Singapore (`asia-southeast1`) serves as the secondary disaster recovery site.
+
+[Q094] What is the standard WFH setup stipend for newly confirmed employees?
+[A094] A one-time setup reimbursement of up to ₹25,000 (or SGD $400 in Singapore) is available.
+
+[Q095] What minimum internet speed is required for remote work?
+[A095] A stable broadband connection with at least 100 Mbps download and upload speed is required.
+
+[Q096] How much internet expense can I claim monthly?
+[A096] Nexora reimburses up to ₹1,500 per month for remote internet connectivity.
+
+[Q097] What laptop is allocated to Engineering employees?
+[A097] MacBook Pro 16" (M3 Pro, 36GB RAM) or Dell XPS 15 (i9, 64GB RAM).
+
+[Q098] What laptop is allocated to non-engineering roles?
+[A098] Lenovo ThinkPad T14s (i7, 16GB RAM) or MacBook Air 15" (M3, 16GB RAM).
+
+[Q099] How often are company laptops refreshed?
+[A099] Corporate laptops are refreshed every 36 months (3 years).
+
+[Q100] Who handles hardware sanitization and wipe upon offboarding?
+[A100] Ramesh Babu (EMP-1499) securely wipes retired assets using DoD 5220.22-M standards.
+
+[Q101] What is the response SLA for P1 Critical IT tickets?
+[A101] P1 tickets require a response within 15 minutes and resolution within 2 hours.
+
+[Q102] What is the response SLA for P2 High IT tickets?
+[A102] P2 tickets require a response within 30 minutes and resolution within 4 hours.
+
+[Q103] What is the response SLA for P3 Normal IT tickets?
+[A103] P3 tickets require a response within 2 hours and resolution within 24 hours.
+
+[Q104] What is the response SLA for P4 Low IT tickets?
+[A104] P4 tickets require a response within 8 hours and resolution within 72 hours.
+
+[Q105] Where is the global headquarters of Nexora located?
+[A105] Global HQ is in Tech Park Campus, Outer Ring Road, Bengaluru, Karnataka, India.
+
+[Q106] Where is the APAC regional hub office located?
+[A106] Marina Bay Financial Centre, Tower 2, Singapore.
+
+[Q107] Where is the IT department primary office located?
+[A107] Cyber City, Magarpatta, Pune, India.
+
+[Q108] Where is the Finance department primary office located?
+[A108] Bandra-Kurla Complex (BKC), Mumbai, India.
+
+[Q109] Where is the Sales department primary hub located?
+[A109] Cyber City, Phase III, Gurugram, Delhi NCR, India.
+
+[Q110] Where is the Cybersecurity department primary office located?
+[A110] Knowledge City, HITEC City, Hyderabad, India.
+
+[Q111] How many employees work at Nexora globally?
+[A111] Approximately 1,500 employees.
+
+[Q112] What happens if I miss a monthly phishing simulation test?
+[A112] Clicking a test link automatically enrolls you in a mandatory 2-hour Remedial Cyber Security Training module.
+
+[Q113] What happens if I fail 3 consecutive phishing simulation tests?
+[A113] Failing 3 tests in 12 months triggers a formal disciplinary review with HRBP Aisha Khan (EMP-1402).
+
+[Q114] Can I engage in external freelance work or moonlighting?
+[A114] No, external paid employment or freelancing is strictly prohibited without written consent from Legal Counsel Neha Gupta.
+
+[Q115] Who owns the intellectual property I create while working at Nexora?
+[A115] All code, architecture, designs, and documentation belong 100% exclusively to Nexora Technologies Pvt. Ltd.
+
+[Q116] What is the standard response window for a Tier 1 manager grievance?
+[A116] Managers must respond to an informal grievance within 5 working days.
+
+[Q117] What is the response window for a Tier 2 Department Head grievance escalation?
+[A117] Department Heads must respond within 7 working days.
+
+[Q118] What is the final resolution window for the HR Grievance Committee?
+[A118] The committee issues a final written verdict within 14 working days.
+
+[Q119] What is the max discount an AE can offer without manager approval?
+[A119] Enterprise Account Executives can authorize up to a 10% discount off list price.
+
+[Q120] Who must approve a sales discount between 11% and 20%?
+[A120] VP of Sales Vikram Singh (EMP-1035) must approve discounts in this range.
+
+[Q121] Who must approve sales discounts exceeding 20%?
+[A121] Dual sign-off is required from VP of Sales Vikram Singh and CFO Sneha Iyer.
+
+[Q122] What is the maximum client entertainment spend limit per head?
+[A122] Client entertainment is capped at ₹5,000 per head per event.
+
+[Q123] Who approves client event expenditures exceeding ₹25,000?
+[A123] Pre-approval from VP of Sales Vikram Singh is required.
+
+[Q124] What is the alcohol expense cap during client meals?
+[A124] Alcohol is capped at 30% of the total meal invoice bill.
+
+[Q125] What primary cloud platform does Nexora use?
+[A125] Amazon Web Services (AWS) primary, with Google Cloud Platform (GCP) secondary for disaster recovery.
+
+[Q126] What API gateway orchestrates microservices traffic?
+[A126] Kong API Gateway hosted on EKS clusters in Mumbai.
+
+[Q127] What service mesh encrypts pod-to-pod communication?
+[A127] Istio Service Mesh v1.20 with mTLS and SPIFFE/SPIRE certificates.
+
+[Q128] What database engine powers relational core data?
+[A128] PostgreSQL 15 on AWS RDS Aurora Multi-AZ.
+
+[Q129] What database engine powers high-throughput telemetry analytics?
+[A129] ClickHouse distributed cluster.
+
+[Q130] What event streaming bus connects asynchronous microservices?
+[A130] Apache Kafka multi-node cluster across 3 Availability Zones.
+
+[Q131] What cache engine is used for session management?
+[A131] Redis Cluster v7.0.
+
+[Q132] What authorization engine enforces fine-grained RBAC policies?
+[A132] Open Policy Agent (OPA) sidecars evaluating Rego policies.
+
+[Q133] Who is the L2 Customer Support Lead in Singapore?
+[A133] Wei Chen (EMP-1201).
+
+[Q134] Who is the L1 Support Agent in Singapore?
+[A134] Chloe Tan (EMP-1150).
+
+[Q135] What product provides Zero-Trust endpoint security?
+[A135] Nexora Secure (PRD-102).
+
+[Q136] What product provides low-code generative AI model tuning?
+[A136] Nexora AI Studio (PRD-104).
+
+[Q137] What product provides hardware-backed secrets management?
+[A137] Nexora Vault (PRD-107).
+
+[Q138] What product provides customer data platform intelligence?
+[A138] Nexora Insight (PRD-108).
+
+[Q139] What product provides business process automation workflows?
+[A139] Nexora Flow (PRD-106).
+
+[Q140] What product provides omnichannel ticketing and SLA tracking?
+[A140] Nexora Desk (PRD-105).
+
+[Q141] What is the maximum allowable travel expense reimbursement window?
+[A141] Expenses must be submitted within 30 days; claims older than 60 days are rejected.
+
+[Q142] How many floating holidays do employees get per year?
+[A142] Employees receive 2 Floating Holidays per calendar year under Policy v2.0.
+
+[Q143] What is the hotel accommodation cap for Tier 2 Indian cities?
+[A143] ₹5,500 per night excluding taxes.
+
+[Q144] Who issues binding Purchase Orders for approved requisitions?
+[A144] Head of Procurement Rajesh Khanna (EMP-1099).
+
+[Q145] Who performs 3-way matching of PO, GRN, and vendor invoices?
+[A145] Senior Accountant Deepa Joshi (EMP-1135).
+
+[Q146] What is the emergency override protocol for P0 outage procurement?
+[A146] Head of IT Amit Patel or CISO Karthik Natarajan can bypass quotes with verbal COO/CFO approval; formal PO generated within 48 hours.
+
+[Q147] What framework is used to qualify sales leads?
+[A147] BANT Framework (Budget, Authority, Need, Timeline).
+
+[Q148] What is the maximum SLA service credit for cloud downtime?
+[A148] Up to 30% credit of monthly subscription fee for uptime below 99.0%.
+
+[Q149] Who approves service credits exceeding $1,000 USD?
+[A149] Head of CS David Lee and CFO Sneha Iyer.
+
+[Q150] What is the official website for system status and outages?
+[A150] `https://status.nexora.com`.

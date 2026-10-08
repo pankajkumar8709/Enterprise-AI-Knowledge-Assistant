@@ -1,0 +1,155 @@
+DOCUMENT METADATA
+Document ID: DOC-NDD-004
+Title: Department Directory and Organizational Structure
+Owner: Operations
+Department: Operations
+Version: 1.4
+Effective Date: 2026-06-01
+Last Updated: 2026-09-10
+Status: Active
+Access Level: Internal / All Active Employees
+Classification: Internal
+Tags: departments, organizational-structure, kpis, department-heads, major-projects
+
+1. HUMAN RESOURCES (DPT-01)
+- Department ID: DPT-01
+- Department Name: Human Resources
+- Department Head: Rahul Desai (EMP-1001, Head of HR)
+- Direct Manager: Meera Reddy (EMP-1080, COO)
+- Primary Office: Bengaluru (HQ)
+- Total Headcount: 45 Employees
+- Core Responsibilities: Talent acquisition, organizational development, total rewards, statutory compliance, employee retention, POSH management, and workplace culture.
+- Key Performance Indicators (KPIs):
+* Time-to-Fill Open Roles < 35 Days
+* Employee eNPS Score > 45
+* Annual Voluntary Attrition Rate < 12%
+- Department Escalation: hr-escalations@nexora.com
+- Major Active Projects: HRMS Enterprise Migration (Project Lead: Aisha Khan, EMP-1402)
+
+2. ENGINEERING (DPT-02)
+- Department ID: DPT-02
+- Department Name: Engineering
+- Department Head: Priya Sharma (EMP-1008, Head of Engineering)
+- Direct Manager: Meera Reddy (EMP-1080, COO)
+- Primary Offices: Bengaluru (HQ) & Hyderabad
+- Total Headcount: 600 Employees
+- Team Structure: Divided into Core SaaS, Enterprise Custom Solutions, DevOps/SRE, and Quality Engineering pods.
+- Core Responsibilities: Full-stack software engineering, SaaS product development, platform architecture, system scalability, and technical debt mitigation.
+- Key Performance Indicators (KPIs):
+* SaaS Platform Uptime > 99.99%
+* Critical Bug Escape Rate < 1.5%
+* Sprint Delivery Velocity > 88%
+- Department Escalation: eng-support-escalations@nexora.com
+- Major Active Projects: Project Titan - NextGen Platform Microservices Rewrite (Lead: Suresh Kumar, EMP-1101)
+
+3. INFORMATION TECHNOLOGY (DPT-03)
+- Department ID: DPT-03
+- Department Name: Information Technology
+- Department Head: Amit Patel (EMP-1015, Head of IT)
+- Direct Manager: Meera Reddy (EMP-1080, COO)
+- Primary Office: Pune
+- Total Headcount: 80 Employees
+- Core Responsibilities: Internal infrastructure provisioning, corporate network maintenance, cloud hardware lifecycle, employee helpdesk, and software license management.
+- Key Performance Indicators (KPIs):
+* Internal IT Ticket SLA Resolution > 95%
+* Infrastructure Uptime > 99.9%
+- Department Escalation: it-helpdesk-urgent@nexora.com
+- Major Active Projects: Zero-Trust Network Infrastructure Expansion (Lead: Tarun Bajaj, EMP-1455)
+
+4. FINANCE (DPT-04)
+- Department ID: DPT-04
+- Department Name: Finance & Accounting
+- Department Head: Sneha Iyer (EMP-1022, CFO)
+- Direct Manager: Meera Reddy (EMP-1080, COO)
+- Primary Office: Mumbai
+- Total Headcount: 50 Employees
+- Core Responsibilities: Financial planning & analysis (FP&A), statutory audit compliance, corporate taxation, client billing, global payroll execution.
+- Key Performance Indicators (KPIs):
+* Monthly Financial Book Closure within 4 Business Days
+* Zero Statutory Compliance Audit Penalties
+- Department Escalation: finance-desk@nexora.com
+- Major Active Projects: Global Payroll System Integration (Lead: Arjun Nair, EMP-1134)
+
+5. SALES (DPT-05)
+- Department ID: DPT-05
+- Department Name: Sales & Business Development
+- Department Head: Vikram Singh (EMP-1035, VP of Sales)
+- Direct Manager: Meera Reddy (EMP-1080, COO)
+- Primary Office: Delhi NCR (Hub) with teams across all offices
+- Total Headcount: 120 Employees
+- Core Responsibilities: B2B enterprise SaaS sales, cloud consulting deal acquisition, account management, and strategic partnerships.
+- Key Performance Indicators (KPIs):
+* Quarterly Annual Recurring Revenue (ARR) Target Achievement > 100%
+* Pipeline Growth Rate > 25% YoY
+- Department Escalation: sales-leads@nexora.com
+- Major Active Projects: APAC Market Expansion Strategy (Lead: John D'Souza, EMP-1250)
+
+6. MARKETING (DPT-06)
+- Department ID: DPT-06
+- Department Name: Marketing & Communications
+- Department Head: Anjali Rao (EMP-1042, CMO)
+- Direct Manager: Meera Reddy (EMP-1080, COO)
+- Primary Office: Bengaluru
+- Total Headcount: 40 Employees
+- Core Responsibilities: Corporate branding, demand generation, product marketing, public relations, trade events, and digital campaigns.
+- Major Active Projects: Global Rebranding Campaign 2026 (Lead: Aditi Bhatia, EMP-1280)
+
+7. CUSTOMER SUPPORT (DPT-07)
+- Department ID: DPT-07
+- Department Name: Customer Support & Success
+- Department Head: David Lee (EMP-1050, Head of CS)
+- Direct Manager: Meera Reddy (EMP-1080, COO)
+- Primary Office: Singapore Hub
+- Total Headcount: 250 Employees
+- Core Responsibilities: 24/7 technical customer support across Tier 1, Tier 2, and Tier 3 levels, client onboarding, customer satisfaction.
+- Key Performance Indicators (KPIs):
+* CSAT Score > 92%
+* First Response Time < 15 Minutes for P1 Tickets
+- Major Active Projects: AI-Powered Customer Support Chatbot Deployment (Lead: Wei Chen, EMP-1201)
+
+8. LEGAL & COMPLIANCE (DPT-08)
+- Department ID: DPT-08
+- Department Name: Legal & Compliance
+- Department Head: Neha Gupta (EMP-1065, General Counsel)
+- Direct Manager: Meera Reddy (EMP-1080, COO)
+- Primary Office: Mumbai
+- Total Headcount: 15 Employees
+- Core Responsibilities: Enterprise contracting, IP protection, regulatory compliance, POSH administration, and litigation management.
+
+9. CYBERSECURITY (DPT-09)
+- Department ID: DPT-09
+- Department Name: Cybersecurity & InfoSec
+- Department Head: Karthik Natarajan (EMP-1072, CISO)
+- Direct Manager: Meera Reddy (EMP-1080, COO)
+- Primary Office: Hyderabad
+- Total Headcount: 35 Employees
+- Core Responsibilities: Security Operations Center (SOC), penetration testing, vulnerability assessment, data loss prevention (DLP), and ISO 27001 audit execution.
+- Major Active Projects: ISO 27001:2022 Recertification Audit (Lead: Kiran Patel, EMP-1350)
+
+10. OPERATIONS (DPT-10)
+- Department ID: DPT-10
+- Department Name: Operations & Facilities
+- Department Head: Meera Reddy (EMP-1080, COO)
+- Direct Manager: Chief Executive Officer (EMP-0001)
+- Primary Office: Bengaluru
+- Total Headcount: 200 Employees
+- Core Responsibilities: Real estate management, travel operations, cross-departmental alignment, administrative governance.
+
+11. RESEARCH & DEVELOPMENT (DPT-11)
+- Department ID: DPT-11
+- Department Name: Research & Development
+- Department Head: Dr. Sanjay Verma (EMP-1090, Head of R&D)
+- Direct Manager: Meera Reddy (EMP-1080, COO)
+- Primary Office: Pune
+- Total Headcount: 50 Employees
+- Core Responsibilities: AI model prototyping, NLP algorithms, patent generation, and emerging tech evaluation.
+- Major Active Projects: Enterprise Large Language Model Integration - NLP Engine v4 (Lead: Dr. Ananya Sen, EMP-1490)
+
+12. PROCUREMENT (DPT-12)
+- Department ID: DPT-12
+- Department Name: Procurement & Supply Chain
+- Department Head: Rajesh Khanna (EMP-1099, Head of Procurement)
+- Direct Manager: Sneha Iyer (EMP-1022, CFO)
+- Primary Office: Hyderabad
+- Total Headcount: 15 Employees
+- Core Responsibilities: Vendor qualification, contract negotiations, IT hardware purchasing, and facility vendor SLAs.

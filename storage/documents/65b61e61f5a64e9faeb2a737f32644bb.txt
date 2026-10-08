@@ -1,0 +1,133 @@
+================================================================================
+DOCUMENT METADATA
+================================================================================
+Document ID:          DOC-NLA-002
+Title:                Leave and Attendance Policy
+Owner:                Human Resources
+Department:           Human Resources
+Version:              2.0 (Active)
+Effective Date:       2026-04-01
+Last Updated:         2026-03-25
+Status:               Active
+Access Level:         Internal / All Active Employees
+Classification:       Confidential
+Tags:                 leave, attendance, annual-leave, sick-leave, casual-leave, holidays, encashment, wfh, late-arrival
+================================================================================
+
+VERSION CONTROL & POLICY HISTORY
+--------------------------------------------------------------------------------
+Version 1.0 (Effective 2024-01-01 to 2026-03-31):
+- Annual Leave (AL) entitlement: 20 days per calendar year.
+- Maximum Annual Leave carry-forward: 5 days.
+- Floating Holidays: 0 days.
+
+Version 2.0 (Effective 2026-04-01 - CURRENT ACTIVE POLICY):
+- Annual Leave (AL) entitlement: Increased to 24 days per calendar year.
+- Maximum Annual Leave carry-forward: Increased to 10 days.
+- Floating Holidays: Introduced 2 days per calendar year.
+- Reason for change: Strategic alignment of employee wellness benefits and standardization across APAC operations.
+--------------------------------------------------------------------------------
+
+
+1. POLICY PURPOSE & SCOPE
+This policy defines the rules, entitlements, application workflows, carry-forward limits, encashment parameters, and attendance regulations governing all full-time regular and probationary employees of Nexora Technologies Pvt. Ltd. across all office locations.
+
+
+2. ANNUAL LEAVE ENTITLEMENT SUMMARY TABLE
+
++-------------------+-----------------+-------------------+---------------------+-----------------------+---------------------+
+| Leave Category    | Annual Quota    | Monthly Accrual   | Carry-Forward Max   | Encashment Limit      | Approving Authority |
++-------------------+-----------------+-------------------+---------------------+-----------------------+---------------------+
+| Annual Leave (AL) | 24 Days         | 2.0 Days/Month    | 10 Days             | Max 30 Days (At Exit) | Direct Manager      |
+| Sick Leave (SL)   | 12 Days         | 1.0 Day/Month     | 0 Days (Lapses)     | Non-Encashable        | Manager (Auto-Log)  |
+| Casual Leave (CL) | 8 Days          | Frontloaded Jan 1 | 0 Days (Lapses)     | Non-Encashable        | Direct Manager      |
+| Floating Holiday  | 2 Days          | Frontloaded Jan 1 | 0 Days (Lapses)     | Non-Encashable        | Direct Manager      |
++-------------------+-----------------+-------------------+---------------------+-----------------------+---------------------+
+
+
+3. DETAILED LEAVE CATEGORIES AND RULES
+
+3.1 Annual Leave (AL)
+- Quota: 24 working days per calendar year accrued at 2.0 days per completed calendar month.
+- Application Window: Requests for 1 to 3 continuous AL days must be submitted at least 5 working days in advance. Requests for 4 or more continuous AL days require 15 calendar days advance notice.
+- Max Continuous Duration: Employees cannot take more than 10 continuous AL working days without explicit approval from their Department Head.
+- Accrual during Probation: Probationary employees accrue AL at 2.0 days/month but can only utilize accrued AL after successful completion of 3 months of service.
+
+3.2 Sick Leave (SL)
+- Quota: 12 calendar days per year accrued at 1.0 day per completed month.
+- Notification: Employees must notify their manager via Slack/Email before 9:30 AM on the day of absence.
+- Medical Certificate Requirement: Any SL extending beyond 3 consecutive working days requires a valid medical certificate from a registered medical practitioner uploaded to the HRMS upon returning to work.
+- Conversion of AL to SL: If an employee falls seriously ill while on approved Annual Leave, the affected days can be converted to Sick Leave upon submission of medical proof within 48 hours of resume.
+
+3.3 Casual Leave (CL)
+- Quota: 8 days per year, fully credited on January 1st (or prorated for mid-year joiners).
+- Purpose: Intended for unexpected personal matters, home emergencies, or personal administrative work.
+- Restrictions: Casual leave cannot be combined with Annual Leave. A maximum of 2 consecutive CL days can be taken at any one time.
+
+3.4 Maternity Leave
+- Entitlement: 26 weeks (182 calendar days) of fully paid maternity leave as mandated by law.
+- Eligibility: Female employees who have worked at Nexora for at least 80 days in the 12 months preceding the expected delivery date.
+- Extension: Up to 4 additional weeks of unpaid leave can be granted upon submission of medical documentation showing health complications.
+
+3.5 Paternity Leave
+- Entitlement: 4 weeks (20 working days) of fully paid paternity leave for male employees upon the birth or adoption of a child.
+- Usage Window: Must be utilized within 6 months of the child's birth/adoption in maximums of two distinct two-week blocks.
+
+3.6 Leave Without Pay (LWP) / Unpaid Leave
+- Conditions: Applicable only when all paid leave balances (AL, SL, CL) have been completely exhausted.
+- Capping: Maximum limit of 30 cumulative days of LWP per calendar year.
+- Approval Path: Requires written approval from Manager, Department Head, and Head of HR (Rahul Desai, EMP-1001).
+- Payroll Impact: Pro-rata deduction of gross daily salary for each day on LWP.
+
+3.7 Emergency / Bereavement Leave
+- Entitlement: Up to 3 fully paid days in the event of the death or critical medical emergency of an immediate family member (spouse, child, parent, sibling). Does not deduct from AL/SL/CL balances.
+
+
+4. LEAVE CARRY-FORWARD AND ENCASHMENT RULES
+
+4.1 Year-End Carry-Forward
+- On December 31st of each calendar year, HRMS automatically calculates unused AL balances.
+- Maximum 10 days of unused Annual Leave (under Policy v2.0) will automatically carry forward to the next year.
+- Any unused AL balance exceeding 10 days will lapse automatically unless an explicit exception is granted by the COO (Meera Reddy, EMP-1080).
+- Unused SL and CL balances lapse completely on December 31st and cannot be carried forward.
+
+4.2 Leave Encashment Rules
+- Annual Leave encashment is permitted ONLY at the time of employee separation (resignation, retirement, or redundancy).
+- Encashment Calculation Formula:
+  Encashment Payout = (Basic Monthly Salary / 26) * Encashable AL Balance (Capped at 30 Days)
+- Sick Leave and Casual Leave are strictly non-encashable under all circumstances.
+
+
+5. ATTENDANCE, PUNCTUALITY, AND WORK FROM HOME (WFH) RULES
+
+5.1 Attendance Capture Systems
+- In-Office Tracking: Captured via biometric turnstiles at office entry points.
+- WFH Tracking: Captured via automated VPN authentication logs and daily HRMS check-in prompts between 9:00 AM and 9:45 AM.
+
+5.2 Late Arrival & Early Departure Penalties
+- Standard Start Time: 9:00 AM. Grace period provided until 9:45 AM.
+- Late Arrival Trigger: Clocking in or logging on after 9:45 AM is marked as a "Late Arrival".
+- Monthly Penalty Rule:
+  * 1st & 2nd Late Arrival in a month: Automated HRMS email warning.
+  * 3rd Late Arrival in a month: Automatic deduction of 0.5 days of Casual Leave (CL).
+  * 4th and subsequent Late Arrivals: Automatic deduction of 0.5 days of Annual Leave (AL) per instance. If AL is exhausted, 0.5 day LWP salary deduction applies.
+- Early Departure Trigger: Logging off or leaving the office before 5:00 PM without prior manager approval results in a half-day leave deduction.
+
+
+6. WORKFLOW EXAMPLES & SCENARIOS
+
+Scenario A: Extended Vacation Planning
+- Employee: Rohit Verma (EMP-1105, Senior Backend Engineer)
+- Request: 8 continuous working days of Annual Leave for family event.
+- Process: Rohit submits request in HRMS 20 days prior. Because duration > 3 days, approval flows to direct manager Priya Sharma (EMP-1008, Head of Engineering). Manager approves after verifying sprint coverage with team.
+
+Scenario B: Consecutive Late Arrivals
+- Employee: Tarun Bajaj (EMP-1455, SysAdmin)
+- Incident: Clocks into Pune office at 10:05 AM on 3 separate occasions in October.
+- Outcome: HRMS triggers an automated notification on the 3rd instance, deducting 0.5 days from Tarun's Casual Leave balance.
+
+
+7. PUBLIC HOLIDAYS & FLOATING HOLIDAYS
+
+Nexora observes 10 statutory regional public holidays per calendar year (published every December for the upcoming year for each office location) plus 2 Floating Holidays per employee.
+- Floating Holidays must be applied for at least 3 days in advance via HRMS and approved by the manager.

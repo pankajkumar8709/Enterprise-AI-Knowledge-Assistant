@@ -1,0 +1,107 @@
+DOCUMENT METADATA
+Document ID: DOC-NIS-011
+Title: Information Security & Access Governance Policy
+Owner: Cybersecurity & InfoSec
+Department: Cybersecurity (DPT-09)
+Author / Maintainer: Karthik Natarajan (EMP-1072, CISO) & Kiran Patel (EMP-1350, Sr. Security Analyst)
+Version: 3.0 (Active)
+Effective Date: 2026-01-01
+Last Updated: 2026-08-15
+Status: Active
+Access Level: Internal / All Employees
+Classification: Confidential
+Tags: infosec, passwords, mfa, data-classification, vpn, remote-work, remote-wipe, security-awareness
+
+VERSION CONTROL & POLICY HISTORY
+Version 1.0 (Effective 2022-01-01 to 2023-12-31):
+- Password expiration period: 30 days. Password minimum length: 10 characters.
+- Multi-Factor Authentication (MFA): Optional for internal office network.
+
+Version 2.0 (Effective 2024-01-01 to 2025-12-31) [DEPRECATED]:
+- Password expiration period: 60 days. Password minimum length: 12 characters.
+- MFA: Mandatory SMS / Push Notification via Okta.
+- Removable media: Restricted via soft warning prompts.
+
+Version 3.0 (Effective 2026-01-01 - CURRENT ACTIVE POLICY):
+- Password expiration period: 90 days (Enforced via Active Directory / Okta).
+- Password minimum length: 16 characters (Must include uppercase, lowercase, numbers, and special symbols).
+- Multi-Factor Authentication: Mandatory hardware-backed FIDO2 / YubiKey 5 Series MFA for ALL authentication attempts (Internal & Remote).
+- Removable Media: Hard block enforced via Jamf / Intune MDM policies. USB mass storage devices are completely disabled across all endpoints.
+- Reason for Change: Alignment with Zero-Trust Infrastructure Rollout (PRJ-2002) and ISO 27001:2022 recertification requirements.
+
+SECTION 1: PURPOSE AND SCOPE
+
+1.1 Objective
+This policy establishes the mandatory security rules, access governance protocols, data protection standards, and acceptable technology use guidelines across all regional offices of Nexora Technologies Pvt. Ltd. (Bengaluru, Hyderabad, Pune, Delhi, Mumbai, and Singapore).
+
+1.2 Scope
+This policy applies to all full-time employees, probationary staff, fixed-term contractors, third-party vendors, and systems managed by or connected to Nexora’s global network infrastructure.
+
+SECTION 2: IDENTITY, PASSWORDS, AND ACCOUNT SECURITY
+
+2.1 Credential Standards (Policy v3.0 Active Standard)
+- Minimum Length: 16 characters.
+- Complexity Rules: Must contain at least one uppercase letter [A-Z], one lowercase letter [a-z], one numeric digit [0-9], and one non-alphanumeric symbol [e.g., !, @, #, $, %, ^, &, *].
+- Historical Recycling Block: Users cannot reuse any of their last 12 previously used passwords.
+- Expiration Lifecycle: Automated forced password reset occurs every 90 days.
+- Account Lockout Threshold: Five (5) consecutive failed authentication attempts will lock the Active Directory / Okta account for 30 minutes. Unlocking prior to 30 minutes requires identity verification via the IT Helpdesk Lead Tarun Bajaj (EMP-1455).
+
+2.2 Hardware-Backed Multi-Factor Authentication (MFA)
+- Primary MFA Token: YubiKey 5 Series NFC hardware token issued during IT onboarding.
+- Secondary MFA Token: Okta Verify Application with Number Matching enabled.
+- SMS-based authentication is strictly deprecated and disabled due to SIM-swapping vulnerabilities.
+
+SECTION 3: DEVICE & ENDPOINT SECURITY
+
+3.1 Full-Disk Encryption & Endpoint Protection
+- All corporate laptops (MacBook Pro / Lenovo ThinkPad / Dell XPS) must maintain 100% full-disk encryption (FileVault 2 on macOS; BitLocker with TPM 2.0 on Windows).
+- Nexora Secure Endpoint Agent (PRD-102) and CrowdStrike Falcon must remain active at all times. Tampering with or disabling security daemons is a Level 3 disciplinary infraction.
+
+3.2 Removable Media Block
+- USB mass storage drives, external hard drives, and SD cards are blocked at the kernel level via MDM profile restrictions.
+- Any business requirement for external drive access must be approved by CISO Karthik Natarajan (EMP-1072) and submitted via a formal IT Exception Ticket.
+
+SECTION 4: NETWORK SECURITY & REMOTE WORK PROTOCOLS
+
+4.1 Remote Work & Telecommuting Security Procedures
+When working remotely (under the 3/2 Hybrid Model detailed in DOC-NHB-001):
+- VPN Requirement: Remote connections to Nexora’s production environment, code repositories (GitHub Enterprise), or internal portals must route through Palo Alto GlobalProtect VPN (`vpn-in.nexora.com` or `vpn-sg.nexora.com`).
+- Public Wi-Fi Restriction: Employees are strictly forbidden from connecting corporate assets to unencrypted public Wi-Fi networks (e.g., airport, cafe, hotel Wi-Fi) unless the GlobalProtect VPN tunnel is actively established first.
+- Physical Screen Privacy: When working in public spaces, privacy screen filters are required. Devices must never be left unattended.
+- Geographical Commute Limit: Employees must remain within a 2-hour commute radius of their base office. Remote work outside their registered country of employment without approval from Head of HR Rahul Desai (EMP-1001) and Legal Counsel Neha Gupta (EMP-1065) is prohibited.
+
+4.2 Stolen or Lost Laptop Protocol
+If a corporate device is lost or stolen:
+1. Immediately notify the IT Security Hotline (+91-80-NEXORA-SEC) or email `security@nexora.com` within two (2) hours of discovery.
+2. Sr. Systems Administrator Tarun Bajaj (EMP-1455) will issue a remote wipe command via Jamf/Intune to erase all local encryption keys and data.
+3. Incident Response Lead Manish Pandey (EMP-1351) will isolate the user's Active Directory and SaaS identity sessions.
+
+SECTION 5: DATA CLASSIFICATION & HANDLING FRAMEWORK
+
+Nexora categorizes all institutional data into four distinct security levels:
+
++---------------------+-------------------------------------------------------+-------------------------------------------------------+-------------------------------------------------------+
+| Data Level | Description & Examples | Storage & Encryption Rules | Access Control List (ACL) |
++---------------------+-------------------------------------------------------+-------------------------------------------------------+-------------------------------------------------------+
+| Level 1: Public | Marketing collateral, public website text, published | No encryption required for public web assets; HTTPS | Unrestricted Public Access |
+| | press releases (Managed by CMO Anjali Rao EMP-1042). | mandatory in transit. | |
++---------------------+-------------------------------------------------------+-------------------------------------------------------+-------------------------------------------------------+
+| Level 2: Internal | Organizational charts, internal phone directories, | Stored on internal Google Workspace / Confluence. | All active Nexora Employees (Authenticated via Okta). |
+| | department roadmaps, general internal policy docs. | AES-256 encryption at rest. | |
++---------------------+-------------------------------------------------------+-------------------------------------------------------+-------------------------------------------------------+
+| Level 3: | Customer MSAs, non-public financial reports, source | Encrypted at rest (AES-256) and in transit (TLS 1.3). | Restricted to designated project team members and |
+| Confidential | code for Project Titan (PRJ-2001), BGV records. | Direct download to personal devices blocked. | Department Heads. Requires NDA. |
++---------------------+-------------------------------------------------------+-------------------------------------------------------+-------------------------------------------------------+
+| Level 4: Restricted | Master cryptographic keys, Nexora Vault (PRD-107) | Stored in Hardware Security Modules (HSMs) or isolated | CISO (Karthik Natarajan EMP-1072), CTO, and specific |
+| | root secrets, customer PII/PHI, raw production DBs. | VPC subnets. Air-gapped access logs. | authorized SysAdmins via Teleport Bastion. |
++---------------------+-------------------------------------------------------+-------------------------------------------------------+-------------------------------------------------------+
+
+SECTION 6: SECURITY AWARENESS & VIOLATIONS
+
+6.1 Phishing Simulations & Training
+- All employees undergo unannounced monthly phishing simulation tests managed by Sr. Security Analyst Kiran Patel (EMP-1350).
+- Any employee who fails a phishing simulation (e.g., clicks a test malicious link or enters credentials) is automatically enrolled in a mandatory 2-hour Remedial Cyber Security Training module.
+- Failing three consecutive phishing simulations within a 12-month period triggers an escalation to HRBP Aisha Khan (EMP-1402) and formal disciplinary review.
+
+6.2 Policy Violation Governance
+Violations of this Information Security Policy (such as credential sharing, disabling EDR agents, or unauthorized data exfiltration) are subject to progressive disciplinary actions under DOC-NHR-005, up to and including immediate termination for cause, forfeiture of unpaid bonuses, and potential legal prosecution under statutory computer misuse laws.
