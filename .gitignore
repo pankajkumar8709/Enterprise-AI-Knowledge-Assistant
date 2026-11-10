@@ -59,6 +59,8 @@ alembic/versions/__pycache__/
 # Uploaded files
 uploads/
 media/
+/storage/documents/
+/storage/extractions/
 
 # Temporary files
 *.tmp

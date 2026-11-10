@@ -100,7 +100,7 @@ and the detailed [docs/CHANGELOG.md](docs/CHANGELOG.md)).
               │                    │                     │
               └────────────────────┴─────────────────────┘
                                    ▼
-                    PostgreSQL 18 + pgvector + pg_trgm
+                    PostgreSQL + pgvector + pg_trgm
               (documents, chunks+embeddings, OKF, chat, audit)
 ```
 
@@ -112,7 +112,7 @@ and the detailed [docs/CHANGELOG.md](docs/CHANGELOG.md)).
 | ------------------------ | ---------------------------- |
 | 🐍 **Python 3.13** | Backend programming |
 | ⚡ **FastAPI** | REST API framework |
-| 🐘 **PostgreSQL 18** | Relational database |
+| 🐘 **PostgreSQL 17+** | Relational database |
 | 🧭 **pgvector + pg_trgm** | Vector (HNSW) and trigram/FTS search |
 | 🗃️ **SQLAlchemy 2.0** | ORM and database interaction |
 | 🔄 **Alembic** | Database migrations |
@@ -220,84 +220,89 @@ Conversation + messages + sources persisted per user
 
 # ⚙️ Setup
 
-## 1. Clone the Repository
+## Prerequisites
 
-```powershell
+Install Python 3.13, Node.js 20+ with npm, and Docker with the Compose plugin.
+If you already run PostgreSQL locally, it must have the `vector` and `pg_trgm`
+extensions available; otherwise the included Compose file starts PostgreSQL 17
+with pgvector for development.
+
+## 1. Clone and configure
+
+```sh
 git clone https://github.com/pankajkumar8709/Enterprise-AI-Knowledge-Assistant.git
 cd Enterprise-AI-Knowledge-Assistant
 ```
 
-## 2. Backend — Virtual Environment & Dependencies
+If you don't already have a `.env` file, create one and start the database:
 
 ```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+Copy-Item .env.example .env
+docker compose up -d db
 ```
 
-## 3. Configure Environment Variables
+On macOS/Linux, use `cp -n .env.example .env` instead of `Copy-Item`. The
+template's database URL and Docker credentials work together as-is. The default
+database credentials are for local development only.
+
+Open `.env` and replace `JWT_SECRET` with a unique random value of at least 32
+characters. To enable generated answers, set `GROQ_API_KEY` and change
+`LLM_EXTERNAL_ALLOWED` to `true`; external model calls are disabled by default.
+To provision a local administrator, set both `ADMIN_EMAIL` and
+`ADMIN_PASSWORD`. Otherwise, the first account can be created through the signup
+page.
+
+Never commit `.env`, database credentials, JWT secrets or API keys.
+
+## 2. Install backend dependencies and migrate the database
 
 ```powershell
-copy .env.example .env
+py -3.13 -m venv .venv
+.\.venv\Scripts\Activate.ps1
 ```
 
-Then update `.env`:
+On macOS/Linux, use `python3.13 -m venv .venv` and
+`source .venv/bin/activate` instead. Then, on either platform, run:
 
-```env
-DATABASE_URL=postgresql://username:password@localhost:5432/enterprise_ai
-JWT_SECRET=change-me-at-least-32-characters-long
-GROQ_API_KEY=your-groq-api-key
+```sh
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+alembic upgrade head
 ```
 
-> ⚠️ Never commit `.env`, database credentials, JWT secrets or API keys.
->
-> To provision one local administrator from `.env`, set both `ADMIN_EMAIL` and
-> `ADMIN_PASSWORD`. The backend creates or synchronizes that account on startup.
-> Changing either value takes effect after restarting the backend. Use a strong
-> password and keep `.env` out of source control.
+The first ingestion or search may download the configured embedding model from
+Hugging Face. OCR for scanned PDFs additionally requires the Tesseract system
+application; document text extraction works without it.
 
-## 4. Frontend — Install
+## 3. Install frontend dependencies
 
-```powershell
+```sh
 cd frontend
 npm ci
 ```
 
----
+## 4. Run the application
 
-# 🗄️ Database Setup
+Start the backend from the repository root:
 
-The application uses PostgreSQL with SQLAlchemy. Ensure **pgvector** and **pg_trgm** are available, then run the Alembic migrations:
-
-```powershell
-alembic upgrade head
-```
-
-To embed chunks from documents ingested before Phase 6:
-
-```powershell
-python -m app.cli backfill-embeddings
-```
-
----
-
-# ▶️ Run the Application
-
-**Backend** (from the repo root):
-
-```powershell
+```sh
 uvicorn app.main:app --reload
 ```
 
-The API starts at `http://127.0.0.1:8000`.
+In a second terminal, start the frontend:
 
-**Frontend** (from `frontend/`):
-
-```powershell
+```sh
+cd frontend
 npm run dev
 ```
 
-The UI starts at `http://localhost:5173` (the dev server proxies `/api` to the backend).
+Open `http://localhost:5173`; the frontend proxies API requests to the backend
+at `http://127.0.0.1:8000`. Interactive API documentation is available at
+`http://127.0.0.1:8000/docs`.
+
+For backend tests, run `python -m pytest` from the repository root. To stop the
+local database, run `docker compose down` (use `docker compose down -v` only if
+you also intend to delete its persisted development data).
 
 ---
 
