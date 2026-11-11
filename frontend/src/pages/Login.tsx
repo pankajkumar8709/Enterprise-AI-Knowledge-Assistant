@@ -171,6 +171,7 @@ export function LoginPage() {
             <p className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-500">
               <Spinner /> Checking your session…
             </p>
+            
           ) : null}
         </div>
       </div>
